@@ -47,4 +47,5 @@ object Draw:
     if ep % evaluateEvery == 0 then
       val (_, sEval, trajEval) = agent.episode(exploitOnly = true)
       println(s"Greedy policy needs $sEval steps:")
-      Draw.traj(env, trajEval)
+      val states: List[State] = trajEval.map(_._1)
+      Draw.traj(env, states)

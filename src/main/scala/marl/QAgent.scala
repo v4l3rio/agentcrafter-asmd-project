@@ -1,52 +1,63 @@
 package marl
 
-import scala.collection.mutable.ArrayBuffer
-import scala.math.max
 import scala.util.Random
+import scala.math.max
 
 class QAgent(
-              env:    GridWorld,
-              alpha:  Double = 0.1,
-              gamma:  Double = 0.99,
-              eps0:   Double = 0.9,
-              epsMin: Double = 0.01,   // lower than before
-              decay:  Double = 0.995
+              env: GridWorld,
+              alpha: Double = 0.1,
+              gamma: Double = 0.99,
+              epsStart: Double = 0.9,
+              epsMin: Double   = 0.05,
+              warmUpEpisodes: Int = 1_000,
+              optimistic: Double = 5.0
             ):
-  private val rng      = new Random()
-  private val A        = Action.values
-  private val Q        = Array.ofDim[Double](env.rows, env.cols, A.length)
-  private var _eps     = eps0
-  def eps: Double = _eps          // public read-only
+  private val rng   = new Random()
+  private val A     = Action.values
+  private val Q     = Array.fill(env.rows, env.cols, A.length)(optimistic)
 
-  private def pick(s: State): Action =
-    if rng.nextDouble() < _eps then A(rng.nextInt(A.length))
+  private var episodeCnt = 0
+  def eps: Double =                                 // ϵ piece-wise
+    if episodeCnt < warmUpEpisodes then epsStart
     else
-      val row = Q(s.r)(s.c)
-      A(row.indexOf(row.max))
+      // decrescita lineare negli episodi rimanenti
+      val frac = (episodeCnt - warmUpEpisodes).toDouble / warmUpEpisodes
+      max(epsMin, epsStart - (epsStart - epsMin) * frac)
 
-  /** run one episode – returns (reachedGoal?, steps, traj) */
+  /** tie-break casuale fra le azioni con valore massimo */
+  private def argMaxRandom(qRow: Array[Double]): Action =
+    val maxVal = qRow.max
+    val bestIdx = qRow.zipWithIndex.collect { case (v,i) if v == maxVal => i }
+    A(bestIdx(rng.nextInt(bestIdx.length)))
+
+  /** pick ⇒ (action, explore?) */
+  private def pick(s: State): (Action, Boolean) =
+    if rng.nextDouble() < eps then (A(rng.nextInt(A.length)), true)
+    else (argMaxRandom(Q(s.r)(s.c)), false)
+
+  /** episodio ⇒ (goal?, steps, log) */
   def episode(maxSteps: Int = 200, exploitOnly: Boolean = false)
-  : (Boolean, Int, List[State]) =
-    val oldEps = _eps
-    if exploitOnly then _eps = 0.0                // evaluation mode
+  : (Boolean, Int, List[(State, Action, Boolean, Array[Double])]) =
+    if !exploitOnly then episodeCnt += 1
+
+    val savedEps = eps
     var s     = env.reset()
-    val path  = ArrayBuffer[State](s)
     var steps = 0
     var done  = false
+    val log   = scala.collection.mutable.ArrayBuffer.empty[
+      (State, Action, Boolean, Array[Double])]
+
     while !done && steps < maxSteps do
-      val a            = pick(s)
+      val (a, explore) = pick(s)
       val (s2, r, end) = env.step(s, a)
 
-      // -- learning only if not evaluation run
       if !exploitOnly then
         val bestNext = Q(s2.r)(s2.c).max
         Q(s.r)(s.c)(a.ordinal) =
-          (1-alpha)*Q(s.r)(s.c)(a.ordinal) + alpha*(r + gamma*bestNext)
+          (1 - alpha) * Q(s.r)(s.c)(a.ordinal) +
+            alpha * (r + gamma * bestNext)
 
-      s     = s2
-      done  = end
-      steps += 1
-      path  += s
-    if !exploitOnly then _eps = max(epsMin, _eps * decay)
-    else _eps = oldEps                                  // restore ε
-    (done, steps, path.toList)
+      log += ((s, a, explore, Q(s.r)(s.c).clone))
+      s = s2; done = end; steps += 1
+
+    (done, steps, log.toList)
