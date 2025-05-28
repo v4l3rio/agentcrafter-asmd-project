@@ -1,6 +1,7 @@
 package DSL.model
 
-import common.{State, Action}
+import DSL.QLearner
+import common.{Action, State}
 
 /* ----------  Effects -------------------------------------------------------- */
 sealed trait Effect
@@ -14,8 +15,9 @@ case class Trigger(who: String, at: State, effects: List[Effect])
 /* ---- Agent spec ----------------------------------------------------- */
 case class AgentSpec(id: String,
                      start: State,
-                     goal: State,
-                     goalReward: Double)
+                     goal: Option[State],
+                     goalReward: Double,
+                     learner: QLearner)
 
 /* ---- World spec ----------------------------------------------------- */
 case class WorldSpec(rows: Int,
@@ -23,4 +25,7 @@ case class WorldSpec(rows: Int,
                      staticWalls: Set[State],
                      triggers: List[Trigger],
                      agents: List[AgentSpec],
-                     episodes: Int)
+                     episodes: Int,
+                     stepLimit: Int,
+                     stepDelay: Int,
+                     showAfter: Int)

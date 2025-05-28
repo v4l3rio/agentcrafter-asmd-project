@@ -2,39 +2,52 @@ package DSL
 
 import common.{Action, State}
 
+import scala.collection.mutable
 import scala.util.Random
 
 /**
  * Q-Learning implementation for the DSL simulation
  */
-class QLearner(id: String,
-               alpha: Double = 0.1, gamma: Double = 0.99,
-               eps0: Double = 0.9, epsMin: Double = 0.05,
-               warm: Int = 1500, optimistic: Double = 2.0):
+class QLearner(
+                id: String,
+                alpha: Double = 0.1, gamma: Double = 0.99,
+                eps0: Double = 0.9, epsMin: Double = 0.15,
+                warm: Int = 10_000, optimistic: Double = 0.5):
+
   private val rng = Random()
-  private val A = Action.values
-  private val Q = scala.collection.mutable.Map
-    .empty[(Map[String, State], Action), Double]
+  private val A   = Action.values
+
+  // *** Q-table: (Pos,Action) invece di (Map,Action) ******************
+  private val Q = mutable.Map.empty[(State, Action), Double]
     .withDefaultValue(optimistic)
+
   private var ep = 0
+  private def eps = if ep < warm then eps0
+  else math.max(epsMin,
+    eps0 - (eps0-epsMin)*(ep-warm)/warm)
 
-  private def eps =
-    if ep < warm then eps0
-    else math.max(epsMin,
-      eps0 - (eps0 - epsMin) * (ep - warm) / warm)
-
-  private def greedy(s: Map[String, State]): Action =
-    val values = A.map(a => Q(s -> a))
-    val m = values.max
-    val best = A.zip(values).collect { case (a, v) if v == m => a }
+  private def greedy(p: State): Action =
+    val vals  = A.map(a => Q(p -> a))
+    val m     = vals.max
+    val best  = A.zip(vals).collect{ case (a,v) if v==m => a }
     best(rng.nextInt(best.length))
 
-  def choose(s: Map[String, State]): (Action, Boolean) =
+  // --------- API -----------------------------------------------------
+  def choose(p: State): (Action, Boolean) =
     if rng.nextDouble() < eps then (A(rng.nextInt(A.length)), true)
-    else (greedy(s), false)
+    else (greedy(p), false)
 
-  def update(s: Map[String, State], a: Action, r: Double, s2: Map[String, State]): Unit =
-    val bestNext = A.map(a2 => Q(s2 -> a2)).max
-    Q((s, a)) = (1 - alpha) * Q((s, a)) + alpha * (r + gamma * bestNext)
+  def update(p: State, a: Action, r: Double, p2: State): Unit =
+    val bestNext = A.map(a2 => Q(p2 -> a2)).max
+    Q(p -> a) = (1-alpha)*Q(p -> a) + alpha*(r + gamma*bestNext)
 
   def incEp(): Unit = ep += 1
+
+  // --------- New methods for Q-table access -------------------------
+  def getQTable: Map[(State, Action), Double] = Q.toMap
+
+  def getQValue(state: State, action: Action): Double = Q(state -> action)
+
+  def getId: String = id
+
+  def getEpsilon: Double = eps

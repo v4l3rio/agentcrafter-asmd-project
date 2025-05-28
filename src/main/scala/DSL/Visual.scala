@@ -15,7 +15,7 @@ class Visual(spec: WorldSpec, cell: Int = 48, delay: Int = 70):
   private var step = 0
 
   /* Identify "goal" cells and switch cells */
-  private val goalCells = spec.agents.map(_.goal).toSet
+  private val goalCells = spec.agents.flatMap(_.goal).toSet
   private val switchCells = spec.triggers.collect {
     case t if t.effects.exists(_.isInstanceOf[DSL.model.OpenWall]) => t.at
   }.toSet
@@ -57,7 +57,7 @@ class Visual(spec: WorldSpec, cell: Int = 48, delay: Int = 70):
       g.setColor(Color.black)
       g.drawString(s"step=$step", 10, size.height - 8)
 
-  val frame = new MainFrame:
+  val frame: MainFrame = new MainFrame:
     title = "MARL DSL visual"
     contents = panel;
     centerOnScreen();
@@ -68,4 +68,4 @@ class Visual(spec: WorldSpec, cell: Int = 48, delay: Int = 70):
     openWalls = open;
     step = k
     panel.repaint();
-    Thread.sleep(delay)
+    Thread.sleep(spec.stepDelay)

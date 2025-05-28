@@ -1,8 +1,8 @@
 package common
 
 class GridWorld(
-                 val rows:  Int = 50,
-                 val cols:  Int = 50,
+                 val rows:  Int = 13,
+                 val cols:  Int = 15,
                  val start: State = State(0, 0),
                  val goal:  State = State(9, 8),
                  val walls: Set[State] = Set(

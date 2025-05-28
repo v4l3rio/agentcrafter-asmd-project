@@ -10,27 +10,43 @@ object dsl:
   def Simulation(): SimulationBuilder = new SimulationBuilder
 
 /**
- * Demo application showing how to use the DSL
+ * Demo application showing how to use the DSL with corrected Q-learning parameters
  */
 @main def DSLDemo(): Unit =
   import dsl.*
   Simulation()
-    .grid(10, 10)
+    .grid(10,10)
     .wallsFromAscii(
-      """...........
-        |...###.....
-        |...#.#.....
-        |...###.....
-        |...........
-        |...........
-        |...........
-        |...........
-        |...........
-        |...........""".stripMargin)
-    .agent("A").start(8, 1).goal(0, 0).reward(0).end()
-    .agent("B").start(1, 1).goal(4, 9).reward(120).end()
-    .on("A", 8, 6).openWall(2, 3).give(30)
-    .on("B", 4, 9).endEpisode().give(120)
-    .episodes(25_000)
+      """..........
+        |...###....
+        |...#.#....
+        |...###....
+        |..........
+        |..........
+        |..........
+        |..........
+        |..........
+        |..........""".stripMargin)
+    // Opener agent con ottimismo ridotto
+    .agent("Opener").start(8,1)
+    .withLearner(
+      alpha = 0.2,
+      gamma = 0.99,  // Discount factor più alto per valorizzare reward futuri
+      eps0 = 0.95,
+      epsMin = 0.1,
+      optimistic = 0.1
+    ).noGoal()
+    // Runner agent
+    .agent("Runner").start(1,1).goal(2,4).reward(50)  // ← Reward ridotto
+    .withLearner(
+      alpha = 0.15,
+      gamma = 0.99,
+      eps0 = 0.95,
+      epsMin = 0.1,
+      optimistic = 0.1
+    ).end()
+    .on("Opener",8,6).openWall(2,3).give(20)  // ← Reward ridotto
+    .episodes(40_000).steps(200).showAfter(38_000)
+    .delay(100)
     .withGUI(true)
     .play()
