@@ -1,7 +1,7 @@
 package DSL
 
 import DSL.QLearner
-import DSL.model.{Effect, WorldSpec}
+import DSL.{Effect, WorldSpec}
 import common.{Action, State}
 
 import scala.collection.mutable
@@ -46,9 +46,9 @@ class Runner(spec: WorldSpec, showGui: Boolean):
   private def applyEffects(effs: List[Effect]): Double =
     var bonus = 0.0
     effs.foreach {
-      case DSL.model.OpenWall(pos) => dynamicWalls += pos // remove wall
-      case DSL.model.Reward(x) => bonus += x
-      case DSL.model.EndEpisode => episodeDone = true
+      case OpenWall(pos) => dynamicWalls += pos // remove wall
+      case Reward(x) => bonus += x
+      case EndEpisode => episodeDone = true
     }
     bonus
 

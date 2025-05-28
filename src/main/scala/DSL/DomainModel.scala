@@ -1,9 +1,8 @@
-package DSL.model
+package DSL
 
 import DSL.QLearner
 import common.{Action, State}
 
-/* ----------  Effects -------------------------------------------------------- */
 sealed trait Effect
 case class OpenWall(pos: State) extends Effect
 case object EndEpisode extends Effect

@@ -7,6 +7,9 @@
 
 .idea/
 target/
+
+.metals/
+.vscode/
 # CMake
 cmake-build-*/
 

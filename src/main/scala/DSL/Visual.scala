@@ -1,6 +1,6 @@
 package DSL
 
-import DSL.model.WorldSpec
+import DSL.WorldSpec
 import common.State
 
 import java.awt.{Color, Graphics2D}
@@ -17,7 +17,7 @@ class Visual(spec: WorldSpec, cell: Int = 48, delay: Int = 70):
   /* Identify "goal" cells and switch cells */
   private val goalCells = spec.agents.flatMap(_.goal).toSet
   private val switchCells = spec.triggers.collect {
-    case t if t.effects.exists(_.isInstanceOf[DSL.model.OpenWall]) => t.at
+    case t if t.effects.exists(_.isInstanceOf[OpenWall]) => t.at
   }.toSet
 
   private val colors = Array(

@@ -1,6 +1,6 @@
 package DSL
 
-import DSL.model.WorldSpec
+import DSL.WorldSpec
 import common.{Action, State}
 
 import java.awt.{Color, Font, Graphics2D}
@@ -13,7 +13,7 @@ import javax.swing.table.DefaultTableModel
  */
 class QTableVisualizer(agentId: String, learner: QLearner, spec: WorldSpec):
 
-  private val cellSize = 80
+  private val cellSize = 60
   private val fontSize = 10
 
   // Get all states that have Q-values

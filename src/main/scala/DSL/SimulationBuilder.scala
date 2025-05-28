@@ -1,6 +1,5 @@
 package DSL
 
-import DSL.model.*
 import common.State
 
 import scala.collection.mutable
@@ -52,7 +51,7 @@ class SimulationBuilder:
 
     // Method to customize the Q-learner parameters for this specific agent
     def withLearner(alpha: Double = 0.1,
-                    gamma: Double = 0.99,
+                    gamma: Double = 0.9,
                     eps0: Double = 0.9,
                     epsMin: Double = 0.15,
                     warm: Int = 10_000,
