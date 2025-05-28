@@ -1,9 +1,10 @@
-package marl
+package visualqlearning
 
 import scala.swing.{Panel, MainFrame}
 import java.awt.{Color, Graphics2D}
 
-import marl.{Action => RLAction}
+import common.*
+import common.{Action => RLAction}
 
 class Visualiser(env: GridWorld, cell: Int = 80, delayMs: Int = 120):
   private var agent   = env.start

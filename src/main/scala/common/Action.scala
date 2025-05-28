@@ -1,4 +1,4 @@
-package marl
+package common
 
 enum Action derives CanEqual:
   case Up, Down, Left, Right

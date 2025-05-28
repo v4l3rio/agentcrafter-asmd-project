@@ -1,4 +1,4 @@
-package marl
+package common
 
 class GridWorld(
                  val rows:  Int = 50,
