@@ -9,7 +9,7 @@ import scala.util.Random
  * Q-Learning implementation for the DSL simulation
  */
 class QLearner(
-                id: String,
+                var id: String,
                 alpha: Double = 0.1, gamma: Double = 0.99,
                 eps0: Double = 0.9, epsMin: Double = 0.15,
                 warm: Int = 10_000, optimistic: Double = 0.5):
@@ -20,6 +20,8 @@ class QLearner(
   // *** Q-table: (Pos,Action) invece di (Map,Action) ******************
   private val Q = mutable.Map.empty[(State, Action), Double]
     .withDefaultValue(optimistic)
+
+  def id(newId: String): Unit = id = newId
 
   private var ep = 0
   private def eps = if ep < warm then eps0

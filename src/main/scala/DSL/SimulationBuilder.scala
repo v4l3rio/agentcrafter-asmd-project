@@ -37,38 +37,16 @@ class SimulationBuilder:
         if ch == '#' then walls += State(r, c)
       }
     }; this
+  
+  def agent(id: String): AgentBuilder = new AgentBuilder(this)
 
-  /* add agent */
-  class AgentBuilder(id: String):
-    private var st: State = State(0, 0)
-    private var gl: Option[State] = None
-    private var rew = 0.0
-    private var learner: QLearner = new QLearner(id) // default learner for this agent
+  def addAgent(id: String, spec: AgentSpec): Unit = {
+    agents += id -> spec
+  }
 
-    def start(r: Int, c: Int): AgentBuilder = { st = State(r, c); this }
-    def goal(r: Int, c: Int): AgentBuilder = { gl = Some(State(r, c)); this }
-    def reward(v: Double): AgentBuilder = { rew = v; this }
-
-    // Method to customize the Q-learner parameters for this specific agent
-    def withLearner(alpha: Double = 0.1,
-                    gamma: Double = 0.9,
-                    eps0: Double = 0.9,
-                    epsMin: Double = 0.15,
-                    warm: Int = 10_000,
-                    optimistic: Double = 0.0): AgentBuilder = {
-      learner = new QLearner(id, alpha, gamma, eps0, epsMin, warm, optimistic)
-      this
-    }
-
-    def noGoal(): SimulationBuilder = end()
-    def end(): SimulationBuilder =
-      val spec = AgentSpec(id, st, gl, rew, learner)
-      agents += id -> spec
-      for g <- gl if rew != 0.0 do
-        triggers += Trigger(id, g, List(EndEpisode, Reward(rew)))
-      SimulationBuilder.this
-
-  def agent(id: String) = new AgentBuilder(id)
+  def addTrigger(trigger: Trigger): Unit = {
+    triggers += trigger
+  }
 
   /* add trigger */
   class TriggerBuilder(who: String, r: Int, c: Int):

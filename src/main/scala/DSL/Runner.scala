@@ -138,7 +138,7 @@ class Runner(spec: WorldSpec, showGui: Boolean):
 
       // 5. CONDIZIONE DI USCITA PARAMETRICA
       done = agentMap.exists { case (id, spec) =>
-        spec.goal.exists(g => nxt(id) == g)         // true se quell'agente ha un goal
+        spec.goal.contains(nxt(id)) // true se quell'agente ha un goal
       }
 
       // 6. aggiorna stato e step
