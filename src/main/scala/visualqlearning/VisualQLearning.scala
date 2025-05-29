@@ -59,7 +59,6 @@ class Visualiser(env: GridWorld, cell: Int = 80, delayMs: Int = 120):
     panel.repaint()
     Thread.sleep(delayMs)
 
-/* ----------  Driver ---------- */
 @main def TrainVisualExplain(): Unit =
   val env       = GridWorld()
   val agent = QAgent(

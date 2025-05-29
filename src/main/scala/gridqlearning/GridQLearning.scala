@@ -4,7 +4,6 @@ import common.*
 import scala.collection.mutable.ArrayBuffer
 import java.util.Locale
 
-/* ---------- 4.  Pretty-printing ---------- */
 object Draw:
   /** letters a-z, then A-Z, then '*', shows first visit order */
   private val glyphs = ('a' to 'z') ++ ('A' to 'Z') :+ '*'
@@ -24,9 +23,8 @@ object Draw:
       println()
     println()
 
-/* ---------- 5.  Driver ---------- */
+
 @main def Train(): Unit =
-  Locale.setDefault(Locale.US)     // force dot decimal
   val env      = GridWorld()
   val agent    = QAgent(env)
   val episodes = 10_000

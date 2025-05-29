@@ -37,7 +37,7 @@ class SimulationBuilder:
         if ch == '#' then walls += State(r, c)
       }
     }; this
-  
+
   def agent(id: String): AgentBuilder = new AgentBuilder(this)
 
   def addAgent(id: String, spec: AgentSpec): Unit = {
@@ -49,16 +49,7 @@ class SimulationBuilder:
   }
 
   /* add trigger */
-  class TriggerBuilder(who: String, r: Int, c: Int):
-    private val eff = mutable.Buffer.empty[Effect]
-    def openWall(r: Int, c: Int): TriggerBuilder = { eff += OpenWall(State(r, c)); this }
-    def endEpisode(): TriggerBuilder = { eff += EndEpisode; this }
-    def give(bonus: Double): SimulationBuilder = { eff += Reward(bonus); finish() }
-    private def finish() =
-      triggers += Trigger(who, State(r, c), eff.toList)
-      SimulationBuilder.this
-
-  def on(who: String, r: Int, c: Int) = new TriggerBuilder(who, r, c)
+  def on(who: String, r: Int, c: Int): TriggerBuilder = new TriggerBuilder(who, r, c, this)
 
   def steps(n: Int): SimulationBuilder = { stepLimit = n; this }
 
