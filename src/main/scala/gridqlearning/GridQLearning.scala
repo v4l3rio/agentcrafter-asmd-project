@@ -26,7 +26,7 @@ object Draw:
 
 @main def Train(): Unit =
   val env      = GridWorld()
-  val agent    = QAgent(env)
+  val agent    = QLearner(id = "grid_agent", gridEnv = Some(env))
   val episodes = 10_000
   val stepsOK  = ArrayBuffer.empty[Int]   // only episodes that finish
 
@@ -34,16 +34,16 @@ object Draw:
   val evaluateEvery = 1_000
 
   for ep <- 1 to episodes do
-    val (done, steps, _) = agent.episode()
+    val (done, steps, _) = agent.episode().get
     if done then stepsOK += steps
 
     if ep % reportEvery == 0 then
       val last = stepsOK.takeRight(reportEvery)
       val mean = if last.nonEmpty then last.sum.toDouble/last.size else Double.NaN
-      println(f"Ep $ep%6d | ε=${agent.eps}%.3f | ⟨steps⟩=${mean}%.2f")
+      println(f"Ep $ep%6d | ε=${agent.getEpsilon}%.3f | ⟨steps⟩=${mean}%.2f")
 
     if ep % evaluateEvery == 0 then
-      val (_, sEval, trajEval) = agent.episode(exploitOnly = true)
+      val (_, sEval, trajEval) = agent.episode(exploitOnly = true).get
       println(s"Greedy policy needs $sEval steps:")
       val states: List[State] = trajEval.map(_._1)
       Draw.traj(env, states)

@@ -1,6 +1,6 @@
 package MARL.DSL
 
-import MARL.builders.{AgentBuilder, SimulationBuilder, TriggerBuilder, LineBuilder}
+import MARL.builders.{AgentBuilder, SimulationBuilder, TriggerBuilder, WallLineBuilder}
 
 trait SimulationDSL:
   def simulation(block: SimulationWrapper ?=> Unit) =
@@ -18,8 +18,8 @@ trait SimulationDSL:
   def walls(block: SimulationWrapper ?=> Unit)(using wrapper: SimulationWrapper) =
     block
 
-  def line(block: LineBuilder ?=> Unit)(using wrapper: SimulationWrapper): Unit =
-    given lineBuilder: LineBuilder = LineBuilder()
+  def line(block: WallLineBuilder ?=> Unit)(using wrapper: SimulationWrapper): Unit =
+    given lineBuilder: WallLineBuilder = WallLineBuilder()
     block
     // Create wall from the configured line builder
     (lineBuilder.direction, lineBuilder.from, lineBuilder.to) match

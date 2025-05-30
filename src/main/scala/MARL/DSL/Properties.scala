@@ -1,7 +1,7 @@
 package MARL.DSL
 
 import scala.annotation.targetName
-import MARL.builders.{AgentBuilder, SimulationBuilder, TriggerBuilder, LineBuilder}
+import MARL.builders.{AgentBuilder, SimulationBuilder, TriggerBuilder, WallLineBuilder}
 
 case class SimulationWrapper(var builder: SimulationBuilder)
 case class AgentWrapper(var builder: AgentBuilder)
@@ -77,7 +77,7 @@ enum LineProperty[T]:
   case To extends LineProperty[(Int, Int)]
 
   @targetName("to")
-  infix def >>(obj: T)(using lineBuilder: LineBuilder): LineBuilder = this match
+  infix def >>(obj: T)(using lineBuilder: WallLineBuilder): WallLineBuilder = this match
     case LineProperty.Direction =>
       lineBuilder.direction = Some(obj.asInstanceOf[String])
       lineBuilder

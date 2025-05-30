@@ -1,14 +1,15 @@
 package MARL.builders
 
 import common.State
-import MARL.{AgentSpec, QLearner, Trigger, EndEpisode, Reward}
+import MARL.{AgentSpec, Trigger, EndEpisode, Reward}
+import common.QLearner
 
 class AgentBuilder(parent: SimulationBuilder):
   private var id: String = ""
   private var st: State = State(0, 0)
   private var gl: Option[State] = None
   private var rew = 0.0
-  private var learner: QLearner = new QLearner(id) // default learner for this agent
+  private var learner: QLearner = new QLearner(id)
 
   def name (n: String): AgentBuilder = {
     id = n; learner.id = n; this

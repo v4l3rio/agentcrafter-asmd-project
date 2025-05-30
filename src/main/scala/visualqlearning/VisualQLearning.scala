@@ -61,12 +61,13 @@ class Visualiser(env: GridWorld, cell: Int = 80, delayMs: Int = 120):
 
 @main def TrainVisualExplain(): Unit =
   val env       = GridWorld()
-  val agent = QAgent(
-    env,
-    epsStart = 0.9,
+  val agent = QLearner(
+    id = "visual_agent",
+    eps0 = 0.9,
     epsMin   = 0.05,
-    warmUpEpisodes = 1000,   // 1 000 episodi full-explore
-    optimistic     = 5.0     // Q0 ottimistico
+    warm = 1000,   // 1 000 episodi full-explore
+    optimistic     = 5.0,     // Q0 ottimistico
+    gridEnv = Some(env)
   )
   val vis       = Visualiser(env)
   val episodes  = 10_000
@@ -75,6 +76,6 @@ class Visualiser(env: GridWorld, cell: Int = 80, delayMs: Int = 120):
   for ep <- 1 to episodes do
     agent.episode()                              // training
     if ep % testEvery == 0 then
-      val (_, _, path) = agent.episode(exploitOnly = true) // greedy run
+      val (_, _, path) = agent.episode(exploitOnly = true).get // greedy run
       path.foreach { case (s, a, e, q) => vis.update(s, a, e, q) }
-      println(f"Ep $ep%5d | ε=${agent.eps}%.3f | steps=${path.size}")
+      println(f"Ep $ep%5d | ε=${agent.getEpsilon}%.3f | steps=${path.size}")

@@ -1,6 +1,6 @@
 package MARL
 
-import MARL.QLearner
+import common.QLearner
 import MARL.visualizers.{QTableVisualizer, SimulationVisualizer}
 import MARL.{Effect, WorldSpec}
 import common.{Action, State}

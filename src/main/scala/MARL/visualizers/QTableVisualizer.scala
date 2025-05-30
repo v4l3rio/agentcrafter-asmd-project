@@ -1,6 +1,7 @@
 package MARL.visualizers
 
-import MARL.{QLearner, WorldSpec}
+import MARL.WorldSpec
+import common.QLearner
 import common.Action
 
 import java.awt.Font
