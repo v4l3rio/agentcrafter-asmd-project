@@ -1,0 +1,38 @@
+# GitHub Pages Configuration
+title: "Advanced Software Modeling and Design - RL Project"
+description: "A comprehensive exploration of Reinforcement Learning approaches from basic Q-Learning to Multi-Agent systems"
+
+# Theme
+theme: minima
+
+# GitHub Pages settings
+baseurl: ""
+url: ""
+
+# Navigation
+header_pages:
+  - index.md
+  - gridqlearning/README.md
+  - visualqlearning/README.md
+  - marl/README.md
+
+# Markdown settings
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
+# Exclude files
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
