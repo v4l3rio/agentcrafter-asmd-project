@@ -1,6 +1,7 @@
-package DSL
+package MARL.builders
 
 import common.State
+import MARL.{AgentSpec, QLearner, Trigger, EndEpisode, Reward}
 
 class AgentBuilder(parent: SimulationBuilder):
   private var id: String = ""

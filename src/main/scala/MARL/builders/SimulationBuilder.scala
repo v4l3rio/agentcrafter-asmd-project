@@ -1,8 +1,9 @@
-package DSL
+package MARL.builders
 
 import common.State
-
+import MARL.{WorldSpec, AgentSpec, Trigger}
 import scala.collection.mutable
+import MARL.Runner
 
 /**
  * Builder for creating simulations using a fluent DSL interface

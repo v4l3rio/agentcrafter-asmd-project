@@ -1,6 +1,6 @@
-package DSL
+package MARL.visualizers
 
-import DSL.WorldSpec
+import MARL.{OpenWall, WorldSpec}
 import common.State
 
 import java.awt.{Color, Graphics2D}
@@ -9,7 +9,7 @@ import scala.swing.{MainFrame, Panel}
 /**
  * Visualization component for the DSL simulation
  */
-class Visual(spec: WorldSpec, cell: Int = 48, delay: Int = 70):
+class SimulationVisualizer(spec: WorldSpec, cell: Int = 48, delay: Int = 70):
   private var state: Map[String, State] = Map.empty
   private var openWalls = Set.empty[State]
   private var step = 0

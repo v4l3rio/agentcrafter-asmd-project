@@ -1,7 +1,8 @@
-package DSL
+package MARL
 
-import DSL.QLearner
-import DSL.{Effect, WorldSpec}
+import MARL.QLearner
+import MARL.visualizers.{QTableVisualizer, SimulationVisualizer}
+import MARL.{Effect, WorldSpec}
 import common.{Action, State}
 
 import scala.collection.mutable
@@ -12,12 +13,12 @@ import scala.collection.mutable
 class Runner(spec: WorldSpec, showGui: Boolean):
 
   /* ---------- optional visualization --------------------------------- */
-  private var vis: Option[Visual] = None          // lazy
+  private var vis: Option[SimulationVisualizer] = None          // lazy
   private var qTableVis: List[QTableVisualizer] = List.empty
 
   private def maybeInitGui(ep: Int): Unit =
     if vis.isEmpty && ep >= spec.showAfter then
-      vis = Some(new Visual(spec))                // finestra principale
+      vis = Some(new SimulationVisualizer(spec))                // finestra principale
       // Crea visualizzatori Q-table per ogni agente
       qTableVis = agentsQL.map { case (id, learner) =>
         new QTableVisualizer(id, learner, spec)

@@ -1,12 +1,12 @@
-package DSL
+package MARL.visualizers
 
-import DSL.WorldSpec
-import common.{Action, State}
+import MARL.{QLearner, WorldSpec}
+import common.Action
 
-import java.awt.{Color, Font, Graphics2D}
-import scala.swing.{MainFrame, Panel, ScrollPane}
+import java.awt.Font
 import javax.swing.JTable
 import javax.swing.table.DefaultTableModel
+import scala.swing.{MainFrame, Panel, ScrollPane}
 
 /**
  * Visualizer for Q-Tables of individual agents
@@ -31,7 +31,7 @@ class QTableVisualizer(agentId: String, learner: QLearner, spec: WorldSpec):
 
       // Fill action values
       for (action <- Action.values) {
-        val value = stateActions.get((state, action)).getOrElse(0.0)
+        val value = stateActions.getOrElse((state, action), 0.0)
         val actionIndex = action match {
           case Action.Up => 1
           case Action.Down => 2

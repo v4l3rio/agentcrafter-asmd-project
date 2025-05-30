@@ -1,6 +1,6 @@
-package DSL
+package MARL
 
-import DSL.QLearner
+import MARL.QLearner
 import common.{Action, State}
 
 sealed trait Effect

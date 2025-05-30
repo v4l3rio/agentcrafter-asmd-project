@@ -1,4 +1,6 @@
-package DSL
+package MARL
+
+import MARL.builders.SimulationBuilder
 
 /**
  * Entry point for the Simulation DSL

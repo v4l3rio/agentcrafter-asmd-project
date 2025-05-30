@@ -1,7 +1,8 @@
-package DSL
+package MARL.builders
 
 import common.State
 import scala.collection.mutable
+import MARL.{Trigger, Effect, OpenWall, EndEpisode, Reward}
 
 class TriggerBuilder(who: String, r: Int, c: Int, parent: SimulationBuilder):
   private val eff = mutable.Buffer.empty[Effect]
