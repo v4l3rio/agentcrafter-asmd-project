@@ -101,26 +101,37 @@ trait SimulationInternalDSL extends App:
   def walls(block: SimulationWrapper ?=> Unit)(using wrapper: SimulationWrapper) =
     block
 
-  object line:
-    object direction:
-      def horizontal: LineDirectionBuilder = LineDirectionBuilder("horizontal")
-      def vertical: LineDirectionBuilder = LineDirectionBuilder("vertical")
+  case class LineBuilder(var direction: Option[String] = None, var from: Option[(Int, Int)] = None, var to: Option[(Int, Int)] = None)
+
+  enum LineProperty[T]:
+    case Direction extends LineProperty[String]
+    case From extends LineProperty[(Int, Int)]
+    case To extends LineProperty[(Int, Int)]
+    @targetName("to")
+    infix def >>(obj: T)(using lineBuilder: LineBuilder): LineBuilder = this match
+      case LineProperty.Direction => 
+        lineBuilder.direction = Some(obj.asInstanceOf[String])
+        lineBuilder
+      case LineProperty.From => 
+        lineBuilder.from = Some(obj.asInstanceOf[(Int, Int)])
+        lineBuilder
+      case LineProperty.To => 
+        lineBuilder.to = Some(obj.asInstanceOf[(Int, Int)])
+        lineBuilder
+
+  def line(block: LineBuilder ?=> Unit)(using wrapper: SimulationWrapper): Unit =
+    given lineBuilder: LineBuilder = LineBuilder()
+    block
+    // Create wall from the configured line builder
+    (lineBuilder.direction, lineBuilder.from, lineBuilder.to) match
+      case (Some(dir), Some(fromPos), Some(toPos)) =>
+        WallProperty.Line >> LineWallConfig(dir, fromPos, toPos)
+      case _ => throw new IllegalArgumentException("Line must have direction, from, and to specified")
 
   object block:
     @targetName("to")
     infix def >>(position: (Int, Int))(using wrapper: SimulationWrapper): Unit =
       WallProperty.Block >> position
-
-  class LineDirectionBuilder(dir: String):
-    object from:
-      @targetName("to")
-      infix def >>(fromPos: (Int, Int)): LineFromBuilder = LineFromBuilder(dir, fromPos)
-
-  class LineFromBuilder(dir: String, fromPos: (Int, Int)):
-    object to:
-      @targetName("to")
-      infix def >>(toPos: (Int, Int))(using wrapper: SimulationWrapper): Unit =
-        WallProperty.Line >> LineWallConfig(dir, fromPos, toPos)
 
   def agent(block: AgentWrapper ?=> Unit)(using wrapper: SimulationWrapper) =
     given agentWrapper: AgentWrapper = AgentWrapper(new AgentBuilder(wrapper.builder))
@@ -175,15 +186,28 @@ object SimulationApp extends SimulationInternalDSL:
   import TriggerProperty.*
   import LearnerProperty.*
   import WallProperty.*
+  import LineProperty.*
   simulation:
     grid:
       10 x 10
     walls:
-      (line.direction.horizontal.from >> (1, 3)).to >> (1, 5)
-      (line.direction.vertical.from >> (1, 3)).to >> (3, 3)
-      (line.direction.vertical.from >> (1, 5)).to >> (3, 5)
-      (line.direction.horizontal.from >> (3, 3)).to >> (3, 5)
-      block >> (2, 4)
+      line:
+        Direction >> "vertical"
+        From >> (1, 3)
+        To >> (1, 5)
+      line:
+        Direction >> "vertical"
+        From >> (1, 3)
+        To >> (3, 3)
+      line:
+        Direction >> "vertical"
+        From >> (1, 5)
+        To >> (3, 5)
+      line:
+        Direction >> "vertical"
+        From >> (3, 3)
+        To >> (3, 5)
+      block >> (7, 7)
     agent:
       Name >> "Runner"
       Start >> (1, 9)
