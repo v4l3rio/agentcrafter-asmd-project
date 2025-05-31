@@ -45,12 +45,20 @@ QTableLoader.loadQTableFromJson(qTableJson, learner) match {
 
 ### 2. LLM DSL Extension
 
-The `LLMQLearning` trait extends the simulation DSL with a new keyword `useLLM` that enables automatic Q-Table generation via LLM API calls using clean Scala 3 extensions.
+The `LLMQLearning` trait extends the simulation DSL with a new keyword `useLLM` that enables automatic Q-Table generation via LLM API calls using clean Scala 3 extensions. The implementation uses a property-based configuration system for flexible LLM settings.
+
+#### Configuration Properties
+
+The LLM extension supports the following configuration properties:
+
+- `Enabled` - Boolean flag to enable/disable LLM Q-Table generation
+- `Model` - String specifying the LLM model to use (default: "gpt-4o")
 
 #### Usage
 
 ```scala
 import llmqlearning.LLMQLearning
+import llmqlearning.LLMProperty.*
 import MARL.DSL._
 
 object MySimulation extends App with LLMQLearning:
@@ -59,7 +67,9 @@ object MySimulation extends App with LLMQLearning:
   // ... other imports
   
   simulation:
-    useLLM(true)  // Enable LLM Q-Table generation
+    useLLM:
+      Enabled >> true
+      Model >> "gpt-4o"  // Optional: specify model
     grid:
       10 x 10
     agent:
@@ -74,13 +84,34 @@ object MySimulation extends App with LLMQLearning:
     // ... rest of simulation configuration
 ```
 
+#### Alternative Syntax
+
+You can also enable LLM with just the default settings:
+
+```scala
+simulation:
+  useLLM:
+    Enabled >> true  // Uses default model "gpt-4o"
+  // ... rest of configuration
+```
+
 #### How it works
 
-1. When `useLLM(true)` is set, the simulation will call the OpenAI API before running
-2. The LLM receives the simulation DSL configuration and generates an appropriate Q-Table
+1. When `Enabled >> true` is set in the `useLLM` block, the simulation will call the OpenAI API before running
+2. The LLM receives the simulation DSL configuration and generates an appropriate Q-Table using the specified model
 3. The generated Q-Table is loaded into all agents before the simulation starts
 4. If the LLM call fails, the simulation continues with normal Q-Learning
-5. Uses clean Scala 3 patterns without code duplication (DRY principle)
+5. Uses clean Scala 3 patterns with property-based configuration for type safety
+
+#### Configuration System
+
+The LLM extension uses an `LLMConfig` case class internally to manage configuration:
+
+```scala
+case class LLMConfig(var enabled: Boolean = false, var model: String = "gpt-4o")
+```
+
+The DSL properties (`Enabled`, `Model`) are defined in `LLMProperties.scala` and use Scala 3's context functions to provide a clean, type-safe configuration syntax. The `>>` operator is used consistently with the rest of the MARL DSL for property assignment.
 
 ### 3. LLM API Client
 
@@ -99,15 +130,16 @@ OPENAI_API_KEY=your_api_key_here
 
 - `QTableLoader.scala` - Core functionality for loading Q-Tables from JSON with markdown support
 - `LLMQLearning.scala` - Clean DSL extensions for LLM integration using Scala 3 patterns
-- `LLMApiClient.scala` - OpenAI API client (already existing)
-- `SimulationApp.scala` - Example simulation using LLM extensions
-- `QTableExample.scala` - Standalone example of Q-Table loading
+- `LLMProperties.scala` - DSL property definitions for LLM configuration (Enabled, Model)
+- `LLMApiClient.scala` - OpenAI API client with environment variable support
+- `SimulationApp.scala` - Example simulation using LLM extensions with property-based configuration
+- `LLMAPICallExample.scala` - Direct API call example
 
 ## Example Usage
 
-See `QTableExample.scala` for a complete example of loading Q-Tables from JSON.
+See `SimulationApp.scala` for a complete example of using the LLM-enabled simulation DSL with property-based configuration.
 
-See `SimulationApp.scala` for an example of using the LLM-enabled simulation DSL.
+See `LLMAPICallExample.scala` for a direct example of calling the LLM API without the DSL wrapper.
 
 ## Dependencies
 
@@ -125,6 +157,9 @@ The system is designed to be robust:
 
 ## Notes
 
-- The LLM prompt is currently in Italian as per the original requirements
+- The LLM prompt is optimized for English to ensure better Q-Table generation quality
 - Q-Table loading uses reflection to access private QLearner internals
 - The system supports both grid-optimized and map-based QLearner storage
+- Property-based configuration uses Scala 3 context functions for type safety
+- The `>>` operator maintains consistency with the existing MARL DSL syntax
+- Default model is "gpt-4o" but can be configured via the `Model` property

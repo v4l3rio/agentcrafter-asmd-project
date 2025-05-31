@@ -17,6 +17,9 @@ A refined approach that introduces visual elements and improved learning mechani
 ### 3. [Multi-Agent Reinforcement Learning (MARL)](marl/)
 The final and most advanced implementation, featuring multi-agent systems and sophisticated reinforcement learning techniques. This section presents the culmination of the project with advanced RL concepts and implementations.
 
+### 4. [LLM Q-Learning Extensions](llmqlearning/)
+An innovative extension to the MARL framework that integrates Large Language Models (LLMs) for intelligent Q-Table generation. This section demonstrates how AI can be used to bootstrap reinforcement learning with pre-computed optimal policies.
+
 ## Navigation
 
 Use the links above to explore each section of the project documentation. Each section contains detailed explanations, implementation details, and analysis of the respective approach.
