@@ -3,7 +3,7 @@ title: "Advanced Software Modeling and Design - RL Project"
 description: "A comprehensive exploration of Reinforcement Learning approaches from basic Q-Learning to Multi-Agent systems"
 
 # Theme
-theme: minima
+theme: jekyll-theme-cayman
 
 # GitHub Pages settings
 baseurl: ""
