@@ -6,8 +6,11 @@ lazy val root = (project in file("."))
   .settings(
     name := "asmd-project",
     libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % "3.2.12" % Test,
-      "org.scalacheck" %% "scalacheck" % "1.17.0",
-      ("de.sciss" %% "scala-chart" % "0.8.0").cross(CrossVersion.for2_13Use3)
+      "org.scalatest" %% "scalatest" % "3.2.18" % Test,
+      "org.scalacheck" %% "scalacheck" % "1.18.1",
+      "com.softwaremill.sttp.client4" %% "core" % "4.0.7",
+      "io.github.cdimascio" % "java-dotenv" % "5.2.2",
+      "org.playframework" %% "play-json" % "3.0.4",
+        ("de.sciss" %% "scala-chart" % "0.8.0").cross(CrossVersion.for2_13Use3)
     ),
   )
