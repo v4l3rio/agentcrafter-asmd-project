@@ -1,7 +1,7 @@
 package llmqlearning
 
 import MARL.DSL.{AgentProperty, LearnerProperty, LineProperty, SimulationDSL, TriggerProperty, WallProperty, block}
-
+import llmqlearning.LLMProperty.*
 
 object SimulationApp extends App with LLMQLearning:
   import AgentProperty.*
@@ -11,44 +11,36 @@ object SimulationApp extends App with LLMQLearning:
   import LineProperty.*
   
   simulation:
-    useLLM(true)
+    useLLM:
+      Enabled >> true
+      Model >> "gpt-4o"
     grid:
       10 x 10
-    walls:
-      line:
-        Direction >> "vertical"
-        From >> (1, 3)
-        To >> (1, 5)
-      line:
-        Direction >> "vertical"
-        From >> (1, 3)
-        To >> (3, 3)
-      line:
-        Direction >> "vertical"
-        From >> (1, 5)
-        To >> (3, 5)
-      line:
-        Direction >> "vertical"
-        From >> (3, 3)
-        To >> (3, 5)
-      block >> (7, 7)
+    asciiWalls(
+      """##########
+        |#.......##
+        |#.####...#
+        |#.#..#.#.#
+        |#.#.##.#.#
+        |#.#....#.#
+        |#..####...
+        |##.#......
+        |#......#.#
+        |#.#......#
+        """.stripMargin)
     agent:
-      Name >> "Runner"
-      Start >> (1, 9)
+      Name >> "Explorer"
+      Start >> (5, 8)
       withLearner:
-        Alpha >> 0.1
+        Alpha >> 0.05
         Gamma >> 0.99
-        Eps0 >> 0.9
-        EpsMin >> 0.05
-        Warm >> 1_000
-        Optimistic >> 0.5
-      Goal >> (2, 4)
+        Eps0 >> 0.15 // with llm we can afford a lower initial exploration rate
+        EpsMin >> 0.02
+        Warm >> 500
+        Optimistic >> 0.2
+      Goal >> (3,4)
       Reward >> 100.0
-    on("Runner", 8, 6):
-      OpenWall >> (2, 3)
-      EndEpisode >> false
-      Give >> 30
     episodes(1)
-    steps(400)
-    delay(100)
+    steps(500)
+    delay(50)
     withGUI(true)

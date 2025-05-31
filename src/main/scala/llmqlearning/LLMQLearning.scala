@@ -4,8 +4,14 @@ import MARL.DSL.{SimulationDSL, SimulationWrapper}
 import MARL.builders.SimulationBuilder
 import scala.util.{Success, Failure}
 import scala.collection.mutable
+import llmqlearning.LLMProperty.*
 
 
+
+/**
+ * LLM configuration wrapper for DSL
+ */
+case class LLMConfig(var enabled: Boolean = false, var model: String = "gpt-4o")
 
 /**
  * LLM-enabled simulation DSL trait
@@ -13,13 +19,15 @@ import scala.collection.mutable
 trait LLMQLearning extends SimulationDSL:
   
   // Mutable context to track LLM state
-  private var llmEnabled: Boolean = false
+  private var llmConfig: LLMConfig = LLMConfig()
   
   /**
-   * DSL keyword to enable LLM Q-Table generation
+   * DSL keyword to enable LLM Q-Table generation with configuration
    */
-  def useLLM(enabled: Boolean)(using wrapper: SimulationWrapper): Unit =
-    llmEnabled = enabled
+  def useLLM(block: LLMConfig ?=> Unit)(using wrapper: SimulationWrapper): Unit =
+    given config: LLMConfig = llmConfig
+    block
+    llmConfig = config
   
   /**
    * Override simulation method to use LLM-enhanced builder
@@ -28,35 +36,58 @@ trait LLMQLearning extends SimulationDSL:
     given wrapper: SimulationWrapper = SimulationWrapper(new SimulationBuilder)
     block
     
-    if llmEnabled then
-      loadQTableFromLLM(wrapper.builder) match
+    if llmConfig.enabled then
+      loadQTableFromLLM(wrapper.builder, llmConfig.model) match
         case Some(qTableJson) =>
-          println("LLM Response received, loading Q-Table...")
+          println(s"LLM Response received from ${llmConfig.model}, loading Q-Table...")
           loadQTableIntoAgents(wrapper.builder, qTableJson)
         case None =>
-          println("Failed to get Q-Table from LLM, proceeding with normal simulation")
+          println(s"Failed to get Q-Table from LLM (${llmConfig.model}), proceeding with normal simulation")
     
     wrapper.builder.play()
 
 /**
  * Helper functions for LLM integration
  */
-private def loadQTableFromLLM(builder: SimulationBuilder): Option[String] =
+private def loadQTableFromLLM(builder: SimulationBuilder, model: String): Option[String] =
   val client = LLMApiClient()
-  val prompt = """Sei un simulatore di Reinforcement Learning. Il tuo compito è generare Q-Table.
-    |La simulazione è descritta utilizzando un Domain Specific Language, in questa descrizione sono presenti tutte le informazioni necessarie.
-    |Il tuo compito è interpretare il DSL, estraendo da esso le informazioni chiave, lanciare la simulazione e ritornare il risultato della simulazione
-    |ovvero: La Q-Table. È importante che l'output generato da questa richiesta sia solo un JSON questo perché la risposta verrà interpretata in maniera automatica, quindi non scrivere niente oltre il JSON.
-    |Alcune caratteristiche possono aiutarti nel compito:
-    |Le azioni possibili sono: Up, Down, Left, Right, Stay
-    |Ogni azione svolta senza reward positivo, comporta un reward di -1
-    |Le coordinate partono da (0,0) e vanno fino al valore espresso in grid
-    |Il formato delle righe deve essere questo:
-    |"(x, y)": {"Up": value, "Down": value, "Left": value, "Right": value, "Stay": value},
-    |Elabora la Q-Table e mandamela con tutti i pesi alla fine della simulazione""".stripMargin
+  val prompt = """You are a Reinforcement Learning simulator specialized in generating optimal Q-Tables for grid-based environments.
+    |
+    |TASK: Analyze the provided Domain Specific Language (DSL) description and generate a complete Q-Table that represents an optimal policy for navigating from any position to the goal.
+    |
+    |CRITICAL REQUIREMENTS:
+    |1. OUTPUT FORMAT: Return ONLY a valid JSON object - no additional text, explanations, or formatting
+    |2. Q-VALUES STRATEGY: Create a value gradient that forms clear paths to the goal, not just high values at reward locations
+    |3. PATH OPTIMIZATION: Ensure Q-values decrease gradually as distance from goal increases, creating natural navigation paths
+    |
+    |ENVIRONMENT RULES:
+    |- Available actions: Up, Down, Left, Right, Stay
+    |- Coordinate system: starts at (0,0) and extends to grid dimensions
+    |- Step penalty: -1 for each action without positive reward
+    |- Walls: represented by '#' in asciiWalls, block movement
+    |- Goal reward: specified in agent configuration
+    |
+    |Q-TABLE GENERATION STRATEGY:
+    |1. Identify the goal position and reward value from the DSL
+    |2. Calculate optimal distances from each cell to the goal (considering walls)
+    |3. Assign Q-values that create a gradient: higher values for actions leading toward goal
+    |4. For each position, the action pointing toward the shortest path to goal should have the highest Q-value
+    |5. Consider wall obstacles when calculating paths - blocked directions should have very low Q-values
+    |6. Apply discount factor to create realistic value propagation
+    |
+    |JSON FORMAT (exact structure required):
+    |"(row, col)": {"Up": value, "Down": value, "Left": value, "Right": value, "Stay": value}
+    |
+    |EXAMPLE Q-VALUE ASSIGNMENT:
+    |- At goal: all actions have high positive values (goal reward - small penalty)
+    |- Adjacent to goal: action toward goal = high value, others = lower values
+    |- Further from goal: gradually decreasing values, with direction toward goal always highest
+    |- Near walls: actions toward walls = very negative values
+    |
+    |Generate the complete Q-Table now:""".stripMargin
   
-  println("Calling LLM API to generate Q-Table...")
-  client.callLLM(prompt) match
+  println(s"Calling LLM API ($model) to generate Q-Table...")
+  client.callLLM(prompt, model) match
     case Success(response) => Some(response)
     case Failure(ex) =>
       println(s"LLM API call failed: ${ex.getMessage}")
