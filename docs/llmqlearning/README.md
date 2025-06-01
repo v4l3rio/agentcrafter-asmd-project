@@ -54,6 +54,76 @@ The LLM extension supports the following configuration properties:
 - `Enabled` - Boolean flag to enable/disable LLM Q-Table generation
 - `Model` - String specifying the LLM model to use (default: "gpt-4o")
 
+#### DSL Grammar
+
+The complete simulation DSL with LLM extensions follows this formal grammar:
+
+```
+simulation_block ::= "simulation:" simulation_config ;
+
+simulation_config ::= llm_block? grid_block agent_block+ episodes_block? steps_block? delay_block? gui_block? ;
+
+llm_block ::= "useLLM:" llm_config_block ;
+
+llm_config_block ::= llm_property+ ;
+
+llm_property ::= enabled_property
+               | model_property ;
+
+enabled_property ::= "Enabled" ">>" boolean ;
+
+model_property ::= "Model" ">>" string ;
+
+grid_block ::= "grid:" grid_size ;
+
+grid_size ::= number "x" number ;
+
+agent_block ::= "agent:" agent_config ;
+
+agent_config ::= agent_property+ ;
+
+agent_property ::= name_property
+                 | start_property
+                 | learner_block
+                 | goal_property
+                 | reward_property ;
+
+name_property ::= "Name" ">>" string ;
+
+start_property ::= "Start" ">>" coordinate ;
+
+goal_property ::= "Goal" ">>" coordinate ;
+
+reward_property ::= "Reward" ">>" number ;
+
+learner_block ::= "withLearner:" learner_config ;
+
+learner_config ::= learner_property+ ;
+
+learner_property ::= "Alpha" ">>" number
+                   | "Gamma" ">>" number
+                   | "Eps0" ">>" number
+                   | "EpsMin" ">>" number
+                   | "Warm" ">>" number
+                   | "Optimistic" ">>" number ;
+
+episodes_block ::= "episodes(" number ")" ;
+
+steps_block ::= "steps(" number ")" ;
+
+delay_block ::= "delay(" number ")" ;
+
+gui_block ::= "withGUI(" boolean ")" ;
+
+coordinate ::= "(" number "," number ")" ;
+
+boolean ::= "true" | "false" ;
+
+number ::= [0-9]+ ("." [0-9]+)? ;
+
+string ::= "\"" [^\"]* "\"" ;
+```
+
 #### Usage
 
 ```scala

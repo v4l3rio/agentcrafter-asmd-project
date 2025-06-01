@@ -2,6 +2,7 @@ package llmqlearning
 
 import MARL.DSL.{SimulationDSL, SimulationWrapper}
 import MARL.builders.SimulationBuilder
+import MARL.AgentSpec
 import scala.util.{Success, Failure}
 import scala.collection.mutable
 import llmqlearning.LLMProperty.*
@@ -12,6 +13,15 @@ import llmqlearning.LLMProperty.*
  * LLM configuration wrapper for DSL
  */
 case class LLMConfig(var enabled: Boolean = false, var model: String = "gpt-4o")
+
+// LLM Property DSL objects for configuration
+object Enabled:
+  def >>(value: Boolean)(using config: LLMConfig): Unit =
+    config.enabled = value
+
+object Model:
+  def >>(value: String)(using config: LLMConfig): Unit =
+    config.model = value
 
 /**
  * LLM-enabled simulation DSL trait

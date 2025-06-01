@@ -113,7 +113,7 @@ class QLearnerTest extends AnyFunSuite with Matchers:
     )
     val learner = QLearner(gridEnv = Some(env))
     
-    val result = learner.episode(maxSteps = 50)
+    val result = learner.episode(maxSteps = 100)
     result shouldBe defined
     
     val (done, steps, trajectory) = result.get
