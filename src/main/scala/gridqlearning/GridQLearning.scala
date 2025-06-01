@@ -4,9 +4,32 @@ import common.*
 import scala.collection.mutable.ArrayBuffer
 import java.util.Locale
 
+/**
+ * Utility object for visualizing agent trajectories in a grid world.
+ * 
+ * Provides methods to draw ASCII representations of grid worlds with
+ * agent paths, showing the order in which states were visited.
+ */
 object Draw:
-  /** letters a-z, then A-Z, then '*', shows first visit order */
+  /** 
+   * Character sequence used to represent visit order in trajectory visualization.
+   * Uses letters a-z, then A-Z, then '*' for states visited beyond 52 steps.
+   */
   private val glyphs = ('a' to 'z') ++ ('A' to 'Z') :+ '*'
+  
+  /**
+   * Visualizes an agent's trajectory through a grid world.
+   * 
+   * Prints an ASCII representation of the grid where:
+   * - "##" represents walls
+   * - "S " represents the start position
+   * - "G " represents the goal position
+   * - Letters (a-z, A-Z) show the order of first visits to each state
+   * - ". " represents unvisited states
+   * 
+   * @param env The grid world environment
+   * @param path List of states representing the agent's trajectory
+   */
   def traj(env: GridWorld, path: List[State]): Unit =
     val idx = path.tail.zipWithIndex.toMap
     for r <- 0 until env.rows do
@@ -24,14 +47,28 @@ object Draw:
     println()
 
 
+/**
+ * Main training program for Q-Learning on a grid world.
+ * 
+ * This program trains a Q-learning agent on a default grid world environment
+ * for 10,000 episodes. It provides periodic progress reports showing the
+ * current epsilon value and average steps per episode, and periodically
+ * evaluates the learned policy by running greedy episodes.
+ * 
+ * Training features:
+ * - Reports progress every 500 episodes
+ * - Evaluates greedy policy every 1,000 episodes
+ * - Visualizes the greedy trajectory during evaluation
+ * - Tracks only successful episodes (those that reach the goal)
+ */
 @main def Train(): Unit =
   val env      = GridWorld()
   val agent    = QLearner(id = "grid_agent", gridEnv = Some(env))
   val episodes = 10_000
   val stepsOK  = ArrayBuffer.empty[Int]   // only episodes that finish
 
-  val reportEvery   = 500
-  val evaluateEvery = 1_000
+  val reportEvery   = 500   // Report progress every 500 episodes
+  val evaluateEvery = 1_000 // Evaluate greedy policy every 1,000 episodes
 
   for ep <- 1 to episodes do
     val (done, steps, _) = agent.episode().get

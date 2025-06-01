@@ -6,6 +6,26 @@ import java.awt.{Color, Graphics2D}
 import common.*
 import common.{Action => RLAction}
 
+/**
+ * Real-time visualization component for Q-Learning training in grid worlds.
+ * 
+ * This class creates a Swing-based GUI that displays the grid world environment
+ * and shows the agent's movement in real-time during training. It visualizes:
+ * - The grid layout with walls, start, and goal positions
+ * - The current agent position
+ * - Debug information including state, action, exploration mode, and Q-values
+ * 
+ * @param env The grid world environment to visualize
+ * @param cell Size of each grid cell in pixels (default: 80)
+ * @param delayMs Delay between updates in milliseconds (default: 120)
+ * 
+ * @example
+ * {{{
+ * val env = GridWorld()
+ * val vis = Visualiser(env, cell = 60, delayMs = 100)
+ * // Use vis.update() to show agent movements during training
+ * }}}
+ */
 class Visualiser(env: GridWorld, cell: Int = 80, delayMs: Int = 120):
   private var agent   = env.start
   private var lastInfo = ""
@@ -47,7 +67,18 @@ class Visualiser(env: GridWorld, cell: Int = 80, delayMs: Int = 120):
     centerOnScreen()
     visible   = true
 
-  /** Aggiorna posizione agente + testo di debug e ridisegna */
+  /**
+   * Updates the visualization with the agent's current state and debug information.
+   * 
+   * This method updates the agent's position, displays debug information about
+   * the current state, action, exploration mode, and Q-values, then repaints
+   * the panel and introduces a delay for smooth visualization.
+   * 
+   * @param pos The current state/position of the agent
+   * @param act The action taken by the agent
+   * @param explore Whether the agent is in exploration mode
+   * @param q Array of Q-values for all actions in the current state
+   */
   def update(pos: State,
              act: RLAction,
              explore: Boolean,
@@ -59,6 +90,24 @@ class Visualiser(env: GridWorld, cell: Int = 80, delayMs: Int = 120):
     panel.repaint()
     Thread.sleep(delayMs)
 
+/**
+ * Main training program with real-time visualization.
+ * 
+ * This program trains a Q-learning agent on a grid world while providing
+ * real-time visual feedback. The visualization shows the agent's movement
+ * and decision-making process during greedy policy evaluation episodes.
+ * 
+ * Training configuration:
+ * - High initial exploration (ε₀ = 0.9)
+ * - Warm-up period of 1,000 episodes with full exploration
+ * - Optimistic initialization (Q₀ = 5.0)
+ * - Visual evaluation every 500 episodes
+ * 
+ * The visualization displays:
+ * - Grid world layout with walls, start, and goal
+ * - Agent position and movement
+ * - Current state, action, exploration mode, and Q-values
+ */
 @main def TrainVisualExplain(): Unit =
   val env       = GridWorld()
   val agent = QLearner(
