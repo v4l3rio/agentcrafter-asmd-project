@@ -285,7 +285,7 @@ class QLearner(
         val qValues = if useGridOptimization then
           QArray.get(s.r)(s.c).clone
         else
-          A.map(action => getQValueInternal(s, action)).toArray
+          A.map(action => getQValue(s, action)).toArray
 
         log += ((s, a, explore, qValues))
         s = s2; done = end; steps += 1

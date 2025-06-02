@@ -13,6 +13,11 @@ class SimulationVisualizer(spec: WorldSpec, cell: Int = 48, delay: Int = 70):
   private var state: Map[String, State] = Map.empty
   private var openWalls = Set.empty[State]
   private var step = 0
+  private var episode = 0
+  private var explorationMode = true
+  private var accumulatedReward = 0.0
+  private var totalReward = 0.0
+  private var episodeReward = 0.0
 
   /* Identify "goal" cells and switch cells */
   private val goalCells = spec.agents.flatMap(_.goal).toSet
@@ -26,7 +31,7 @@ class SimulationVisualizer(spec: WorldSpec, cell: Int = 48, delay: Int = 70):
   )
 
   private val panel = new Panel:
-    preferredSize = new java.awt.Dimension(spec.cols * cell, spec.rows * cell + 25)
+    preferredSize = new java.awt.Dimension(spec.cols * cell, spec.rows * cell + 80)
 
     override def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
@@ -55,7 +60,13 @@ class SimulationVisualizer(spec: WorldSpec, cell: Int = 48, delay: Int = 70):
       }
 
       g.setColor(Color.black)
-      g.drawString(s"step=$step", 10, size.height - 8)
+      val infoY = size.height - 60
+      g.drawString(s"Step: $step", 10, infoY)
+      g.drawString(s"Episode: $episode", 10, infoY + 15)
+      g.drawString(s"Mode: ${if (explorationMode) "Exploration" else "Exploitation"}", 10, infoY + 30)
+      g.drawString(s"Episode Reward: ${"%.2f".format(episodeReward)}", 10, infoY + 45)
+      g.drawString(s"Total Reward: ${"%.2f".format(totalReward)}", 200, infoY)
+      g.drawString(s"Avg Reward: ${if (episode > 0) "%.2f".format(totalReward / episode) else "0.00"}", 200, infoY + 15)
 
   val frame: MainFrame = new MainFrame:
     title = "MARL DSL visual"
@@ -69,3 +80,10 @@ class SimulationVisualizer(spec: WorldSpec, cell: Int = 48, delay: Int = 70):
     step = k
     panel.repaint();
     Thread.sleep(spec.stepDelay)
+
+  def updateSimulationInfo(ep: Int, exploration: Boolean, reward: Double, totalRew: Double, epRew: Double): Unit =
+    episode = ep
+    explorationMode = exploration
+    accumulatedReward = reward
+    totalReward = totalRew
+    episodeReward = epRew

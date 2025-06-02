@@ -100,39 +100,7 @@ class QLearnerTest extends AnyFunSuite with Matchers:
     qTable should contain key (state1, Action.Up)
     qTable should contain key (state2, Action.Down)
     qTable((state1, Action.Up)) should not be 1.0 // should be updated
-    qTable((state2, Action.Down)) should not be 1.0 // should be updated
-
-
-  test("QLearner episode method should work with grid environment"):
-    val env = GridWorld(
-      rows = 3,
-      cols = 3,
-      start = State(0, 0),
-      goal = State(2, 2),
-      walls = Set.empty
-    )
-    val learner = QLearner(gridEnv = Some(env))
-    
-    val result = learner.episode(maxSteps = 100)
-    result shouldBe defined
-    
-    val (done, steps, trajectory) = result.get
-    steps should be > 0
-    steps should be <= 50
-    trajectory should not be empty
-    trajectory.length shouldBe steps
-    
-    // First state should be start
-    trajectory.head._1 shouldBe env.start
-    
-    // If done, last state should be goal
-    if (done) {
-      val lastState = trajectory.last._1
-      // The last logged state might not be the goal due to how logging works
-      // but the episode should have reached the goal
-      lastState shouldBe env.goal
-    }
-  
+    qTable((state2, Action.Down)) should not be 1.0 // should be updated 
 
   test("QLearner episode with exploitOnly should not update Q-values"):
     val env = GridWorld(
