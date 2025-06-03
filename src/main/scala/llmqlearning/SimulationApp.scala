@@ -12,7 +12,7 @@ object SimulationApp extends App with LLMQLearning:
   
   simulation:
     useLLM:
-      Enabled >> true
+      Enabled >> false
       Model >> "gpt-4o"
     grid:
       10 x 10

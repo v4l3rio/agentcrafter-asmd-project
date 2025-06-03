@@ -40,10 +40,6 @@ object SimulationApp extends App with SimulationDSL:
         Optimistic >> 0.5
       Goal >> (2, 4)
       Reward >> 100.0
-    on("Runner", 8, 6):
-      OpenWall >> (2, 3)
-      EndEpisode >> false
-      Give >> 30
     episodes(10_000)
     steps(400)
     showAfter(9_000)
