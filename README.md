@@ -59,11 +59,11 @@ object BasicSimulation extends SimulationDSL with App:
         Gamma >> 0.9
         Epsilon >> 0.8
         
-    episodes(5_000)
-    steps(400)
-    showAfter(4_000)
-    delay(100)
-    withGUI(true)
+    Episodes >> 5_000
+    Steps >> 400
+    ShowAfter >> 4_000
+    Delay >> 100
+    WithGUI >> true
 ```
 
 ### Using LLM Integration
@@ -89,11 +89,11 @@ object LLMSimulation extends SimulationDSL with LLMQLearning with App:
         Alpha >> 0.1
         Gamma >> 0.99
 
-    episodes(5_000)
-    steps(400)
-    showAfter(4_000)
-    delay(100)
-    withGUI(true)
+    Episodes >> 5_000
+    Steps >> 400
+    ShowAfter >> 4_000
+    Delay >> 100
+    WithGUI >> true
 ```
 
 ## Continuous Integration

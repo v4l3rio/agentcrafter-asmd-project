@@ -6,6 +6,7 @@ object SimulationApp extends App with SimulationDSL:
   import LearnerProperty.*
   import WallProperty.*
   import LineProperty.*
+  import SimulationProperty.*
   
   simulation:
     grid:
@@ -40,8 +41,8 @@ object SimulationApp extends App with SimulationDSL:
         Optimistic >> 0.5
       Goal >> (2, 4)
       Reward >> 100.0
-    episodes(10_000)
-    steps(400)
-    showAfter(9_000)
-    delay(100)
-    withGUI(true)
+    Episodes >> 10_000
+    Steps >> 400
+    ShowAfter >> 9_000
+    Delay >> 100
+    WithGUI >> true

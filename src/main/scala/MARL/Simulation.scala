@@ -14,7 +14,7 @@ object dsl:
 /**
  * Demo application showing how to use the DSL with corrected Q-learning parameters
  */
-@main def DSLDemo(): Unit =
+@main def MARLSimulationDemo(): Unit =
   import dsl.*
   Simulation()
     .grid(10,10)

@@ -15,6 +15,21 @@ case class LearnerConfig(
                           var optimistic: Double = 0.0
                         )
 
+enum SimulationProperty[T]:
+  case Episodes extends SimulationProperty[Int]
+  case Steps extends SimulationProperty[Int]
+  case ShowAfter extends SimulationProperty[Int]
+  case Delay extends SimulationProperty[Int]
+  case WithGUI extends SimulationProperty[Boolean]
+  
+  @targetName("to")
+  infix def >>(obj: T)(using wrapper: SimulationWrapper): Unit = this match
+    case SimulationProperty.Episodes => wrapper.builder = wrapper.builder.episodes(obj.asInstanceOf[Int])
+    case SimulationProperty.Steps => wrapper.builder = wrapper.builder.steps(obj.asInstanceOf[Int])
+    case SimulationProperty.ShowAfter => wrapper.builder = wrapper.builder.showAfter(obj.asInstanceOf[Int])
+    case SimulationProperty.Delay => wrapper.builder = wrapper.builder.delay(obj.asInstanceOf[Int])
+    case SimulationProperty.WithGUI => wrapper.builder = wrapper.builder.withGUI(obj.asInstanceOf[Boolean])
+
 enum AgentProperty[T]:
   case Name extends AgentProperty[String]
   case Start extends AgentProperty[(Int, Int)]

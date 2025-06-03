@@ -61,7 +61,7 @@ The complete simulation DSL with LLM extensions follows this formal grammar:
 ```
 simulation_block ::= "simulation:" simulation_config ;
 
-simulation_config ::= llm_block? grid_block agent_block+ episodes_block? steps_block? delay_block? gui_block? ;
+simulation_config ::= llm_block? grid_block agent_block+ episodes_block? steps_block? delay_block? show_after_block? gui_block? ;
 
 llm_block ::= "useLLM:" llm_config_block ;
 
@@ -107,13 +107,15 @@ learner_property ::= "Alpha" ">>" number
                    | "Warm" ">>" number
                    | "Optimistic" ">>" number ;
 
-episodes_block ::= "episodes(" number ")" ;
+episodes_block ::= "Episodes" ">>" number ;
 
-steps_block ::= "steps(" number ")" ;
+steps_block ::= "Steps" ">>" number ;
 
-delay_block ::= "delay(" number ")" ;
+delay_block ::= "Delay" ">>" number ;
 
-gui_block ::= "withGUI(" boolean ")" ;
+show_after_block ::= "ShowAfter" ">>" number ;
+
+gui_block ::= "WithGUI" ">>" boolean ;
 
 coordinate ::= "(" number "," number ")" ;
 
@@ -149,9 +151,13 @@ object MySimulation extends App with LLMQLearning:
         Alpha >> 0.1
         Gamma >> 0.99
         // ... other learner parameters
-      Goal >> (2, 4)
+      Goal >> (9, 9)
       Reward >> 100.0
-    // ... rest of simulation configuration
+    Episodes >> 10_000
+    Steps >> 500
+    Delay >> 100
+    ShowAfter >> 9_000
+    WithGUI >> true
 ```
 
 #### Alternative Syntax

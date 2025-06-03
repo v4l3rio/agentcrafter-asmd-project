@@ -1,6 +1,7 @@
 package MARL.DSL
 
 import MARL.builders.{AgentBuilder, SimulationBuilder, TriggerBuilder, WallLineBuilder}
+import MARL.DSL.SimulationProperty
 
 /**
  * Domain-Specific Language (DSL) for creating Multi-Agent Reinforcement Learning simulations.
@@ -9,39 +10,6 @@ import MARL.builders.{AgentBuilder, SimulationBuilder, TriggerBuilder, WallLineB
  * walls, triggers, and simulation parameters. The DSL uses Scala 3's context functions
  * and given/using syntax to create a clean, readable configuration syntax.
  * 
- * @example
- * {{{
- * object MySimulation extends SimulationDSL {
- *   simulation {
- *     grid(10 x 10)
- *     
- *     walls {
- *       line {
- *         horizontal from (2, 3) to (2, 7)
- *       }
- *     }
- *     
- *     agent {
- *       id("agent1")
- *       start(0, 0)
- *       goal(9, 9)
- *       withLearner {
- *         alpha = 0.1
- *         gamma = 0.9
- *       }
- *     }
- *     
- *     on("agent1", 5, 5) {
- *       give(10.0)
- *       openWall(3, 3)
- *     }
- *     
- *     episodes(1000)
- *     steps(200)
- *     showAfter(900)
- *   }
- * }
- * }}}
  */
 trait SimulationDSL:
   /**
@@ -173,6 +141,7 @@ trait SimulationDSL:
    * Sets the number of episodes to run in the simulation.
    * 
    * @param n Number of episodes
+   * @deprecated Use `Episodes >> n` syntax instead for consistency with other DSL properties
    */
   def episodes(n: Int)(using wrapper: SimulationWrapper) =
     wrapper.builder = wrapper.builder.episodes(n)
@@ -181,6 +150,7 @@ trait SimulationDSL:
    * Sets the maximum number of steps per episode.
    * 
    * @param n Maximum steps per episode
+   * @deprecated Use `Steps >> n` syntax instead for consistency with other DSL properties
    */
   def steps(n: Int)(using wrapper: SimulationWrapper) =
     wrapper.builder = wrapper.builder.steps(n)
@@ -189,6 +159,7 @@ trait SimulationDSL:
    * Sets after which episode to start showing the GUI visualization.
    * 
    * @param n Episode number to start showing visualization
+   * @deprecated Use `ShowAfter >> n` syntax instead for consistency with other DSL properties
    */
   def showAfter(n: Int)(using wrapper: SimulationWrapper) =
     wrapper.builder = wrapper.builder.showAfter(n)
@@ -197,6 +168,7 @@ trait SimulationDSL:
    * Sets the delay between simulation steps for visualization.
    * 
    * @param ms Delay in milliseconds
+   * @deprecated Use `Delay >> ms` syntax instead for consistency with other DSL properties
    */
   def delay(ms: Int)(using wrapper: SimulationWrapper) =
     wrapper.builder = wrapper.builder.delay(ms)
@@ -205,6 +177,7 @@ trait SimulationDSL:
    * Enables or disables the graphical user interface.
    * 
    * @param flag True to enable GUI, false to disable
+   * @deprecated Use `WithGUI >> flag` syntax instead for consistency with other DSL properties
    */
   def withGUI(flag: Boolean)(using wrapper: SimulationWrapper) =
     wrapper.builder = wrapper.builder.withGUI(flag)

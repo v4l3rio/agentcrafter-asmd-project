@@ -9,6 +9,7 @@ object SimulationApp extends App with LLMQLearning:
   import LearnerProperty.*
   import WallProperty.*
   import LineProperty.*
+  import MARL.DSL.SimulationProperty.*
   
   simulation:
     useLLM:
@@ -40,7 +41,7 @@ object SimulationApp extends App with LLMQLearning:
         Optimistic >> 0.2
       Goal >> (3,4)
       Reward >> 100.0
-    episodes(1)
-    steps(500)
-    delay(50)
-    withGUI(true)
+    Episodes >> 1
+    Steps >> 500
+    Delay >> 50
+    WithGUI >> true
