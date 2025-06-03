@@ -13,8 +13,10 @@
 
 # AgentCrafter: Advanced Software Modeling and Design Project
 
-[![Scala Version](https://img.shields.io/badge/scala-3.7.0-blue.svg)](https://www.scala-lang.org/)
-
+![Scala](https://img.shields.io/badge/scala-%23DC322F.svg?style=for-the-badge&logo=scala&logoColor=white)
+![Cucumber](https://img.shields.io/badge/Cucumber-43B02A?style=for-the-badge&logo=cucumber&logoColor=white)
+![RL](https://img.shields.io/badge/Method-Reinforcement--Learning-red?style=for-the-badge)
+![LLM](https://img.shields.io/badge/Method-LLM-red?style=for-the-badge)
 ## Overview
 
 This project is part of the **Advanced Software Modeling and Design** course, exploring different approaches to Reinforcement Learning (RL) implementation and optimization. The repository contains a comprehensive multi-agent reinforcement learning system, developed through several distinct phases of refinement and improvement.
