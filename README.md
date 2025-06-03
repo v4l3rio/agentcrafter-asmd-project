@@ -1,11 +1,15 @@
 <p align="center"><img src="assets/logo.svg" alt="AgentCrafter"></p>
 
+<p align="center">
+<a href="https://www.scala-lang.org/"><img src="https://img.shields.io/badge/scala-%23DC322F.svg?style=for-the-badge&logo=scala&logoColor=white"></a>
+<a href="https://cucumber.io/"><img src="https://img.shields.io/badge/Cucumber-43B02A?style=for-the-badge&logo=cucumber&logoColor=white"></a>
+<a href="https://en.wikipedia.org/wiki/Reinforcement_learning"><img src="https://img.shields.io/badge/Method-Reinforcement--Learning-red?style=for-the-badge"></a>
+<a href="https://en.wikipedia.org/wiki/Large_language_model"><img src="https://img.shields.io/badge/Method-LLM-red?style=for-the-badge"></a>
+</p>
+
+
 # AgentCrafter: Advanced Software Modeling and Design Project
 
-![Scala](https://img.shields.io/badge/scala-%23DC322F.svg?style=for-the-badge&logo=scala&logoColor=white)
-![Cucumber](https://img.shields.io/badge/Cucumber-43B02A?style=for-the-badge&logo=cucumber&logoColor=white)
-![RL](https://img.shields.io/badge/Method-Reinforcement--Learning-red?style=for-the-badge)
-![LLM](https://img.shields.io/badge/Method-LLM-red?style=for-the-badge)
 ## Overview
 
 This project is part of the **Advanced Software Modeling and Design** course, exploring different approaches to Reinforcement Learning (RL) implementation and optimization. The repository contains a comprehensive multi-agent reinforcement learning system, developed through several distinct phases of refinement and improvement.
