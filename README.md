@@ -96,6 +96,10 @@ object LLMSimulation extends SimulationDSL with LLMQLearning with App:
     withGUI(true)
 ```
 
+## Continuous Integration
+
+This project uses GitHub Actions for continuous integration. The CI pipeline automatically runs all tests when code is pushed to the main branch or when a pull request is created.
+
 ## Documentation
 
 Detailed documentation for each component is available in the `docs` directory:

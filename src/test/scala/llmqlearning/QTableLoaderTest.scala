@@ -37,7 +37,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     """
     
     val result = QTableLoader.loadQTableFromJson(jsonWithMarkdown, learner)
-    result shouldBe a[Success[_]]
+    result shouldBe a[Success[?]]
     
     learner.getQValue(State(0, 0), Action.Down) shouldBe 2.0
   
@@ -53,7 +53,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     """
     
     val result = QTableLoader.loadQTableFromJson(jsonWithLangSpec, learner)
-    result shouldBe a[Success[_]]
+    result shouldBe a[Success[?]]
     
     learner.getQValue(State(1, 1), Action.Up) shouldBe 5.0
 
@@ -67,7 +67,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     """
     
     val result = QTableLoader.loadQTableFromJson(jsonWithPrefix, learner)
-    result shouldBe a[Success[_]]
+    result shouldBe a[Success[?]]
     
     learner.getQValue(State(2, 2), Action.Stay) shouldBe 1.0
   
@@ -82,7 +82,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     """
     
     val result = QTableLoader.loadQTableFromJson(incompleteMarkdown, learner)
-    result shouldBe a[Success[_]]
+    result shouldBe a[Success[?]]
     
     learner.getQValue(State(0, 0), Action.Left) shouldBe 3.0
 
@@ -102,7 +102,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     """
     
     val result = QTableLoader.loadQTableFromJson(jsonWithAllActions, learner)
-    result shouldBe a[Success[_]]
+    result shouldBe a[Success[?]]
     
     learner.getQValue(State(0, 0), Action.Up) shouldBe 1.0
     learner.getQValue(State(0, 0), Action.Down) shouldBe 2.0
@@ -123,7 +123,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     """
     
     val result = QTableLoader.loadQTableFromJson(jsonWithMultipleStates, learner)
-    result shouldBe a[Success[_]]
+    result shouldBe a[Success[?]]
     
     learner.getQValue(State(0, 0), Action.Stay) shouldBe 5.0
     learner.getQValue(State(1, 0), Action.Stay) shouldBe 10.0
@@ -140,7 +140,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     """
     
     val result = QTableLoader.loadQTableFromJson(invalidJson, learner)
-    result shouldBe a[Failure[_]]
+    result shouldBe a[Failure[?]]
     
     result.failed.get.getMessage should include("Failed to load Q-Table from JSON")
   
@@ -154,7 +154,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     """
     
     val result = QTableLoader.loadQTableFromJson(invalidStateJson, learner)
-    result shouldBe a[Failure[_]]
+    result shouldBe a[Failure[?]]
   
 
   test("QTableLoader should fail on invalid action names"):
@@ -166,7 +166,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     """
     
     val result = QTableLoader.loadQTableFromJson(invalidActionJson, learner)
-    result shouldBe a[Failure[_]]
+    result shouldBe a[Failure[?]]
     
     result.failed.get.getMessage should include("Unknown action")
   
@@ -180,7 +180,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     """
     
     val result = QTableLoader.loadQTableFromJson(nonNumericJson, learner)
-    result shouldBe a[Failure[_]]
+    result shouldBe a[Failure[?]]
   
 
   test("QTableLoader should handle empty JSON object"):
@@ -188,7 +188,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     val emptyJson = "{}"
     
     val result = QTableLoader.loadQTableFromJson(emptyJson, learner)
-    result shouldBe a[Success[_]]
+    result shouldBe a[Success[?]]
   
 
   test("QTableLoader should handle whitespace and formatting variations"):
@@ -206,7 +206,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     """
     
     val result = QTableLoader.loadQTableFromJson(messyJson, learner)
-    result shouldBe a[Success[_]]
+    result shouldBe a[Success[?]]
     
     learner.getQValue(State(0, 0), Action.Up) shouldBe 1.0
   
