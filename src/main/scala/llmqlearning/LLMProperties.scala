@@ -14,13 +14,6 @@ enum LLMProperty[T]:
     case LLMProperty.Model => config.model = value.asInstanceOf[String]
 
 /**
- * Extension methods for LLMConfig to support DSL syntax
- */
-extension (config: LLMConfig)
-  def enabled: Boolean = config.enabled
-  def model: String = config.model
-
-/**
  * Implicit conversions for boolean values in DSL
  */
 given Conversion[Boolean, Unit] = _ => ()
