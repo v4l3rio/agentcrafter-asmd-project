@@ -17,11 +17,9 @@ package agentcrafter.common
  * val (deltaRow, deltaCol) = action.delta  // (-1, 0)
  * }}}
  */
-enum Action derives CanEqual:
-  case Up, Down, Left, Right, Stay
-  def delta: (Int, Int) = this match
-    case Up    => (-1, 0)
-    case Down  => ( 1, 0)
-    case Left  => ( 0,-1)
-    case Right => ( 0, 1)
-    case Stay  => ( 0, 0)
+enum Action(val delta: (Int, Int)) derives CanEqual:
+  case Up extends Action((-1, 0))
+  case Down extends Action((1, 0))
+  case Left extends Action((0, -1))
+  case Right extends Action((0, 1))
+  case Stay extends Action((0, 0))
