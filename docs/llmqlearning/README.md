@@ -130,34 +130,37 @@ string ::= "\"" [^\"]* "\"" ;
 
 ```scala
 import llmqlearning.LLMQLearning
-import llmqlearning.LLMProperty.*
-import MARL.DSL._
+import agentcrafter.llmqlearning.LLMProperty.*
 
-object MySimulation extends App with LLMQLearning:
-  import AgentProperty._
-  import LearnerProperty._
-  // ... other imports
-  
-  simulation:
-    useLLM:
-      Enabled >> true
-      Model >> "gpt-4o"  // Optional: specify model
-    grid:
-      10 x 10
-    agent:
-      Name >> "Runner"
-      Start >> (1, 9)
-      withLearner:
-        Alpha >> 0.1
-        Gamma >> 0.99
-        // ... other learner parameters
-      Goal >> (9, 9)
-      Reward >> 100.0
-    Episodes >> 10_000
-    Steps >> 500
-    Delay >> 100
-    ShowAfter >> 9_000
-    WithGUI >> true
+object MySimulation extends App with LLMQLearning
+
+:
+
+import agentcrafter.MARL.DSL.AgentProperty._
+import agentcrafter.MARL.DSL.LearnerProperty._
+// ... other imports
+
+simulation:
+  useLLM
+:
+Enabled >> true
+Model >> "gpt-4o" // Optional: specify model
+grid:
+  10 x 10
+agent:
+  Name >> "Runner"
+Start >> (1, 9)
+withLearner:
+  Alpha >> 0.1
+Gamma >> 0.99
+// ... other learner parameters
+Goal >> (9, 9)
+Reward >> 100.0
+Episodes >> 10_000
+Steps >> 500
+Delay >> 100
+ShowAfter >> 9_000
+WithGUI >> true
 ```
 
 #### Alternative Syntax

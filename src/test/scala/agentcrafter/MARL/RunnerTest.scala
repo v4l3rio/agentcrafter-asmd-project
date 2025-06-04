@@ -1,0 +1,90 @@
+package agentcrafter.MARL
+
+import agentcrafter.MARL.{AgentSpec, EndEpisode, OpenWall, Reward, Runner, Trigger, WorldSpec}
+import agentcrafter.common.{Action, QLearner, State}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
+
+import scala.collection.mutable
+
+class RunnerTest extends AnyFunSuite with Matchers:
+
+  // Helper method to create a simple WorldSpec for testing
+  private def createSimpleWorldSpec(
+    rows: Int = 5,
+    cols: Int = 5,
+    staticWalls: Set[State] = Set.empty,
+    agents: List[AgentSpec] = List.empty,
+    triggers: List[Trigger] = List.empty,
+    episodes: Int = 10,
+    stepLimit: Int = 50,
+    stepDelay: Int = 0,
+    showAfter: Int = 100
+  ): WorldSpec = 
+    WorldSpec(rows, cols, staticWalls, triggers, agents, episodes, stepLimit, stepDelay, showAfter)
+  
+
+  private def createSimpleAgent(id: String, start: State, goal: Option[State] = None, reward: Double = 0.0): AgentSpec = 
+    AgentSpec(id, start, goal, reward, QLearner(id, alpha = 0.5, gamma = 0.9, eps0 = 0.1))
+  
+
+  test("Runner should handle empty world without agents"):
+    val spec = createSimpleWorldSpec()
+    val runner = new Runner(spec, showGui = false)
+    
+    noException should be thrownBy runner.run()
+
+  test("Runner should handle multiple agents"):
+    val agent1 = createSimpleAgent("Agent1", State(0, 0), Some(State(4, 4)), 100.0)
+    val agent2 = createSimpleAgent("Agent2", State(1, 1), Some(State(3, 3)), 50.0)
+    val spec = createSimpleWorldSpec(agents = List(agent1, agent2))
+    val runner = new Runner(spec, showGui = false)
+    
+    noException should be thrownBy runner.run()
+  
+
+  test("Runner should handle world with walls"):
+    val walls = Set(State(1, 1), State(2, 2), State(3, 3))
+    val agent = createSimpleAgent("Agent1", State(0, 0), Some(State(4, 4)), 100.0)
+    val spec = createSimpleWorldSpec(staticWalls = walls, agents = List(agent))
+    val runner = new Runner(spec, showGui = false)
+    
+    noException should be thrownBy runner.run()
+  
+  test("Runner should handle triggers with OpenWall effects"):
+    val agent = createSimpleAgent("Agent1", State(0, 0), Some(State(4, 4)), 100.0)
+    val trigger = Trigger("Agent1", State(2, 2), List(OpenWall(State(1, 1))))
+    val walls = Set(State(1, 1))
+    val spec = createSimpleWorldSpec(
+      staticWalls = walls,
+      agents = List(agent),
+      triggers = List(trigger)
+    )
+    val runner = new Runner(spec, showGui = false)
+    
+    noException should be thrownBy runner.run()
+  
+  test("Runner should handle complex triggers with multiple effects"):
+    val agent = createSimpleAgent("Agent1", State(0, 0), Some(State(4, 4)), 100.0)
+    val trigger = Trigger("Agent1", State(2, 2), List(
+      OpenWall(State(1, 1)),
+      Reward(25.0),
+      EndEpisode
+    ))
+    val walls = Set(State(1, 1))
+    val spec = createSimpleWorldSpec(
+      staticWalls = walls,
+      agents = List(agent),
+      triggers = List(trigger)
+    )
+    val runner = new Runner(spec, showGui = false)
+    
+    noException should be thrownBy runner.run()
+
+  test("Runner should handle agents starting at same position"):
+    val agent1 = createSimpleAgent("Agent1", State(2, 2), Some(State(4, 4)), 100.0)
+    val agent2 = createSimpleAgent("Agent2", State(2, 2), Some(State(0, 0)), 50.0)
+    val spec = createSimpleWorldSpec(agents = List(agent1, agent2))
+    val runner = new Runner(spec, showGui = false)
+    
+    noException should be thrownBy runner.run()
