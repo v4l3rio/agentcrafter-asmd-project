@@ -21,7 +21,7 @@ Feature: Q-Learning Agent Behavior
     And action "Up" has the highest Q-value
     When the agent chooses an action 100 times
     Then approximately 50% of actions should be exploratory
-    And approximately 50% should be the optimal action "Up"
+    And approximately 60% should be the optimal action "Up"
   # OK
   Scenario: Epsilon decay over episodes
     Given the agent starts with epsilon 0.9

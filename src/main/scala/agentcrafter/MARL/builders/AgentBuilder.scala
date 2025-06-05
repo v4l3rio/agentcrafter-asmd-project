@@ -1,17 +1,19 @@
 package agentcrafter.MARL.builders
 
 import agentcrafter.MARL.{AgentSpec, EndEpisode, Reward, Trigger}
-import agentcrafter.common.{QLearner, State}
+import agentcrafter.common.{GridWorld, QLearner, State}
+
+import scala.compiletime.uninitialized
 
 class AgentBuilder(parent: SimulationBuilder):
   private var id: String = ""
   private var st: State = State(0, 0)
   private var gl: Option[State] = None
   private var rew = 0.0
-  private var learner: QLearner = new QLearner(id)
+  private var learner: QLearner = uninitialized // TODO: CHECK
 
   def name (n: String): AgentBuilder = {
-    id = n; learner.id = n; this
+    id = n; this
   }
 
   def start(r: Int, c: Int): AgentBuilder = { st = State(r, c); this }
@@ -25,7 +27,16 @@ class AgentBuilder(parent: SimulationBuilder):
                   epsMin: Double = 0.15,
                   warm: Int = 10_000,
                   optimistic: Double = 0.0): AgentBuilder = {
-    learner = new QLearner(id, alpha, gamma, eps0, epsMin, warm, optimistic)
+    // Create a GridWorld environment for this agent
+    // We'll use the agent's start and goal positions to configure the environment
+    val gridWorld = GridWorld(
+      rows = parent.getRows,
+      cols = parent.getCols,
+      start = st,
+      goal = gl.getOrElse(State(0, 0)),
+      walls = parent.getWalls
+    )
+    learner = QLearner(alpha, gamma, eps0, epsMin, warm, optimistic, gridWorld)
     this
   }
 

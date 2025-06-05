@@ -46,7 +46,7 @@ class GridWorldTest extends AnyFunSuite with Matchers:
       walls = Set.empty
     )
     
-    val (nextState, reward, done) = env.step(State(2, 2), Action.Right)
+    val StepResult(nextState, reward, done) = env.step(State(2, 2), Action.Right)
     nextState shouldBe State(2, 3)
     reward shouldBe -3.0 // step penalty
     done shouldBe false
@@ -61,7 +61,7 @@ class GridWorldTest extends AnyFunSuite with Matchers:
       walls = Set(State(1, 2))
     )
     
-    val (nextState, reward, done) = env.step(State(1, 1), Action.Right)
+    val StepResult(nextState, reward, done) = env.step(State(1, 1), Action.Right)
     nextState shouldBe State(1, 1) // should stay in place
     reward shouldBe -3.0
     done shouldBe false
@@ -76,19 +76,19 @@ class GridWorldTest extends AnyFunSuite with Matchers:
     )
     
     // Try to move up from top edge
-    val (nextState1, _, _) = env.step(State(0, 0), Action.Up)
+    val StepResult(nextState1, _, _) = env.step(State(0, 0), Action.Up)
     nextState1 shouldBe State(0, 0)
     
     // Try to move left from left edge
-    val (nextState2, _, _) = env.step(State(0, 0), Action.Left)
+    val StepResult(nextState2, _, _) = env.step(State(0, 0), Action.Left)
     nextState2 shouldBe State(0, 0)
     
     // Try to move down from bottom edge
-    val (nextState3, _, _) = env.step(State(4, 4), Action.Down)
+    val StepResult(nextState3, _, _) = env.step(State(4, 4), Action.Down)
     nextState3 shouldBe State(4, 4)
     
     // Try to move right from right edge
-    val (nextState4, _, _) = env.step(State(4, 4), Action.Right)
+    val StepResult(nextState4, _, _) = env.step(State(4, 4), Action.Right)
     nextState4 shouldBe State(4, 4)
   
 
@@ -101,7 +101,7 @@ class GridWorldTest extends AnyFunSuite with Matchers:
       walls = Set.empty
     )
     
-    val (nextState, reward, done) = env.step(State(2, 1), Action.Right)
+    val StepResult(nextState, reward, done) = env.step(State(2, 1), Action.Right)
     nextState shouldBe State(2, 2)
     reward shouldBe 50.0 // goal reward
     done shouldBe true
@@ -116,7 +116,7 @@ class GridWorldTest extends AnyFunSuite with Matchers:
       walls = Set.empty
     )
     
-    val (nextState, reward, done) = env.step(State(2, 2), Action.Stay)
+    val StepResult(nextState, reward, done) = env.step(State(2, 2), Action.Stay)
     nextState shouldBe State(2, 2)
     reward shouldBe -3.0 //TODO: THIS NEED TO CHANGE
     done shouldBe false
@@ -130,8 +130,8 @@ class GridWorldTest extends AnyFunSuite with Matchers:
       goal = State(2, 2),
       walls = Set.empty
     )
-    
-    val (nextState, reward, done) = env.step(State(2, 2), Action.Stay)
+
+    val StepResult(nextState, reward, done) = env.step(State(2, 2), Action.Stay)
     nextState shouldBe State(2, 2)
     reward shouldBe 50.0 // goal reward
     done shouldBe true
@@ -155,7 +155,7 @@ class GridWorldTest extends AnyFunSuite with Matchers:
     val actions = List(Action.Right, Action.Right, Action.Down, Action.Down)
     
     for (action <- actions if !done) {
-      val (nextState, reward, isDone) = env.step(currentState, action)
+      val StepResult(nextState, reward, isDone) = env.step(currentState, action)
       currentState = nextState
       totalReward += reward
       done = isDone

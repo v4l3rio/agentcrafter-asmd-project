@@ -1,7 +1,7 @@
 package agentcrafter.MARL
 
 import agentcrafter.MARL.{AgentSpec, EndEpisode, OpenWall, Reward, Runner, Trigger, WorldSpec}
-import agentcrafter.common.{Action, QLearner, State}
+import agentcrafter.common.{Action, GridWorld, QLearner, State}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
@@ -22,10 +22,18 @@ class RunnerTest extends AnyFunSuite with Matchers:
     showAfter: Int = 100
   ): WorldSpec = 
     WorldSpec(rows, cols, staticWalls, triggers, agents, episodes, stepLimit, stepDelay, showAfter)
+
+  private def createSimpleGrid(): GridWorld = GridWorld(
+    rows = 3,
+    cols = 3,
+    start = State(0, 0),
+    goal = State(2, 2),
+    walls = Set.empty
+  )
   
 
   private def createSimpleAgent(id: String, start: State, goal: Option[State] = None, reward: Double = 0.0): AgentSpec = 
-    AgentSpec(id, start, goal, reward, QLearner(id, alpha = 0.5, gamma = 0.9, eps0 = 0.1))
+    AgentSpec(id, start, goal, reward, QLearner(alpha = 0.5, gamma = 0.9, eps0 = 0.1, gridEnv = createSimpleGrid()))
   
 
   test("Runner should handle empty world without agents"):

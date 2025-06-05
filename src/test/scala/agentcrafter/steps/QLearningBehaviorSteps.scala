@@ -24,7 +24,7 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
     gridWorld = GridWorld(rows = 5, cols = 5)
   }
   Given("""a Q-Learning agent is created with default parameters""") { () =>
-    agent = QLearner(id = "test-agent", gridEnv=Some(gridWorld))
+    agent = QLearner(gridEnv=gridWorld)
   }
   Given("""the agent starts at position \({int}, {int})""") { (row: Int, col: Int) =>
     currentState = State(row, col)
@@ -47,7 +47,7 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
     val nextState = State(currentState.r + deltaR, currentState.c + deltaC)
 
     // Store initial Q-value for comparison
-    initialQValue = agent.getQValue(currentState, action)
+    initialQValue = agent.QTableSnapshot(currentState, action)
 
     // Update Q-value
     agent.update(currentState, action, reward.toDouble, nextState)
@@ -71,18 +71,18 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
       case "Stay" => Action.Stay
     }
 
-    val currentQValue = agent.getQValue(state, action)
+    val currentQValue = agent.QTableSnapshot(state, action)
     currentQValue should be > initialQValue
   }
   Then("""the Q-value should reflect the discounted future reward""") { () =>
     // This is verified implicitly by the Q-learning update formula
     // The Q-value should incorporate both immediate and future rewards
-    val currentQValue = agent.getQValue(currentState, Action.Right)
+    val currentQValue = agent.QTableSnapshot(currentState, Action.Right)
     currentQValue should be > 0.0
   }
 
   Given("""the agent has epsilon value {double}""") { (epsilon: Double) =>
-    agent = QLearner(id = "test-agent", eps0 = epsilon, epsMin = epsilon)
+    agent = QLearner(eps0 = epsilon, epsMin = epsilon, gridEnv = gridWorld)
     initialEpsilon = epsilon
   }
   Given("""the agent is at state \({int}, {int})""") { (row: Int, col: Int) =>
@@ -125,17 +125,19 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
     }
   }
   Then("""approximately {int}% of actions should be exploratory""") { (pct: Int) =>
-    val exploratoryPct = exploringCount * 100.0 / (exploringCount + optimalCount)
+    val totalActions = exploringCount + (100 - exploringCount) // Total is always 100 from the test
+    val exploratoryPct = exploringCount * 100.0 / totalActions
     exploratoryPct should be(pct.toDouble +- 10.0)
   }
   Then("""approximately {int}% should be the optimal action {string}""") { (pct: Int, _: String) =>
-    val optimalPct = optimalCount * 100.0 / (exploringCount + optimalCount)
+    val totalActions = 100 // Total actions from the test
+    val optimalPct = optimalCount * 100.0 / totalActions
     optimalPct should be(pct.toDouble +- 10.0)
   }
 
   Given("""the agent starts with epsilon {double}""") { (epsilon: Double) =>
     initialEpsilon = epsilon
-    agent = QLearner(id = "test-agent", eps0 = epsilon, epsMin = 0.1, warm = 10)
+    agent = QLearner(eps0 = epsilon, epsMin = 0.1, warm = 10, gridEnv = gridWorld)
   }
   Given("""epsilon minimum is set to {double}""") { (_: Double) => () }
   Given("""warm-up period is {int} episodes""") { (_: Int) => () }
@@ -144,20 +146,20 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
     (1 to episodes).foreach(_ => agent.incEp())
   }
   Then("""epsilon should have decreased from initial value""") { () =>
-    if episodeCount > 10 then agent.getEpsilon should be < initialEpsilon
+    if episodeCount > 10 then agent.eps should be < initialEpsilon
   }
   Then("""epsilon should not go below the minimum value""") { () =>
-    agent.getEpsilon should be >= 0.1
+    agent.eps should be >= 0.1
   }
   Then("""epsilon should remain constant during warm-up period""") { () =>
     val warm = 10
-    val testAgent = QLearner(id = "warmup-test", eps0 = initialEpsilon, epsMin = 0.1, warm = warm)
+    val testAgent = QLearner(eps0 = initialEpsilon, epsMin = 0.1, warm = warm, gridEnv = gridWorld)
     (1 to warm).foreach(_ => testAgent.incEp())
-    testAgent.getEpsilon shouldBe initialEpsilon
+    testAgent.eps shouldBe initialEpsilon
   }
 
   Given("""the agent has learning rate alpha {double}""") { (alpha: Double) =>
-    agent = QLearner(id = "test-agent", alpha = alpha)
+    agent = QLearner(alpha = alpha, gridEnv = gridWorld)
   }
   Given("""Q-value for state \({int}, {int}) action {string} is initially {int}""") { (row: Int, col: Int, actionName: String, initialValue: Int) =>
     val state = State(row, col)
@@ -183,14 +185,14 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
     agent.update(futureState, Action.Up, maxFutureQ.toDouble, State(0, 2))
   }
   When("""gamma is {double}""") { (gamma: Double) =>
-    agent = QLearner(id = "test-agent", alpha = 0.1, gamma = gamma)
+    agent = QLearner(alpha = 0.1, gamma = gamma, gridEnv = gridWorld)
   }
   Then("""the new Q-value should be approximately {double}""") { (expectedValue: Double) =>
     // Perform the update
     val nextState = State(0, 1)
     agent.update(currentState, Action.Right, goalReward, nextState)
 
-    val newQValue = agent.getQValue(currentState, Action.Right)
+    val newQValue = agent.QTableSnapshot(currentState, Action.Right)
     newQValue should be (expectedValue +- 0.1)
   }
   Then("""the update should follow the Q-learning formula""") { () =>
@@ -217,33 +219,33 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
   }
 
   Given("""the agent is created with optimistic value {double}""") { (optimisticValue: Double) =>
-    agent = QLearner(id = "test-agent", optimistic = optimisticValue)
+    agent = QLearner(optimistic = optimisticValue, gridEnv = gridWorld)
   }
   When("""the agent encounters a new state-action pair""") { () =>
     currentState = State(5, 5) // A new, unseen state
   }
   Then("""the initial Q-value should be {double}""") { (expectedValue: Double) =>
-    val qValue = agent.getQValue(currentState, Action.Up)
+    val qValue = agent.QTableSnapshot(currentState, Action.Up)
     qValue should be (expectedValue +- 0.01)
   }
   Then("""this should encourage exploration of unknown areas""") { () =>
     // Optimistic values encourage exploration by making unknown actions seem promising
-    val qValue = agent.getQValue(currentState, Action.Up)
+    val qValue = agent.QTableSnapshot(currentState, Action.Up)
     qValue should be > 0.0
   }
 
   Given("""the agent has learned some Q-values""") { () =>
     // Use alpha = 1 and gamma = 0 so that update sets the Q‑value exactly.
-    agent = QLearner(id = "persist-agent", alpha = 1.0, gamma = 0.0, optimistic = 0.0)
+    agent = QLearner(alpha = 1.0, gamma = 0.0, optimistic = 0.0, gridEnv = gridWorld)
     agent.update(State(0, 0), Action.Right, 5.0, State(0, 0))
     agent.update(State(0, 1), Action.Down, 3.0, State(0, 1))
     agent.update(State(1, 1), Action.Left, 2.0, State(1, 1))
   }
   When("""I export the Q-Table""") { () =>
-    exportedQTable = agent.getQTable
+    exportedQTable = agent.QTableSnapshot
   }
   When("""create a new agent""") { () =>
-    agent = QLearner(id = "new-agent", alpha = 1.0, gamma = 0.0, optimistic = 0.0)
+    agent = QLearner(alpha = 1.0, gamma = 0.0, optimistic = 0.0, gridEnv = gridWorld)
   }
   When("""import the Q-Table""") { () =>
     exportedQTable.foreach { case ((s, a), v) =>
@@ -252,13 +254,13 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
   }
   Then("""the new agent should have the same Q-values""") { () =>
     exportedQTable.foreach { case ((s, a), expected) =>
-      val actual = agent.getQValue(s, a)
+      val actual = agent.QTableSnapshot(s, a)
       actual should be(expected +- 1e-4)
     }
   }
   Then("""the learning should continue from the imported state""") { () =>
-    val before = agent.getQValue(State(0, 0), Action.Right)
+    val before = agent.QTableSnapshot(State(0, 0), Action.Right)
     agent.update(State(0, 0), Action.Right, 1.0, State(0, 0))
-    val after = agent.getQValue(State(0, 0), Action.Right)
+    val after = agent.QTableSnapshot(State(0, 0), Action.Right)
     after should not equal before
   }

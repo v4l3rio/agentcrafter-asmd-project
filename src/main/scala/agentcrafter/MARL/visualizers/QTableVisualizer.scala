@@ -18,7 +18,7 @@ class QTableVisualizer(agentId: String, learner: QLearner, spec: WorldSpec):
 
   // Get all states that have Q-values
   private def getQTableData: Array[Array[String]] = {
-    val qValues = learner.getQTable
+    val qValues = learner.QTableSnapshot
     val data = collection.mutable.ArrayBuffer[Array[String]]()
 
     // Group by state

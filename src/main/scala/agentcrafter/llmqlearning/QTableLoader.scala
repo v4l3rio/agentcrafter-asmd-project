@@ -89,22 +89,21 @@ object QTableLoader:
    */
   private def setQValueViaReflection(learner: QLearner, state: State, action: Action, value: Double): Unit = 
     try {
-      // Try to access the private setQValue method
-      val setQValueMethod = learner.getClass.getDeclaredMethod("setQValue", classOf[State], classOf[Action], classOf[Double])
-      setQValueMethod.setAccessible(true)
-      setQValueMethod.invoke(learner, state, action, value.asInstanceOf[AnyRef])
+      // Access the private Q field (QTable instance)
+      val qField = learner.getClass.getDeclaredField("Q")
+      qField.setAccessible(true)
+      val qTable = qField.get(learner)
+      
+      // Access the private table field inside QTable
+      val tableField = qTable.getClass.getDeclaredField("table")
+      tableField.setAccessible(true)
+      val table = tableField.get(qTable).asInstanceOf[mutable.Map[(State, Action), Double]]
+      
+      // Set the Q-value
+      table((state, action)) = value
     } catch {
-      case _: Exception =>
-        // Fallback: try to access QMap directly
-        try {
-          val qMapField = learner.getClass.getDeclaredField("QMap")
-          qMapField.setAccessible(true)
-          val qMap = qMapField.get(learner).asInstanceOf[mutable.Map[(State, Action), Double]]
-          qMap((state, action)) = value
-        } catch {
-          case ex: Exception =>
-            throw new RuntimeException(s"Could not set Q-value for state $state, action $action: ${ex.getMessage}")
-        }
+      case ex: Exception =>
+        throw new RuntimeException(s"Could not set Q-value for state $state, action $action: ${ex.getMessage}")
     }
   
   /**
@@ -122,15 +121,15 @@ object QTableLoader:
    * @return JSON string representation of the Q-Table
    */
   def qTableToJson(learner: QLearner): String = 
-    val qTable = learner.getQTable
+    val qTable = learner.QTableSnapshot
     val grouped = qTable.groupBy(_._1._1) // Group by State
     
     val jsonObject = grouped.map { case (state, stateActions) =>
       val stateKey = s"(${state.r}, ${state.c})"
       val actionsJson = stateActions.map { case ((_, action), qValue) =>
         action.toString -> JsNumber(qValue)
-      }.toMap
+      }
       stateKey -> JsObject(actionsJson)
-    }.toMap
+    }
     
     Json.stringify(JsObject(jsonObject))

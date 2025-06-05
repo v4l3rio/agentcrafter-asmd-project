@@ -6,7 +6,7 @@ import agentcrafter.MARL.AgentSpec
 import agentcrafter.MARL.DSL.{SimulationDSL, SimulationWrapper}
 import agentcrafter.llmqlearning.LLMProperty.*
 import agentcrafter.MARL.builders.SimulationBuilder
-import agentcrafter.common.{Action, QLearner, State}
+import agentcrafter.common.{Action, GridWorld, QLearner, State}
 import agentcrafter.llmqlearning.{LLMApiClient, LLMConfig, LLMQLearning, QTableLoader}
 
 import scala.util.{Failure, Success, Try}
@@ -40,6 +40,14 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
         mockApiResponse match
           case Some(response) => Success(response)
           case None => Success("""{"(0, 0)": {"Up": 1.0, "Down": 1.0, "Left": 1.0, "Right": 1.0, "Stay": 1.0}}""")
+
+  private def createSimpleGrid(): GridWorld = GridWorld(
+    rows = 3,
+    cols = 3,
+    start = State(0, 0),
+    goal = State(2, 2),
+    walls = Set.empty
+  )
   
   // Background
   Given("""the LLM integration system is available""") { () =>
@@ -165,7 +173,7 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   When("""I attempt to load the Q-Table""") { () =>
     val mockClient = new MockLLMApiClient()
     val jsonResponse = mockClient.callLLM("test prompt").getOrElse("")
-    val learner = QLearner(id = "test-agent")
+    val learner = QLearner(gridEnv = createSimpleGrid())
     qTableLoadResult = QTableLoader.loadQTableFromJson(jsonResponse, learner)
   }
   

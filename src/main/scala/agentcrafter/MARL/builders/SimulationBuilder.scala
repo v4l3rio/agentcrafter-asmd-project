@@ -48,6 +48,11 @@ class SimulationBuilder:
     triggers += trigger
   }
 
+  // Getter methods for AgentBuilder
+  def getRows: Int = rows
+  def getCols: Int = cols
+  def getWalls: Set[State] = walls.toSet
+
   /* add trigger */
   def on(who: String, r: Int, c: Int): TriggerBuilder = new TriggerBuilder(who, r, c, this)
 

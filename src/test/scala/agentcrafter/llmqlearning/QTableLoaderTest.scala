@@ -1,6 +1,6 @@
 package agentcrafter.llmqlearning
 
-import agentcrafter.common.{Action, QLearner, State}
+import agentcrafter.common.{Action, GridWorld, QLearner, State}
 import agentcrafter.llmqlearning.QTableLoader
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
@@ -9,8 +9,17 @@ import scala.util.{Failure, Success}
 
 class QTableLoaderTest extends AnyFunSuite with Matchers:
 
+  // make dummy GridWorld to satisfy QLearner's requirements
+  private def createSimpleGrid(): GridWorld = GridWorld(
+    rows = 3,
+    cols = 3,
+    start = State(0, 0),
+    goal = State(2, 2),
+    walls = Set.empty
+  )
+
   test("QTableLoader should load valid JSON Q-Table"):
-    val learner = QLearner()
+    val learner = QLearner(gridEnv = createSimpleGrid())
     val validJson = """
     {
       "(0, 0)": {"Up": 1.5, "Down": 2.0, "Left": 0.5, "Right": 3.0, "Stay": 0.0},
@@ -23,13 +32,13 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     result shouldBe a[Success[?]]
     
     // Verify that Q-values were loaded correctly
-    learner.getQValue(State(0, 0), Action.Right) shouldBe 3.0
-    learner.getQValue(State(0, 1), Action.Up) shouldBe 2.5
-    learner.getQValue(State(1, 0), Action.Down) shouldBe 3.5
+    learner.QTableSnapshot(State(0, 0), Action.Right) shouldBe 3.0
+    learner.QTableSnapshot(State(0, 1), Action.Up) shouldBe 2.5
+    learner.QTableSnapshot(State(1, 0), Action.Down) shouldBe 3.5
   
 
   test("QTableLoader should handle JSON with markdown code blocks"):
-    val learner = QLearner()
+    val learner = QLearner(gridEnv = createSimpleGrid())
     val jsonWithMarkdown = """
     ```json
     {
@@ -41,11 +50,11 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     val result = QTableLoader.loadQTableFromJson(jsonWithMarkdown, learner)
     result shouldBe a[Success[?]]
     
-    learner.getQValue(State(0, 0), Action.Down) shouldBe 2.0
+    learner.QTableSnapshot(State(0, 0), Action.Down) shouldBe 2.0
   
 
   test("QTableLoader should handle JSON with language specification"):
-    val learner = QLearner()
+    val learner = QLearner(gridEnv = createSimpleGrid())
     val jsonWithLangSpec = """
     ```json
     {
@@ -57,10 +66,10 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     val result = QTableLoader.loadQTableFromJson(jsonWithLangSpec, learner)
     result shouldBe a[Success[?]]
     
-    learner.getQValue(State(1, 1), Action.Up) shouldBe 5.0
+    learner.QTableSnapshot(State(1, 1), Action.Up) shouldBe 5.0
 
   test("QTableLoader should handle JSON with LLM prefixes"):
-    val learner = QLearner()
+    val learner = QLearner(gridEnv = createSimpleGrid())
     val jsonWithPrefix = """
     Here is the JSON Q-Table:
     {
@@ -71,11 +80,11 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     val result = QTableLoader.loadQTableFromJson(jsonWithPrefix, learner)
     result shouldBe a[Success[?]]
     
-    learner.getQValue(State(2, 2), Action.Stay) shouldBe 1.0
+    learner.QTableSnapshot(State(2, 2), Action.Stay) shouldBe 1.0
   
 
   test("QTableLoader should handle incomplete markdown blocks"):
-    val learner = QLearner()
+    val learner = QLearner(gridEnv = createSimpleGrid())
     val incompleteMarkdown = """
     ```json
     {
@@ -86,11 +95,11 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     val result = QTableLoader.loadQTableFromJson(incompleteMarkdown, learner)
     result shouldBe a[Success[?]]
     
-    learner.getQValue(State(0, 0), Action.Left) shouldBe 3.0
+    learner.QTableSnapshot(State(0, 0), Action.Left) shouldBe 3.0
 
 
   test("QTableLoader should handle all action types"):
-    val learner = QLearner()
+    val learner = QLearner(gridEnv = createSimpleGrid())
     val jsonWithAllActions = """
     {
       "(0, 0)": {
@@ -106,15 +115,15 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     val result = QTableLoader.loadQTableFromJson(jsonWithAllActions, learner)
     result shouldBe a[Success[?]]
     
-    learner.getQValue(State(0, 0), Action.Up) shouldBe 1.0
-    learner.getQValue(State(0, 0), Action.Down) shouldBe 2.0
-    learner.getQValue(State(0, 0), Action.Left) shouldBe 3.0
-    learner.getQValue(State(0, 0), Action.Right) shouldBe 4.0
-    learner.getQValue(State(0, 0), Action.Stay) shouldBe 5.0
+    learner.QTableSnapshot(State(0, 0), Action.Up) shouldBe 1.0
+    learner.QTableSnapshot(State(0, 0), Action.Down) shouldBe 2.0
+    learner.QTableSnapshot(State(0, 0), Action.Left) shouldBe 3.0
+    learner.QTableSnapshot(State(0, 0), Action.Right) shouldBe 4.0
+    learner.QTableSnapshot(State(0, 0), Action.Stay) shouldBe 5.0
   
 
   test("QTableLoader should handle multiple states"):
-    val learner = QLearner()
+    val learner = QLearner(gridEnv = createSimpleGrid())
     val jsonWithMultipleStates = """
     {
       "(0, 0)": {"Up": 1.0, "Down": 2.0, "Left": 3.0, "Right": 4.0, "Stay": 5.0},
@@ -127,14 +136,14 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     val result = QTableLoader.loadQTableFromJson(jsonWithMultipleStates, learner)
     result shouldBe a[Success[?]]
     
-    learner.getQValue(State(0, 0), Action.Stay) shouldBe 5.0
-    learner.getQValue(State(1, 0), Action.Stay) shouldBe 10.0
-    learner.getQValue(State(0, 1), Action.Stay) shouldBe 15.0
-    learner.getQValue(State(5, 7), Action.Stay) shouldBe 20.0
+    learner.QTableSnapshot(State(0, 0), Action.Stay) shouldBe 5.0
+    learner.QTableSnapshot(State(1, 0), Action.Stay) shouldBe 10.0
+    learner.QTableSnapshot(State(0, 1), Action.Stay) shouldBe 15.0
+    learner.QTableSnapshot(State(5, 7), Action.Stay) shouldBe 20.0
   
 
   test("QTableLoader should fail on invalid JSON"):
-    val learner = QLearner()
+    val learner = QLearner(gridEnv = createSimpleGrid())
     val invalidJson = """
     {
       "(0, 0)": {"Up": 1.0, "Down": 2.0, "Left": 3.0, "Right": 4.0, "Stay": 5.0
@@ -148,7 +157,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
   
 
   test("QTableLoader should fail on invalid state coordinates"):
-    val learner = QLearner()
+    val learner = QLearner(gridEnv = createSimpleGrid())
     val invalidStateJson = """
     {
       "invalid_state": {"Up": 1.0, "Down": 2.0, "Left": 3.0, "Right": 4.0, "Stay": 5.0}
@@ -160,7 +169,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
   
 
   test("QTableLoader should fail on invalid action names"):
-    val learner = QLearner()
+    val learner = QLearner(gridEnv = createSimpleGrid())
     val invalidActionJson = """
     {
       "(0, 0)": {"InvalidAction": 1.0, "Down": 2.0, "Left": 3.0, "Right": 4.0, "Stay": 5.0}
@@ -174,7 +183,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
   
 
   test("QTableLoader should fail on non-numeric Q-values"):
-    val learner = QLearner()
+    val learner = QLearner(gridEnv = createSimpleGrid())
     val nonNumericJson = """
     {
       "(0, 0)": {"Up": "not_a_number", "Down": 2.0, "Left": 3.0, "Right": 4.0, "Stay": 5.0}
@@ -186,7 +195,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
   
 
   test("QTableLoader should handle empty JSON object"):
-    val learner = QLearner()
+    val learner = QLearner(gridEnv = createSimpleGrid())
     val emptyJson = "{}"
     
     val result = QTableLoader.loadQTableFromJson(emptyJson, learner)
@@ -194,7 +203,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
   
 
   test("QTableLoader should handle whitespace and formatting variations"):
-    val learner = QLearner()
+    val learner = QLearner(gridEnv = createSimpleGrid())
     val messyJson = """
     
     
@@ -210,5 +219,5 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     val result = QTableLoader.loadQTableFromJson(messyJson, learner)
     result shouldBe a[Success[?]]
     
-    learner.getQValue(State(0, 0), Action.Up) shouldBe 1.0
+    learner.QTableSnapshot(State(0, 0), Action.Up) shouldBe 1.0
   
