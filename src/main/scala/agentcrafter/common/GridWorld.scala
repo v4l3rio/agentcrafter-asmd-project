@@ -1,20 +1,18 @@
 package agentcrafter.common
 
-case class StepResult(state: State, reward: Double, isEnd: Boolean)
+import agentcrafter.common.GridWorld.stepPenalty
+
+case class StepResult(state: State, reward: Double)
 
 object GridWorld:
   def apply(rows: Int = 13,
             cols: Int = 15,
-            start: State = State(0, 0),
-            goal: State = State(9, 8),
             walls: Set[State] = Set(
               State(1, 2), State(2, 2)
-            )): GridWorld = new GridWorld(rows, cols, start, goal, walls)
+            )): GridWorld = new GridWorld(rows, cols, walls)
 
   /** Penalty applied for each step taken (encourages shorter paths) */
   private val stepPenalty = -3.0
-  /** Reward given when the agent reaches the goal state */
-  private val goalReward = 50.0
 
 /**
  * Represents a 2D grid-based reinforcement learning environment.
@@ -34,32 +32,9 @@ object GridWorld:
  *
  * @param rows  The number of rows in the grid (height)
  * @param cols  The number of columns in the grid (width)
- * @param start The starting position for agents
- * @param goal  The goal position that provides positive reward
  * @param walls Set of states that represent impassable obstacles
- * @example
- * {{{
- * // Create a simple 5x5 grid with custom start/goal
- * val env = GridWorld(
- *   rows = 5,
- *   cols = 5,
- *   start = State(0, 0),
- *   goal = State(4, 4),
- *   walls = Set(State(2, 2), State(2, 3))
- * )
- *
- * // Take a step in the environment
- * val (nextState, reward, done) = env.step(State(0, 0), Action.Right)
- * }}}
  */
-class GridWorld private (val rows: Int, val cols: Int, val start: State, val goal: State, val walls: Set[State]):
-
-  /**
-   * Resets the environment to the initial state.
-   *
-   * @return The starting state of the environment
-   */
-  def reset(): State = start
+class GridWorld private (val rows: Int, val cols: Int, val walls: Set[State]):
 
   /**
    * Executes one step in the environment given a current state and action.
@@ -77,12 +52,6 @@ class GridWorld private (val rows: Int, val cols: Int, val start: State, val goa
    *         - next state after the action
    *         - reward received for this transition
    *         - boolean indicating if the episode is done (goal reached)
-   * @example
-   * {{{
-   * val env = GridWorld()
-   * val (nextState, reward, done) = env.step(State(0, 0), Action.Right)
-   * // nextState = State(0, 1), reward = -3.0, done = false
-   * }}}
    */
   def step(s: State, a: Action): StepResult  =
     val (dr, dc) = a.delta
@@ -91,9 +60,10 @@ class GridWorld private (val rows: Int, val cols: Int, val start: State, val goa
       (s.c + dc).clamp(0, cols - 1)
     )
     val next = if walls.contains(next0) then s else next0
-    val done = next == goal
-    val reward = if done then GridWorld.goalReward else GridWorld.stepPenalty
-    StepResult(next, reward, done)
+    // if you want to extend the implementation to make different
+    // states give different rewards you can do it here,
+    // for now each step gives a penalty
+    StepResult(next, stepPenalty)
 
 /**
  * Extension method to clamp an integer value between bounds.

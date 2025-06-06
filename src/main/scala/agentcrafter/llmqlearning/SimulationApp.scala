@@ -35,8 +35,8 @@ object SimulationApp extends App with LLMQLearning:
       withLearner:
         Alpha >> 0.05
         Gamma >> 0.99
-        Eps0 >> 0.15 // with llm we can afford a lower initial exploration rate
-        EpsMin >> 0.02
+        Eps0 >> 0 // with llm we can afford a lower initial exploration rate
+        EpsMin >> 0
         Warm >> 500
         Optimistic >> 0.2
       Goal >> (3,4)

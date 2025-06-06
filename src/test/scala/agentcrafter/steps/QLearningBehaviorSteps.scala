@@ -47,7 +47,7 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
     val nextState = State(currentState.r + deltaR, currentState.c + deltaC)
 
     // Store initial Q-value for comparison
-    initialQValue = agent.QTableSnapshot(currentState, action)
+    initialQValue = agent.getQValue(currentState, action)
 
     // Update Q-value
     agent.update(currentState, action, reward.toDouble, nextState)
@@ -71,13 +71,13 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
       case "Stay" => Action.Stay
     }
 
-    val currentQValue = agent.QTableSnapshot(state, action)
+    val currentQValue = agent.getQValue(state, action)
     currentQValue should be > initialQValue
   }
   Then("""the Q-value should reflect the discounted future reward""") { () =>
     // This is verified implicitly by the Q-learning update formula
     // The Q-value should incorporate both immediate and future rewards
-    val currentQValue = agent.QTableSnapshot(currentState, Action.Right)
+    val currentQValue = agent.getQValue(currentState, Action.Right)
     currentQValue should be > 0.0
   }
 
@@ -192,7 +192,7 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
     val nextState = State(0, 1)
     agent.update(currentState, Action.Right, goalReward, nextState)
 
-    val newQValue = agent.QTableSnapshot(currentState, Action.Right)
+    val newQValue = agent.getQValue(currentState, Action.Right)
     newQValue should be (expectedValue +- 0.1)
   }
   Then("""the update should follow the Q-learning formula""") { () =>
@@ -225,12 +225,12 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
     currentState = State(5, 5) // A new, unseen state
   }
   Then("""the initial Q-value should be {double}""") { (expectedValue: Double) =>
-    val qValue = agent.QTableSnapshot(currentState, Action.Up)
+    val qValue = agent.getQValue(currentState, Action.Up)
     qValue should be (expectedValue +- 0.01)
   }
   Then("""this should encourage exploration of unknown areas""") { () =>
     // Optimistic values encourage exploration by making unknown actions seem promising
-    val qValue = agent.QTableSnapshot(currentState, Action.Up)
+    val qValue = agent.getQValue(currentState, Action.Up)
     qValue should be > 0.0
   }
 
@@ -254,13 +254,13 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
   }
   Then("""the new agent should have the same Q-values""") { () =>
     exportedQTable.foreach { case ((s, a), expected) =>
-      val actual = agent.QTableSnapshot(s, a)
+      val actual = agent.getQValue(s, a)
       actual should be(expected +- 1e-4)
     }
   }
   Then("""the learning should continue from the imported state""") { () =>
-    val before = agent.QTableSnapshot(State(0, 0), Action.Right)
+    val before = agent.getQValue(State(0, 0), Action.Right)
     agent.update(State(0, 0), Action.Right, 1.0, State(0, 0))
-    val after = agent.QTableSnapshot(State(0, 0), Action.Right)
+    val after = agent.getQValue(State(0, 0), Action.Right)
     after should not equal before
   }

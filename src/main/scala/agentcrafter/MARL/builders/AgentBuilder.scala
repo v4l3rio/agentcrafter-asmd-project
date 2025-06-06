@@ -1,23 +1,29 @@
 package agentcrafter.MARL.builders
 
 import agentcrafter.MARL.{AgentSpec, EndEpisode, Reward, Trigger}
-import agentcrafter.common.{GridWorld, QLearner, State}
+import agentcrafter.common.{GridWorld, LearningParameters, QLearner, State, StepResult}
 
 import scala.compiletime.uninitialized
 
 class AgentBuilder(parent: SimulationBuilder):
   private var id: String = ""
   private var st: State = State(0, 0)
-  private var gl: Option[State] = None
-  private var rew = 0.0
-  private var learner: QLearner = uninitialized // TODO: CHECK
+  private var gl: State = State(0, 0)
+  private var rew = 0.00
+  private var learner: QLearner = QLearner(
+    learningParameters = LearningParameters(),
+    goalState = gl,
+    goalReward = 0.0,
+    updateFunction = (s, _) => StepResult(s, 0.0),
+    resetFunction = () => st
+  )
 
   def name (n: String): AgentBuilder = {
     id = n; this
   }
 
   def start(r: Int, c: Int): AgentBuilder = { st = State(r, c); this }
-  def goal(r: Int, c: Int): AgentBuilder = { gl = Some(State(r, c)); this }
+  def goal(r: Int, c: Int): AgentBuilder = { gl = State(r, c); this }
   def reward(v: Double): AgentBuilder = { rew = v; this }
 
   // Method to customize the Q-learner parameters for this specific agent
@@ -32,11 +38,13 @@ class AgentBuilder(parent: SimulationBuilder):
     val gridWorld = GridWorld(
       rows = parent.getRows,
       cols = parent.getCols,
-      start = st,
-      goal = gl.getOrElse(State(0, 0)),
       walls = parent.getWalls
     )
-    learner = QLearner(alpha, gamma, eps0, epsMin, warm, optimistic, gridWorld)
+    learner = QLearner(learningParameters = LearningParameters(alpha, gamma, eps0, epsMin, warm, optimistic),
+                            goalState = gl,
+                            goalReward = rew,
+                            updateFunction = gridWorld.step,
+                            resetFunction = () => st)
     this
   }
 
@@ -44,6 +52,5 @@ class AgentBuilder(parent: SimulationBuilder):
   def end(): SimulationBuilder =
     val spec = AgentSpec(id, st, gl, rew, learner)
     parent.addAgent(id, spec)
-    for g <- gl if rew != 0.0 do
-      parent.addTrigger(Trigger(id, g, List(EndEpisode, Reward(rew))))
+    parent.addTrigger(Trigger(id, gl, List(EndEpisode, Reward(rew))))
     parent

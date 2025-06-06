@@ -32,9 +32,9 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     result shouldBe a[Success[?]]
     
     // Verify that Q-values were loaded correctly
-    learner.QTableSnapshot(State(0, 0), Action.Right) shouldBe 3.0
-    learner.QTableSnapshot(State(0, 1), Action.Up) shouldBe 2.5
-    learner.QTableSnapshot(State(1, 0), Action.Down) shouldBe 3.5
+    learner.getQValue(State(0, 0), Action.Right) shouldBe 3.0
+    learner.getQValue(State(0, 1), Action.Up) shouldBe 2.5
+    learner.getQValue(State(1, 0), Action.Down) shouldBe 3.5
   
 
   test("QTableLoader should handle JSON with markdown code blocks"):
@@ -50,7 +50,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     val result = QTableLoader.loadQTableFromJson(jsonWithMarkdown, learner)
     result shouldBe a[Success[?]]
     
-    learner.QTableSnapshot(State(0, 0), Action.Down) shouldBe 2.0
+    learner.getQValue(State(0, 0), Action.Down) shouldBe 2.0
   
 
   test("QTableLoader should handle JSON with language specification"):
@@ -66,7 +66,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     val result = QTableLoader.loadQTableFromJson(jsonWithLangSpec, learner)
     result shouldBe a[Success[?]]
     
-    learner.QTableSnapshot(State(1, 1), Action.Up) shouldBe 5.0
+    learner.getQValue(State(1, 1), Action.Up) shouldBe 5.0
 
   test("QTableLoader should handle JSON with LLM prefixes"):
     val learner = QLearner(gridEnv = createSimpleGrid())
@@ -80,7 +80,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     val result = QTableLoader.loadQTableFromJson(jsonWithPrefix, learner)
     result shouldBe a[Success[?]]
     
-    learner.QTableSnapshot(State(2, 2), Action.Stay) shouldBe 1.0
+    learner.getQValue(State(2, 2), Action.Stay) shouldBe 1.0
   
 
   test("QTableLoader should handle incomplete markdown blocks"):
@@ -95,7 +95,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     val result = QTableLoader.loadQTableFromJson(incompleteMarkdown, learner)
     result shouldBe a[Success[?]]
     
-    learner.QTableSnapshot(State(0, 0), Action.Left) shouldBe 3.0
+    learner.getQValue(State(0, 0), Action.Left) shouldBe 3.0
 
 
   test("QTableLoader should handle all action types"):
@@ -115,11 +115,11 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     val result = QTableLoader.loadQTableFromJson(jsonWithAllActions, learner)
     result shouldBe a[Success[?]]
     
-    learner.QTableSnapshot(State(0, 0), Action.Up) shouldBe 1.0
-    learner.QTableSnapshot(State(0, 0), Action.Down) shouldBe 2.0
-    learner.QTableSnapshot(State(0, 0), Action.Left) shouldBe 3.0
-    learner.QTableSnapshot(State(0, 0), Action.Right) shouldBe 4.0
-    learner.QTableSnapshot(State(0, 0), Action.Stay) shouldBe 5.0
+    learner.getQValue(State(0, 0), Action.Up) shouldBe 1.0
+    learner.getQValue(State(0, 0), Action.Down) shouldBe 2.0
+    learner.getQValue(State(0, 0), Action.Left) shouldBe 3.0
+    learner.getQValue(State(0, 0), Action.Right) shouldBe 4.0
+    learner.getQValue(State(0, 0), Action.Stay) shouldBe 5.0
   
 
   test("QTableLoader should handle multiple states"):
@@ -136,10 +136,10 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     val result = QTableLoader.loadQTableFromJson(jsonWithMultipleStates, learner)
     result shouldBe a[Success[?]]
     
-    learner.QTableSnapshot(State(0, 0), Action.Stay) shouldBe 5.0
-    learner.QTableSnapshot(State(1, 0), Action.Stay) shouldBe 10.0
-    learner.QTableSnapshot(State(0, 1), Action.Stay) shouldBe 15.0
-    learner.QTableSnapshot(State(5, 7), Action.Stay) shouldBe 20.0
+    learner.getQValue(State(0, 0), Action.Stay) shouldBe 5.0
+    learner.getQValue(State(1, 0), Action.Stay) shouldBe 10.0
+    learner.getQValue(State(0, 1), Action.Stay) shouldBe 15.0
+    learner.getQValue(State(5, 7), Action.Stay) shouldBe 20.0
   
 
   test("QTableLoader should fail on invalid JSON"):
@@ -219,5 +219,5 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     val result = QTableLoader.loadQTableFromJson(messyJson, learner)
     result shouldBe a[Success[?]]
     
-    learner.QTableSnapshot(State(0, 0), Action.Up) shouldBe 1.0
+    learner.getQValue(State(0, 0), Action.Up) shouldBe 1.0
   

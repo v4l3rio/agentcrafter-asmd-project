@@ -1,135 +1,80 @@
 package agentcrafter.llmqlearning
 
-import agentcrafter.common.Action.{Down, Up}
 import agentcrafter.common.{Action, QLearner, State}
 import play.api.libs.json.*
 
-import scala.util.{Failure, Success, Try}
 import scala.collection.mutable
+import scala.util.{Failure, Success, Try}
+import scala.util.control.NonFatal
 
 /**
- * Utility for loading Q-Tables from JSON format
+ * Pure helpers to **serialise / deserialize** a Q‑table carried by a [[QLearner]].
  */
 object QTableLoader:
   
-  /**
-   * Loads a Q-Table from JSON string into a QLearner instance
-   * 
-   * @param jsonString JSON representation of the Q-Table
-   * @param learner The QLearner instance to load the Q-Table into
-   * @return Try[Unit] indicating success or failure
-   */
-  def loadQTableFromJson(jsonString: String, learner: QLearner): Try[Unit] = 
-    Try {
-      // Clean the JSON string by removing markdown code block formatting
-      val cleanedJson = cleanJsonString(jsonString)
-      val json = Json.parse(cleanedJson)
-      
-      // Parse JSON and populate Q-Table using the public interface
-      json.as[JsObject].fields.foreach { case (stateKey, actionsJson) =>
-        // Parse state coordinates from string like "(0, 0)"
-        val stateCoords = parseStateCoordinates(stateKey)
-        val state = State(stateCoords._1, stateCoords._2)
-        
-        // Parse actions and their Q-values
-        actionsJson.as[JsObject].fields.foreach { case (actionName, qValueJson) =>
-          val qValue = qValueJson.as[Double]
-          val action = actionName match {
-            case "Up" => Up
-            case "Down" => Down
-            case "Left" => Action.Left
-            case "Right" => Action.Right
-            case "Stay" => Action.Stay
-            case _ => throw new IllegalArgumentException(s"Unknown action: $actionName")
-          }
-          
-          // Use reflection to set Q-values since there's no public setter
-          setQValueViaReflection(learner, state, action, qValue)
-        }
+  private given actionFormat: Format[Action] = new Format[Action]:
+    private val map = Action.values.map(a => a.toString -> a).toMap
+    def reads(j: JsValue): JsResult[Action] =
+      j.validate[String].flatMap { str =>
+        map.get(str) match
+          case Some(a) => JsSuccess(a)
+          case None    => JsError(s"unknown Action '$str'")
       }
-    }.recoverWith {
-      case ex: Exception => 
-        Failure(new RuntimeException(s"Failed to load Q-Table from JSON: ${ex.getMessage}", ex))
+    def writes(a: Action): JsValue = JsString(a.toString)
+
+  private val stateRegex = """\((\d+)\s*,\s*(\d+)\)""".r
+
+  private given stateKeyFormat: Format[State] = new Format[State]:
+    def reads(j: JsValue): JsResult[State] = j.validate[String].flatMap {
+      case stateRegex(r, c) => JsSuccess(State(r.toInt, c.toInt))
+      case other            => JsError(s"invalid state key '$other'")
     }
-  
-  /**
-   * Cleans JSON string by removing markdown code block formatting and other common LLM artifacts
-   */
-  private def cleanJsonString(jsonString: String): String = {
-    val trimmed = jsonString.trim
-    
-    // Remove markdown code block markers
-    val withoutCodeBlocks = if (trimmed.startsWith("```")) {
-      val lines = trimmed.split("\n")
-      val startIndex = if (lines.head.startsWith("```json") || lines.head == "```") 1 else 0
-      val endIndex = lines.lastIndexWhere(_.trim == "```")
-      
-      if (endIndex > startIndex) {
-        lines.slice(startIndex, endIndex).mkString("\n")
-      } else {
-        // If no closing ```, remove just the opening
-        lines.drop(startIndex).mkString("\n")
-      }
-    } else {
-      trimmed
+    def writes(s: State): JsValue = JsString(s"(${s.r}, ${s.c})")
+
+  private given qTableReads: Reads[Map[(State, Action), Double]] = Reads { json =>
+    json.validate[Map[State, Map[Action, Double]]].map { nested =>
+      nested.flatMap { case (st, actMap) => actMap.view.map { case (a, v) => (st, a) -> v } }
     }
-    
-    // Additional cleaning for common LLM artifacts
-    val cleaned = withoutCodeBlocks
-      .trim
-      .replaceAll("^[Jj]son\\s*", "") // Remove "json" or "Json" at the beginning
-      .replaceAll("^[Hh]ere.*?:\\s*", "") // Remove "Here is the JSON:" type prefixes
-      .trim
-    
-    cleaned
+  }
+
+  private given qTableWrites: Writes[Map[(State, Action), Double]] = Writes { map =>
+    val grouped: Map[State, Map[Action, Double]] =
+      map.groupMapReduce(_._1._1) { case ((_, a), v) => Map(a -> v) }(_ ++ _)
+    Json.toJson(grouped)
   }
   
-  /**
-   * Sets a Q-value using reflection to access private methods/fields
-   */
-  private def setQValueViaReflection(learner: QLearner, state: State, action: Action, value: Double): Unit = 
-    try {
-      // Access the private Q field (QTable instance)
-      val qField = learner.getClass.getDeclaredField("Q")
-      qField.setAccessible(true)
-      val qTable = qField.get(learner)
-      
-      // Access the private table field inside QTable
-      val tableField = qTable.getClass.getDeclaredField("table")
-      tableField.setAccessible(true)
-      val table = tableField.get(qTable).asInstanceOf[mutable.Map[(State, Action), Double]]
-      
-      // Set the Q-value
-      table((state, action)) = value
-    } catch {
-      case ex: Exception =>
-        throw new RuntimeException(s"Could not set Q-value for state $state, action $action: ${ex.getMessage}")
-    }
-  
-  /**
-   * Parses state coordinates from string format "(r, c)"
-   */
-  private def parseStateCoordinates(stateStr: String): (Int, Int) = 
-    val cleaned = stateStr.trim.stripPrefix("(").stripSuffix(")")
-    val parts = cleaned.split(",").map(_.trim.toInt)
-    (parts(0), parts(1))
-  
-  /**
-   * Converts a Q-Table to JSON format
-   * 
-   * @param learner The QLearner instance to extract Q-Table from
-   * @return JSON string representation of the Q-Table
-   */
-  def qTableToJson(learner: QLearner): String = 
-    val qTable = learner.QTableSnapshot
-    val grouped = qTable.groupBy(_._1._1) // Group by State
-    
-    val jsonObject = grouped.map { case (state, stateActions) =>
-      val stateKey = s"(${state.r}, ${state.c})"
-      val actionsJson = stateActions.map { case ((_, action), qValue) =>
-        action.toString -> JsNumber(qValue)
-      }
-      stateKey -> JsObject(actionsJson)
-    }
-    
-    Json.stringify(JsObject(jsonObject))
+
+  /** Load a Q‑table (produced by an LLM) into the learner; reflection is hidden here. */
+  def loadQTableFromJson(raw: String, learner: QLearner): Try[Unit] =
+    for
+      cleaned <- Success(stripLlMDecorations(raw))
+      table   <- Json.parse(cleaned).validate[Map[(State, Action), Double]].asEither
+        .fold(err => Failure(new RuntimeException(err.toString)), Success.apply)
+      _       <- inject(learner, table)
+    yield ()
+
+  /** Serialise the learner's current Q‑table. */
+  def qTableToJson(learner: QLearner): String =
+    Json.prettyPrint(Json.toJson(learner.QTableSnapshot))
+
+  /*──────────────────────── helpers  ────────────────────────*/
+
+  private def stripLlMDecorations(s: String): String =
+    val noTicks =
+      if s.trim.startsWith("```") then s.trim.stripPrefix("```json").stripPrefix("```").stripSuffix("```")
+      else s
+    noTicks.replaceAll("(?i)^json\\s*", "").replaceAll("(?i)^here.*?:\\s*", "").trim
+
+  private def inject(learner: QLearner, table: Map[(State, Action), Double]) = Try {
+    val qField   = learner.getClass.getDeclaredField("Q")
+    qField.setAccessible(true)
+    val qTable   = qField.get(learner)
+
+    val mapField = qTable.getClass.getDeclaredField("table")
+    mapField.setAccessible(true)
+    val internal = mapField.get(qTable).asInstanceOf[mutable.Map[(State, Action), Double]]
+
+    internal ++= table  // bulk update
+  }.recoverWith { case NonFatal(e) =>
+    Failure(new RuntimeException("Failed to inject Q‑values via reflection: " + e.getMessage, e))
+  }

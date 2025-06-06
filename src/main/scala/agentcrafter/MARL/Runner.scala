@@ -1,6 +1,6 @@
 package agentcrafter.MARL
 
-import agentcrafter.MARL.visualizers.{QTableVisualizer, SimulationVisualizer}
+import agentcrafter.MARL.visualizers.{QTableVisualizer, Visualizer}
 import agentcrafter.common.{Action, QLearner, State}
 
 import scala.collection.mutable
@@ -11,12 +11,13 @@ import scala.collection.mutable
 class Runner(spec: WorldSpec, showGui: Boolean):
 
   /* ---------- optional visualization --------------------------------- */
-  private var vis: Option[SimulationVisualizer] = None          // lazy
+  private var vis: Option[Visualizer] = None          // lazy
   private var qTableVis: List[QTableVisualizer] = List.empty
 
   private def maybeInitGui(ep: Int): Unit =
     if vis.isEmpty && ep >= spec.showAfter then
-      vis = Some(new SimulationVisualizer(spec))                // finestra principale
+      vis = Some(new Visualizer("MARL Simulation", spec.rows, spec.cols, cell = 48, delayMs = spec.stepDelay))
+      vis.foreach(_.configureMultiAgent(spec))                // configure for multi-agent mode
       // Crea visualizzatori Q-table per ogni agente
       qTableVis = agentsQL.map { case (id, learner) =>
         new QTableVisualizer(id, learner, spec)
@@ -74,7 +75,7 @@ class Runner(spec: WorldSpec, showGui: Boolean):
 
       // 4. goal and parametric rewards
       val reached: Set[String] =
-        agentMap.collect { case (id, spec) if spec.goal.contains(nextPos(id)) => id }.toSet
+        agentMap.collect { case (id, spec) if spec.goal.eq(nextPos(id)) => id }.toSet
 
       def rewardFor(id: String,
                     bonus: Double,
@@ -95,7 +96,7 @@ class Runner(spec: WorldSpec, showGui: Boolean):
 
       state = nextPos
       steps += 1
-      vis.foreach(_.update(state, dynamicWalls.toSet, steps))
+      vis.foreach(_.updateMultiAgent(state, dynamicWalls.toSet, steps))
       // Update Q-table visualizers every 10 steps to avoid too frequent updates
       if steps % 10 == 0 then qTableVis.foreach(_.update())
     steps
@@ -119,7 +120,7 @@ class Runner(spec: WorldSpec, showGui: Boolean):
 
     while !done && k < spec.stepLimit do
       // 1. ridisegna
-      vis.foreach(_.update(state, dynamicWalls.toSet, k))
+      vis.foreach(_.updateMultiAgent(state, dynamicWalls.toSet, k))
 
       // 2. politica greedy (ε = 0) per ogni agente
       val actions: Map[String, Action] =
@@ -137,7 +138,7 @@ class Runner(spec: WorldSpec, showGui: Boolean):
 
       // 5. CONDIZIONE DI USCITA PARAMETRICA
       done = agentMap.exists { case (id, spec) =>
-        spec.goal.contains(nxt(id)) // true se quell'agente ha un goal
+        spec.goal.eq(nxt(id)) // true se quell'agente ha un goal
       }
 
       // 6. aggiorna stato e step
@@ -146,7 +147,7 @@ class Runner(spec: WorldSpec, showGui: Boolean):
     end while
 
     // ultimo frame
-    vis.foreach(_.update(state, dynamicWalls.toSet, k))
+    vis.foreach(_.updateMultiAgent(state, dynamicWalls.toSet, k))
 
   private def resetEpisode(): Unit =
     state = agentMap.view.mapValues(_.start).toMap

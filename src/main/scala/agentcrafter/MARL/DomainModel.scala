@@ -58,7 +58,7 @@ case class Trigger(who: String, at: State, effects: List[Effect])
  */
 case class AgentSpec(id: String,
                      start: State,
-                     goal: Option[State],
+                     goal: State,
                      goalReward: Double,
                      learner: QLearner)
 

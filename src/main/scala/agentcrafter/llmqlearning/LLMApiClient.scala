@@ -1,6 +1,7 @@
 package agentcrafter.llmqlearning
 
 import sttp.client4.httpclient.HttpClientSyncBackend
+import sttp.client4.StreamBackend
 import scala.concurrent.duration.Duration
 import play.api.libs.json._
 import scala.util.{Failure, Try, Using}
@@ -27,7 +28,7 @@ class LLMApiClient(
    * Trigger an LLM generation.
    *
    * @param prompt   Extra text to prepend
-   * @param model    Model name (default: "gpt-4")
+   * @param model    Model name (default: "gpt-4o")
    * @param stream   Whether to request streaming output
    * @param endpoint API path (default: "/v1/chat/completions")
    */
@@ -45,7 +46,7 @@ class LLMApiClient(
 
   /**
    * Constructs a full URI by combining the base URL with the endpoint path.
-   * 
+   *
    * @param endpoint The API endpoint path
    * @return Complete URI for the API call
    * @throws IllegalArgumentException if the resulting URI is invalid
@@ -57,7 +58,7 @@ class LLMApiClient(
 
   /**
    * Performs the actual HTTP POST request to the LLM API.
-   * 
+   *
    * @param prompt The user prompt
    * @param model The LLM model to use
    * @param stream Whether to enable streaming
@@ -100,7 +101,7 @@ class LLMApiClient(
         .readTimeout(Duration.Inf) // wait indefinitely for response
         .send(HttpClientSyncBackend())
 
-      if resp.code.isSuccess then 
+      if resp.code.isSuccess then
         // Parse OpenAI response format
         val parsed = Json.parse(resp.body)
         (parsed \ "choices" \ 0 \ "message" \ "content").asOpt[String]
@@ -111,9 +112,9 @@ class LLMApiClient(
         Failure(new RuntimeException(s"Error calling OpenAI API at ${fullUri(endpoint)} – ${ex.getMessage}", ex))
     }
 
-  /** 
+  /**
    * Escapes control characters so the string can be safely embedded in JSON.
-   * 
+   *
    * @param s The string to escape
    * @return JSON-safe escaped string
    */
@@ -128,7 +129,7 @@ class LLMApiClient(
 
   /**
    * Wraps a string in JSON quotes with proper escaping.
-   * 
+   *
    * @param s The string to wrap
    * @return JSON-formatted string with quotes
    */
@@ -136,14 +137,14 @@ class LLMApiClient(
 
   /**
    * Extracts the `simulation:` block from SimulationApp.scala if present.
-   * 
+   *
    * This method reads the SimulationApp.scala file and extracts any simulation
    * DSL content to include in the LLM prompt for context.
-   * 
+   *
    * @return Try containing the simulation content or an error message
    */
   private def readSimulationAppFile(): Try[String] =
-    val simPath = "src/main/scala/llmqlearning/SimulationApp.scala"
+    val simPath = "src/main/scala/agentcrafter/llmqlearning/SimulationApp.scala"
     val file     = File(simPath)
 
     if file.exists then

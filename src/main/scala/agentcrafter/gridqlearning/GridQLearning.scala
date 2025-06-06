@@ -1,85 +1,89 @@
 package agentcrafter.gridqlearning
 
 import agentcrafter.common.*
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.immutable.Vector
 
 /**
- * Utility object for visualizing agent trajectories in a grid world.
- *
- * Provides methods to draw ASCII representations of grid worlds with
- * agent paths, showing the order in which states were visited.
+ * Utility functions for producing (pure) ASCII renderings of an agent trajectory
+ * in a GridWorld, plus an optional impure helper for quick REPL/CLI use.
  */
 object Draw:
-  /**
-   * Character sequence used to represent visit order in trajectory visualization.
-   * Uses letters a-z, then A-Z, then '*' for states visited beyond 52 steps.
-   */
-  private val glyphs = ('a' to 'z') ++ ('A' to 'Z') :+ '*'
+  // finite alphabet a‒z, A‒Z; any step ≥52 is rendered as '*'
+  private val glyphs: IndexedSeq[Char] =
+    ('a' to 'z') ++ ('A' to 'Z')
+
+  @inline private def glyph(i: Int): Char =
+    if i < glyphs.length then glyphs(i) else '*'
 
   /**
-   * Visualizes an agent's trajectory through a grid world.
-   *
-   * Prints an ASCII representation of the grid where:
-   * - "##" represents walls
-   * - "S " represents the start position
-   * - "G " represents the goal position
-   * - Letters (a-z, A-Z) show the order of first visits to each state
-   * - ". " represents unvisited states
-   *
-   * @param env The grid world environment
-   * @param path List of states representing the agent's trajectory
+   * Pure function: returns one ASCII line per grid row.
+   * The first visit to each state is highlighted with a glyph
+   * according to the visit index.
    */
-  def traj(env: GridWorld, path: List[State]): Unit =
-    val idx = path.tail.zipWithIndex.toMap
-    for r <- 0 until env.rows do
-      for c <- 0 until env.cols do
-        val s = State(r,c)
-        val ch =
-          if env.walls contains s then "##"
-          else if s == env.start  then "S "
-          else if s == env.goal   then "G "
-          else idx.get(s) match
-            case Some(i) => s"${glyphs(math.min(i, glyphs.length-1))} "
-            case None    => ". "
-        print(ch)
-      println()
-    println()
+  private def asciiLines(start: State, goal: State, walls: Set[State], path: List[State], rows: Int, cols: Int): Vector[String] =
+    // Map first visit only (ignore revisits)
+    val firstVisit: Map[State, Int] =
+      path.drop(1).zipWithIndex.foldLeft(Map.empty[State, Int]) {
+        case (m, (s, i)) => if m.contains(s) then m else m.updated(s, i)
+      }
+
+    (0 until rows).toVector.map { r =>
+      (0 until cols).map { c =>
+        val s = State(r, c)
+        if walls.contains(s) then "##"
+        else if s == start then "S "
+        else if s == goal then "G "
+        else firstVisit.get(s) match
+          case Some(i) => s"${glyph(i)} "
+          case None => ". "
+      }.mkString
+    }
+
+  /** Single String rendering (newline‑separated). Pure. */
+  def asciiString(start: State, goal: State, walls: Set[State], path: List[State], rows: Int, cols: Int): String =
+    asciiLines(start, goal, walls, path, rows, cols).mkString("\n")
+
+  /**
+   * Convenience side‑effecting helper – delegates to println.
+   * Keeps impure concern *outside* core logic.
+   */
+  def render(start: State, goal: State, walls: Set[State], path: List[State], rows: Int, cols: Int): Unit =
+    println(asciiString(start, goal, walls, path, rows, cols))
 
 
 /**
- * Main training program for Q-Learning on a grid world.
- *
- * This program trains a Q-learning agent on a default grid world environment
- * for 10,000 episodes. It provides periodic progress reports showing the
- * current epsilon value and average steps per episode, and periodically
- * evaluates the learned policy by running greedy episodes.
- *
- * Training features:
- * - Reports progress every 500 episodes
- * - Evaluates greedy policy every 1,000 episodes
- * - Visualizes the greedy trajectory during evaluation
- * - Tracks only successful episodes (those that reach the goal)
+ * Main training entry‑point for Q‑Learning on a GridWorld.
+ * Prints progress reports and periodically visualises the greedy policy
+ * using the (pure) Draw helpers.
  */
 @main def Train(): Unit =
-  val env      = GridWorld()
-  val agent    = QLearner(gridEnv = env)
-  val episodes = 10_000
-  val stepsOK  = ArrayBuffer.empty[Int]   // only episodes that finish
+  val start = State(0, 0) // agent start position
+  val goal = State(5, 5) // agent goal position
 
-  val reportEvery   = 500   // Report progress every 500 episodes
-  val evaluateEvery = 1_000 // Evaluate greedy policy every 1,000 episodes
+  val env = GridWorld(rows = 10, cols = 10, walls = Set(State(1, 1), State(1, 2), State(1, 3), State(2, 3), State(3, 3), State(4, 3), State(5, 3), State(6, 3), State(7, 3), State(8, 3)))
+  val agent = QLearner(
+    goalState = goal,
+    goalReward = 50,
+    updateFunction = env.step,
+    resetFunction = () => start
+  )
+  val episodes = 20_000
+
+  var successes = Vector.empty[Int]
+
+  val reportEvery = 500 // progress log cadence
+  val evaluateEvery = 1_000 // greedy‑policy evaluation cadence
 
   for ep <- 1 to episodes do
     val (done, steps, _) = agent.episode()
-    if done then stepsOK += steps
+    if done then successes :+= steps
 
     if ep % reportEvery == 0 then
-      val last = stepsOK.takeRight(reportEvery)
-      val mean = if last.nonEmpty then last.sum.toDouble/last.size else Double.NaN
-      println(f"Ep $ep%6d | ε=${agent.eps}%.3f | ⟨steps⟩=${mean}%.2f")
+      val window = successes.takeRight(reportEvery)
+      val mean = if window.nonEmpty then window.sum.toDouble / window.size else Double.NaN
+      println(f"Ep $ep%6d | ε=${agent.eps}%.3f | ⟨steps⟩=$mean%.2f")
 
     if ep % evaluateEvery == 0 then
-      val (_, sEval, trajEval) = agent.episode()
-      println(s"Greedy policy needs $sEval steps:")
-      val states: List[State] = trajEval.map(_._1)
-      Draw.traj(env, states)
+      val (_, greedySteps, trajEval) = agent.episode() // NB: still learns; refactor QLearner to expose pure greedy run if needed
+      println(s"Greedy policy needs $greedySteps steps:")
+      println(Draw.asciiString(start, goal, env.walls, trajEval.map(_._1), env.rows, env.cols))

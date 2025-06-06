@@ -112,28 +112,28 @@ class LLMQTableLoadingSteps extends ScalaDsl with EN with Matchers:
     
     // For the valid JSON scenario
     if jsonString.contains("\"(0, 0)\": {\"Up\": 1.5") then
-      this.learner.QTableSnapshot(State(0, 0), Action.Right) shouldBe 3.0
-      this.learner.QTableSnapshot(State(0, 1), Action.Up) shouldBe 2.5
-      this.learner.QTableSnapshot(State(1, 0), Action.Down) shouldBe 3.5
+      this.learner.getQValue(State(0, 0), Action.Right) shouldBe 3.0
+      this.learner.getQValue(State(0, 1), Action.Up) shouldBe 2.5
+      this.learner.getQValue(State(1, 0), Action.Down) shouldBe 3.5
     
     // For the markdown scenario
     else if jsonString.contains("```json") && jsonString.contains("\"(0, 0)\": {\"Up\": 1.0") then
-      learner.QTableSnapshot(State(0, 0), Action.Down) shouldBe 2.0
+      learner.getQValue(State(0, 0), Action.Down) shouldBe 2.0
     
     // For the LLM prefixes scenario
     else if jsonString.contains("Here is the JSON") then
-      learner.QTableSnapshot(State(2, 2), Action.Stay) shouldBe 1.0
+      learner.getQValue(State(2, 2), Action.Stay) shouldBe 1.0
   }
   
   Then("""all actions should have correct Q-values""") { () =>
     // This step verifies that all actions have the correct Q-values
     // The specific values depend on the scenario
     if jsonString.contains("\"(0, 0)\": {\"Up\": 1.0, \"Down\": 2.0, \"Left\": 3.0, \"Right\": 4.0, \"Stay\": 5.0}") then
-      learner.QTableSnapshot(State(0, 0), Action.Up) shouldBe 1.0
-      learner.QTableSnapshot(State(0, 0), Action.Down) shouldBe 2.0
-      learner.QTableSnapshot(State(0, 0), Action.Left) shouldBe 3.0
-      learner.QTableSnapshot(State(0, 0), Action.Right) shouldBe 4.0
-      learner.QTableSnapshot(State(0, 0), Action.Stay) shouldBe 5.0
+      learner.getQValue(State(0, 0), Action.Up) shouldBe 1.0
+      learner.getQValue(State(0, 0), Action.Down) shouldBe 2.0
+      learner.getQValue(State(0, 0), Action.Left) shouldBe 3.0
+      learner.getQValue(State(0, 0), Action.Right) shouldBe 4.0
+      learner.getQValue(State(0, 0), Action.Stay) shouldBe 5.0
   }
   
   Then("""the markdown formatting should be stripped""") { () =>
