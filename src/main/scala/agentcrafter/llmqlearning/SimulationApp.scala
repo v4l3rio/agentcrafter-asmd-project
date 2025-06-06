@@ -40,7 +40,9 @@ object SimulationApp extends App with LLMQLearning:
         Warm >> 500
         Optimistic >> 0.2
       Goal >> (3,4)
-      Reward >> 100.0
+      onGoal:
+        Give >> 100
+        EndEpisode >> true
     Episodes >> 1
     Steps >> 500
     Delay >> 50

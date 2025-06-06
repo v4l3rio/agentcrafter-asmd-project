@@ -40,7 +40,9 @@ object SimulationApp extends App with SimulationDSL:
         Warm >> 1_000
         Optimistic >> 0.5
       Goal >> (2, 4)
-      Reward >> 100.0
+      onGoal:
+        Give >> 100
+        EndEpisode >> true
     Episodes >> 10_000
     Steps >> 400
     ShowAfter >> 9_000

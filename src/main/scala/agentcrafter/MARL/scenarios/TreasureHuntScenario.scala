@@ -81,7 +81,10 @@ object TreasureHuntScenario extends App with SimulationDSL:
         Warm >> 3_000
         Optimistic >> 1.0
       Goal >> (1, 12)  // Key collection point
-      Reward >> 60.0
+      onGoal:
+        Give >> 80.0  // Reward for collecting keys
+        OpenWall >> (9, 10)
+        EndEpisode >> false  // Continue until all keys are collected
     
     // Guardian: Clears obstacles and guards passages
     agent:
@@ -95,7 +98,11 @@ object TreasureHuntScenario extends App with SimulationDSL:
         Warm >> 3_000
         Optimistic >> 0.8
       Goal >> (5, 7)   // Guard post
-      Reward >> 70.0
+      onGoal:
+        Give >> 60.0  // Reward for clearing obstacles
+        OpenWall >> (6, 7) // Clear obstacle 1
+        OpenWall >> (7, 7)
+        EndEpisode >> false  // Continue until all obstacles are cleared
     
     // Treasure Hunter: Claims the final treasure
     agent:
@@ -109,32 +116,10 @@ object TreasureHuntScenario extends App with SimulationDSL:
         Warm >> 3_000
         Optimistic >> 0.5
       Goal >> (9, 12)  // Treasure location
-      Reward >> 150.0
-    
-    // Key collection triggers
-    on("KeyMaster", 1, 12):
-      OpenWall >> (9, 10)   // Open first door
-      Give >> 40.0
-    
-    on("KeyMaster", 3, 1):
-      OpenWall >> (10, 10)  // Open second door
-      Give >> 40.0
-    
-    // Guardian clearing obstacles
-    on("Guardian", 5, 7):
-      OpenWall >> (6, 7)    // Clear obstacle 1
-      OpenWall >> (7, 7)    // Clear obstacle 2
-      Give >> 50.0
-    
-    on("Guardian", 2, 5):
-      OpenWall >> (4, 7)    // Open passage in wall
-      Give >> 30.0
-    
-    // Bonus cooperation rewards
-    on("TreasureHunter", 9, 12):
-      Give >> 100.0  // Big bonus for reaching treasure
-      EndEpisode >> true
-    
+      onGoal:
+        Give >> 100.0  // Big reward for reaching treasure
+        EndEpisode >> true  // End episode when treasure is claimed
+
     Episodes >> 20_000
     Steps >> 600
     ShowAfter >> 17_000

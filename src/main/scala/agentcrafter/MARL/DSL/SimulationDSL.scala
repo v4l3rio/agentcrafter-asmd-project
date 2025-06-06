@@ -101,17 +101,15 @@ trait SimulationDSL:
     )
 
   /**
-   * Defines a trigger that activates when a specific agent reaches a specific position.
-   * 
-   * @param who The agent ID that can trigger this effect
-   * @param r Row position of the trigger
-   * @param c Column position of the trigger
-   * @param block Configuration block for trigger effects
+   * Defines trigger effects for the current agent's goal position.
    */
-  def on(who: String, r: Int, c: Int)(block: TriggerBuilder ?=> Unit)(using wrapper: SimulationWrapper) =
-    val tb = wrapper.builder.on(who, r, c)
+  def onGoal(block: TriggerBuilder ?=> Unit)(using agentWrapper: AgentWrapper, wrapper: SimulationWrapper): Unit =
+    val g = agentWrapper.builder.currentGoal
+    val id = agentWrapper.builder.currentId
+    val tb = wrapper.builder.newTrigger(id, g.r, g.c)
     given TriggerBuilder = tb
     block
+    wrapper.builder = tb.finish()
 
   /**
    * Trigger effect that removes a wall at the specified position.

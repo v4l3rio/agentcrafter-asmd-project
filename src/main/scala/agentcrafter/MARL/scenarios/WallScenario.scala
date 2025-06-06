@@ -44,7 +44,10 @@ object WallScenario extends App with SimulationDSL:
         Warm >> 1_500
         Optimistic >> 0.5
       Goal >> (6, 2)  // Switch location
-      Reward >> 50.0
+      onGoal:
+        Give >> 25.0  // Reward for reaching the goal
+        OpenWall >> (4, 6)
+        EndEpisode >> true  // End episode when Runner reaches the goal
     
     // Agent that needs to reach the other side
     agent:
@@ -58,12 +61,9 @@ object WallScenario extends App with SimulationDSL:
         Warm >> 1_500
         Optimistic >> 0.5
       Goal >> (6, 10)  // Goal on the other side
-      Reward >> 100.0
-    
-    // Trigger: When Opener reaches the switch, open the wall
-    on("Opener", 6, 2):
-      OpenWall >> (4, 6)  // Open a passage in the wall
-      Give >> 25.0  // Bonus reward for opening the wall
+      onGoal:
+        Give >> 55.0  // Reward for reaching the goal
+        EndEpisode >> true  // End episode when Opener reaches the switch
     
     Episodes >> 12_000
     Steps >> 300

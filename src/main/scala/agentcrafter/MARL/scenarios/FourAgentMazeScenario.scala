@@ -10,6 +10,7 @@ import agentcrafter.MARL.DSL.{SimulationDSL, *}
 object FourAgentMazeScenario extends App with SimulationDSL:
   import AgentProperty.*
   import LearnerProperty.*
+  import TriggerProperty.*
   import WallProperty.*
   import LineProperty.*
   import SimulationProperty.*
@@ -66,7 +67,9 @@ object FourAgentMazeScenario extends App with SimulationDSL:
         Warm >> 2_000
         Optimistic >> 0.3
       Goal >> (5, 5)  // Center of maze
-      Reward >> 80.0
+      onGoal:
+        Give >> 80.0
+        EndEpisode >> true
     
     // Agent 2: North-East corner agent
     agent:
@@ -80,7 +83,9 @@ object FourAgentMazeScenario extends App with SimulationDSL:
         Warm >> 2_000
         Optimistic >> 0.3
       Goal >> (3, 3)  // Inside maze, top-left area
-      Reward >> 75.0
+      onGoal:
+        Give >> 75.0
+        EndEpisode >> true
     
     // Agent 3: South-West corner agent
     agent:
@@ -94,7 +99,9 @@ object FourAgentMazeScenario extends App with SimulationDSL:
         Warm >> 2_000
         Optimistic >> 0.3
       Goal >> (6, 6)  // Inside maze, bottom-right area
-      Reward >> 85.0
+      onGoal:
+        Give >> 85.0
+        EndEpisode >> true
     
     // Agent 4: South-East corner agent
     agent:
@@ -108,7 +115,9 @@ object FourAgentMazeScenario extends App with SimulationDSL:
         Warm >> 2_000
         Optimistic >> 0.3
       Goal >> (4, 3)  // Inside maze, middle-left area
-      Reward >> 90.0
+      onGoal:
+        Give >> 90.0
+        EndEpisode >> true
     
     Episodes >> 18_000
     Steps >> 400

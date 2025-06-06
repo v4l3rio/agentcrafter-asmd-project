@@ -53,13 +53,11 @@ case class Trigger(who: String, at: State, effects: List[Effect])
  * @param id Unique identifier for the agent
  * @param start Starting position of the agent
  * @param goal Optional goal position (if None, agent has no specific goal)
- * @param goalReward Reward given when the agent reaches its goal
  * @param learner The Q-learning algorithm instance for this agent
  */
 case class AgentSpec(id: String,
                      start: State,
                      goal: State,
-                     goalReward: Double,
                      learner: QLearner)
 
 /**

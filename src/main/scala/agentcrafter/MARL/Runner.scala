@@ -27,6 +27,7 @@ class Runner(spec: WorldSpec, showGui: Boolean):
   private val staticWalls = spec.staticWalls.to(mutable.Set)
   private val dynamicWalls = mutable.Set.empty[State] // opened walls
   private var episodeDone = false
+  private var activeTriggers: List[Trigger] = spec.triggers // triggers that can be activated
 
   private val agentMap = spec.agents.map(a => a.id -> a).toMap // id → spec
   private var state = agentMap.view.mapValues(_.start).toMap // id → pos
@@ -69,28 +70,17 @@ class Runner(spec: WorldSpec, showGui: Boolean):
         acc + (id -> move(acc(id), act))
       }
 
-      // 3. trigger & bonus
-      val triggered = spec.triggers.filter(t => nextPos(t.who) == t.at)
-      val bonus = triggered.map(t => applyEffects(t.effects)).sum
+      val (fired, remaining) = activeTriggers.partition(t => nextPos(t.who) == t.at)
+      val bonus = fired.map(t => applyEffects(t.effects)).sum
+      activeTriggers = remaining
 
-      // 4. goal and parametric rewards
-        val reached: Set[String] =
-          agentMap.collect { case (id, spec) if spec.goal == nextPos(id) => id }.toSet
-
-      def rewardFor(id: String,
-                    bonus: Double,
-                    reached: Set[String]): Double =
-        bonus - 1.0 +                            // penalità di passo
-          reached.find(_ == id)                    // + goalReward se è fra i raggiunti
-            .map(_ => agentMap(id).goalReward)
-            .getOrElse(0.0)
-
-      episodeDone ||= reached.nonEmpty
+      def rewardFor(bonus: Double): Double =
+        bonus - 1.0
 
       // 5. update Q
       agentsQL.foreach { case (id, learner) =>
         val act = jointActions(id)
-        val r = rewardFor(id, bonus, reached)
+        val r = rewardFor(bonus)
         learner.update(state(id), act, r, nextPos(id))
       }
 
@@ -132,9 +122,9 @@ class Runner(spec: WorldSpec, showGui: Boolean):
       }
 
       // 4. applica eventuali trigger
-      spec.triggers
-        .filter(t => nxt(t.who) == t.at)
-        .foreach(t => applyEffects(t.effects))
+      val (firedDemo, remainingDemo) = activeTriggers.partition(t => nxt(t.who) == t.at)
+      firedDemo.foreach(t => applyEffects(t.effects))
+      activeTriggers = remainingDemo
 
       // 5. CONDIZIONE DI USCITA PARAMETRICA
         done = agentMap.exists { case (id, spec) =>

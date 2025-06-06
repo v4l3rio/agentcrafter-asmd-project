@@ -36,7 +36,7 @@ class RunnerTest extends AnyFunSuite with Matchers:
       resetFunction = () => start,
       learningParameters = LearningParameters(alpha = 0.5, gamma = 0.9, eps0 = 0.1)
     )
-    AgentSpec(id, start, goal, reward, learner)
+    AgentSpec(id, start, goal, learner)
   
 
   test("Runner should handle empty world without agents"):

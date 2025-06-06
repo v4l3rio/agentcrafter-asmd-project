@@ -15,10 +15,10 @@ class TriggerBuilder(who: String, r: Int, c: Int, parent: SimulationBuilder):
     eff += EndEpisode
     this
     
-  def give(bonus: Double): SimulationBuilder = 
+  def give(bonus: Double): TriggerBuilder =
     eff += Reward(bonus)
-    finish()
-    
-  private def finish(): SimulationBuilder =
+    this
+
+  private[MARL] def finish(): SimulationBuilder =
     parent.addTrigger(Trigger(who, State(r, c), eff.toList))
     parent

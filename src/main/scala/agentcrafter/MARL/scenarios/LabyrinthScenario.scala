@@ -9,6 +9,7 @@ import agentcrafter.MARL.DSL.{SimulationDSL, *}
 object LabyrinthScenario extends App with SimulationDSL:
   import AgentProperty.*
   import LearnerProperty.*
+  import TriggerProperty.*
   import SimulationProperty.*
   
   simulation:
@@ -39,12 +40,13 @@ object LabyrinthScenario extends App with SimulationDSL:
         Eps0 >> 0.9
         EpsMin >> 0.1
         Warm >> 2_000
-        Optimistic >> 1.0
+        Optimistic >> 0.2
       Goal >> (10, 10)
-      Reward >> 100.0
+      onGoal:
+        Give >> 100
+        EndEpisode >> true
     
-    Episodes >> 15_000
+    Episodes >> 1000
     Steps >> 500
-    ShowAfter >> 12_000
-    Delay >> 80
+    Delay >> 50
     WithGUI >> true

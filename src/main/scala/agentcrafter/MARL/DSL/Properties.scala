@@ -34,7 +34,6 @@ enum AgentProperty[T]:
   case Name extends AgentProperty[String]
   case Start extends AgentProperty[(Int, Int)]
   case Goal extends AgentProperty[(Int, Int)]
-  case Reward extends AgentProperty[Double]
   @targetName("to")
   infix def >>(obj: T)(using agentWrapper:AgentWrapper): AgentBuilder = this match
     case AgentProperty.Name => agentWrapper.builder.name(obj.asInstanceOf[String])
@@ -44,7 +43,6 @@ enum AgentProperty[T]:
     case AgentProperty.Goal =>
       val (r, c) = obj.asInstanceOf[(Int, Int)]
       agentWrapper.builder.goal(r, c)
-    case AgentProperty.Reward => agentWrapper.builder.reward(obj.asInstanceOf[Double])
 
 enum TriggerProperty[T]:
   case OpenWall extends TriggerProperty[(Int, Int)]
