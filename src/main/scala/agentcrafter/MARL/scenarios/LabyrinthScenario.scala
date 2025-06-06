@@ -39,14 +39,15 @@ object LabyrinthScenario extends App with SimulationDSL:
         Gamma >> 0.95
         Eps0 >> 0.9
         EpsMin >> 0.1
-        Warm >> 2_000
+        Warm >> 1_000
         Optimistic >> 0.2
       Goal >> (10, 10)
       onGoal:
         Give >> 100
         EndEpisode >> true
     
-    Episodes >> 1000
+    Episodes >> 15_000
     Steps >> 500
+    ShowAfter >> 1100
     Delay >> 50
     WithGUI >> true

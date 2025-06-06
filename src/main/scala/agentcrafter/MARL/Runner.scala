@@ -31,6 +31,11 @@ class Runner(spec: WorldSpec, showGui: Boolean):
 
   private val agentMap = spec.agents.map(a => a.id -> a).toMap // id → spec
   private var state = agentMap.view.mapValues(_.start).toMap // id → pos
+  
+  // Reward tracking for GUI
+  private var totalReward = 0.0
+  private var episodeReward = 0.0
+  private var currentEpisode = 0
 
   /* ---------- geometric helpers ------------------------------------- */
   private inline def clamp(x: Int, lo: Int, hi: Int) = Math.min(Math.max(x, lo), hi)
@@ -61,9 +66,11 @@ class Runner(spec: WorldSpec, showGui: Boolean):
   private def runEpisode(): Int =
     var steps = 0
     while !episodeDone && steps < spec.stepLimit do
-      // 1. actions
-      val jointActions: Map[String, Action] =
-        agentsQL.map { case (id, ql) => id -> ql.choose(state(id))._1 }
+      // 1. choose actions and track exploration behavior
+      val jointActionsWithExploration: Map[String, (Action, Boolean)] =
+        agentsQL.map { case (id, ql) => id -> ql.choose(state(id)) }
+      val jointActions: Map[String, Action] = jointActionsWithExploration.view.mapValues(_._1).toMap
+      val anyAgentExploring = jointActionsWithExploration.values.exists(_._2)
 
       // 2. transition
       val nextPos = jointActions.foldLeft(state) { case (acc, (id, act)) =>
@@ -71,22 +78,39 @@ class Runner(spec: WorldSpec, showGui: Boolean):
       }
 
       val (fired, remaining) = activeTriggers.partition(t => nextPos(t.who) == t.at)
-      val bonus = fired.map(t => applyEffects(t.effects)).sum
       activeTriggers = remaining
 
-      def rewardFor(bonus: Double): Double =
-        bonus - 1.0
+      // Apply effects and collect rewards per agent
+      val agentRewards = mutable.Map.empty[String, Double].withDefaultValue(0.0)
+      fired.foreach { trigger =>
+        val bonus = applyEffects(trigger.effects)
+        agentRewards(trigger.who) += bonus
+      }
+
+      def rewardFor(agentId: String): Double =
+        agentRewards(agentId) - 1.0
 
       // 5. update Q
       agentsQL.foreach { case (id, learner) =>
         val act = jointActions(id)
-        val r = rewardFor(bonus)
+        val r = rewardFor(id)
         learner.update(state(id), act, r, nextPos(id))
       }
 
       state = nextPos
       steps += 1
-      vis.foreach(_.updateMultiAgent(state, dynamicWalls.toSet, steps))
+      
+      // Update episode reward (including step penalty for each agent)
+      val stepRewards = agentsQL.keys.map(id => rewardFor(id)).sum
+      episodeReward += stepRewards
+      
+      // Update GUI with cumulative episode reward
+      val isExploring = anyAgentExploring
+      val currentEpsilon = agentsQL.values.headOption.map(_.eps).getOrElse(0.0)
+      vis.foreach { v =>
+        v.updateMultiAgent(state, dynamicWalls.toSet, steps)
+        v.updateSimulationInfo(currentEpisode, isExploring, episodeReward, currentEpsilon)
+      }
       // Update Q-table visualizers every 10 steps to avoid too frequent updates
       if steps % 10 == 0 then qTableVis.foreach(_.update())
     steps
@@ -96,8 +120,13 @@ class Runner(spec: WorldSpec, showGui: Boolean):
     for ep <- 1 to spec.episodes do
       maybeInitGui(ep)
       resetEpisode()
+      currentEpisode = ep
+      episodeReward = 0.0
       val steps = runEpisode()
       agentsQL.values.foreach(_.incEp())
+      
+      // Update total reward
+      totalReward += episodeReward
 
       if ep % 1000 == 0 then
         println(s"Episode $ep finished in $steps steps")
@@ -141,5 +170,7 @@ class Runner(spec: WorldSpec, showGui: Boolean):
 
   private def resetEpisode(): Unit =
     state = agentMap.view.mapValues(_.start).toMap
-    dynamicWalls.clear();
+    dynamicWalls.clear()
     episodeDone = false
+    activeTriggers = spec.triggers // Reset triggers for new episode
+    episodeReward = 0.0

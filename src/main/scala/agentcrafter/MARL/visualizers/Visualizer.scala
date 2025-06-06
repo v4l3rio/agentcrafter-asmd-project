@@ -53,9 +53,8 @@ class Visualizer(
   private var step = 0
   private var episode = 0
   private var explorationMode = true
-  private var accumulatedReward = 0.0
-  private var totalReward = 0.0
   private var episodeReward = 0.0
+  private var epsilon = 0.0
   
   // Visualization mode
   private var isSingleAgent = true
@@ -125,22 +124,12 @@ class Visualizer(
       g.setColor(Color.black)
       val infoY = size.height - 80
       
-      if isSingleAgent then
-        // Single-agent Q-learning info
-        g.drawString(lastQInfo, 10, infoY + 60)
-        g.drawString(s"Episode: $episode", 10, infoY)
-        g.drawString(s"Step: $step", 10, infoY + 15)
-        g.drawString(s"Mode: ${if explorationMode then "Exploration" else "Exploitation"}", 10, infoY + 30)
-        if episodeReward != 0.0 then
-          g.drawString(s"Episode Reward: ${"%.2f".format(episodeReward)}", 10, infoY + 45)
-      else
-        // Multi-agent simulation info
-        g.drawString(s"Step: $step", 10, infoY)
-        g.drawString(s"Episode: $episode", 10, infoY + 15)
-        g.drawString(s"Mode: ${if explorationMode then "Exploration" else "Exploitation"}", 10, infoY + 30)
-        g.drawString(s"Episode Reward: ${"%.2f".format(episodeReward)}", 10, infoY + 45)
-        g.drawString(s"Total Reward: ${"%.2f".format(totalReward)}", 200, infoY)
-        g.drawString(s"Avg Reward: ${if episode > 0 then "%.2f".format(totalReward / episode) else "0.00"}", 200, infoY + 15)
+      // Display only requested fields
+      g.drawString(s"Step: $step", 10, infoY)
+      g.drawString(s"Episode: $episode", 10, infoY + 15)
+      g.drawString(s"Mode: ${if explorationMode then "Exploration" else "Exploitation"}", 10, infoY + 30)
+      g.drawString(s"Episode Reward: ${"%.2f".format(episodeReward)}", 10, infoY + 45)
+      g.drawString(s"Epsilon: ${"%.3f".format(epsilon)}", 10, infoY + 60)
   
   val frame: MainFrame = new MainFrame:
     title = windowTitle
@@ -211,15 +200,13 @@ class Visualizer(
   def updateSimulationInfo(
     episodeNum: Int,
     exploration: Boolean,
-    reward: Double,
-    totalRew: Double,
-    epRew: Double
+    epReward: Double,
+    eps: Double
   ): Unit =
     episode = episodeNum
     explorationMode = exploration
-    accumulatedReward = reward
-    totalReward = totalRew
-    episodeReward = epRew
+    episodeReward = epReward
+    epsilon = eps
   
   /**
    * Simple update method for basic position changes
