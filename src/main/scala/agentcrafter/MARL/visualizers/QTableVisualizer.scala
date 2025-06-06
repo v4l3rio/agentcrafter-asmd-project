@@ -26,7 +26,7 @@ class QTableVisualizer(agentId: String, learner: QLearner, spec: WorldSpec):
 
     for (state <- byState.keys.toSeq.sortBy(s => (s.r, s.c))) {
       val stateActions = byState(state)
-      val row = Array.ofDim[String](7) // State(r,c), Up, Down, Left, Right, Stay
+      val row = Array.ofDim[String](6) // State(r,c), Up, Down, Left, Right, Stay
       row(0) = s"(${state.r},${state.c})"
 
       // Fill action values

@@ -41,13 +41,8 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
           case Some(response) => Success(response)
           case None => Success("""{"(0, 0)": {"Up": 1.0, "Down": 1.0, "Left": 1.0, "Right": 1.0, "Stay": 1.0}}""")
 
-  private def createSimpleGrid(): GridWorld = GridWorld(
-    rows = 3,
-    cols = 3,
-    start = State(0, 0),
-    goal = State(2, 2),
-    walls = Set.empty
-  )
+  private def createSimpleGrid(): GridWorld =
+    GridWorld(rows = 3, cols = 3, walls = Set.empty)
   
   // Background
   Given("""the LLM integration system is available""") { () =>
@@ -173,7 +168,13 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   When("""I attempt to load the Q-Table""") { () =>
     val mockClient = new MockLLMApiClient()
     val jsonResponse = mockClient.callLLM("test prompt").getOrElse("")
-    val learner = QLearner(gridEnv = createSimpleGrid())
+    val env = createSimpleGrid()
+    val learner = QLearner(
+      goalState = State(2,2),
+      goalReward = 0.0,
+      updateFunction = env.step,
+      resetFunction = () => State(0,0)
+    )
     qTableLoadResult = QTableLoader.loadQTableFromJson(jsonResponse, learner)
   }
   

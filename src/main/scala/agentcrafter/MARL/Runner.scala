@@ -74,8 +74,8 @@ class Runner(spec: WorldSpec, showGui: Boolean):
       val bonus = triggered.map(t => applyEffects(t.effects)).sum
 
       // 4. goal and parametric rewards
-      val reached: Set[String] =
-        agentMap.collect { case (id, spec) if spec.goal.eq(nextPos(id)) => id }.toSet
+        val reached: Set[String] =
+          agentMap.collect { case (id, spec) if spec.goal == nextPos(id) => id }.toSet
 
       def rewardFor(id: String,
                     bonus: Double,
@@ -137,8 +137,8 @@ class Runner(spec: WorldSpec, showGui: Boolean):
         .foreach(t => applyEffects(t.effects))
 
       // 5. CONDIZIONE DI USCITA PARAMETRICA
-      done = agentMap.exists { case (id, spec) =>
-        spec.goal.eq(nxt(id)) // true se quell'agente ha un goal
+        done = agentMap.exists { case (id, spec) =>
+        spec.goal == nxt(id) // true se quell'agente ha un goal
       }
 
       // 6. aggiorna stato e step

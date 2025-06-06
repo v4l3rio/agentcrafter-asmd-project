@@ -15,17 +15,18 @@ class LLMQTableLoadingSteps extends ScalaDsl with EN with Matchers:
   private var loadResult: Try[Unit] = uninitialized
   private var initialQValues: Map[(State, Action), Double] = Map.empty
 
-  private def createSimpleGrid(): GridWorld = GridWorld(
-    rows = 3,
-    cols = 3,
-    start = State(0, 0),
-    goal = State(2, 2),
-    walls = Set.empty
-  )
+  private def createSimpleGrid(): GridWorld =
+    GridWorld(rows = 3, cols = 3, walls = Set.empty)
   
   // Background
   Given("""a Q-Learner instance is created""") { () =>
-    learner = QLearner(gridEnv = createSimpleGrid())
+    val env = createSimpleGrid()
+    learner = QLearner(
+      goalState = State(2, 2),
+      goalReward = 0.0,
+      updateFunction = env.step,
+      resetFunction = () => State(0, 0)
+    )
   }
   
   // Scenario: Loading valid Q-Table JSON
