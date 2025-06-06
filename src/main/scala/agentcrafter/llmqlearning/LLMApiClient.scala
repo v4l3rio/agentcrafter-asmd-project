@@ -11,7 +11,10 @@ import sttp.client4.{Response, quickRequest}
 import sttp.model.Uri
 import io.github.cdimascio.dotenv.Dotenv
 
-val dotenv = Dotenv.load()
+val dotenv: Dotenv =
+  Dotenv.configure()
+    .ignoreIfMissing()
+    .load()
 
 /**
  * Pure‑Scala LLM API client based on **sttp‑client v4** (quick layer).

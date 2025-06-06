@@ -48,10 +48,7 @@ class GridWorld private (val rows: Int, val cols: Int, val walls: Set[State]):
    *
    * @param s The current state of the agent
    * @param a The action to be executed
-   * @return A tuple containing:
-   *         - next state after the action
-   *         - reward received for this transition
-   *         - boolean indicating if the episode is done (goal reached)
+   * @return StepResult containing next state and reward
    */
   def step(s: State, a: Action): StepResult  =
     val (dr, dc) = a.delta
