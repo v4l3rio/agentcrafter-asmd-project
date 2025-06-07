@@ -57,8 +57,6 @@ object QTableLoader:
   def qTableToJson(learner: QLearner): String =
     Json.prettyPrint(Json.toJson(learner.QTableSnapshot))
 
-  /*──────────────────────── helpers  ────────────────────────*/
-
   private def stripLlMDecorations(s: String): String =
     val noTicks =
       if s.trim.startsWith("```") then s.trim.stripPrefix("```json").stripPrefix("```").stripSuffix("```")

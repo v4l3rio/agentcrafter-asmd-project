@@ -1,7 +1,6 @@
 package agentcrafter.llmqlearning
 
 import sttp.client4.httpclient.HttpClientSyncBackend
-import sttp.client4.StreamBackend
 import scala.concurrent.duration.Duration
 import play.api.libs.json._
 import scala.util.{Failure, Try, Using}

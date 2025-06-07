@@ -22,7 +22,7 @@ trait SimulationDSL:
   def simulation(block: SimulationWrapper ?=> Unit) =
     given wrapper: SimulationWrapper = SimulationWrapper(new SimulationBuilder)
     block
-    wrapper.builder.play()
+    wrapper.builder.build()
 
   /**
    * Defines the grid dimensions for the simulation world.
@@ -80,7 +80,7 @@ trait SimulationDSL:
   def agent(block: AgentWrapper ?=> Unit)(using wrapper: SimulationWrapper) =
     given agentWrapper: AgentWrapper = AgentWrapper(new AgentBuilder(wrapper.builder))
     block
-    wrapper.builder = agentWrapper.builder.end()
+    wrapper.builder = agentWrapper.builder.build()
 
   /**
    * Configures the Q-learning parameters for an agent.
@@ -109,7 +109,7 @@ trait SimulationDSL:
     val tb = wrapper.builder.newTrigger(id, g.r, g.c)
     given TriggerBuilder = tb
     block
-    wrapper.builder = tb.finish()
+    wrapper.builder = tb.build()
 
   /**
    * Trigger effect that removes a wall at the specified position.

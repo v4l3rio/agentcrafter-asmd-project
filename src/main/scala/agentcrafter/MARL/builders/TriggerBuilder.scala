@@ -19,6 +19,6 @@ class TriggerBuilder(who: String, r: Int, c: Int, parent: SimulationBuilder):
     eff += Reward(bonus)
     this
 
-  private[MARL] def finish(): SimulationBuilder =
+  private[MARL] def build(): SimulationBuilder =
     parent.addTrigger(Trigger(who, State(r, c), eff.toList))
     parent

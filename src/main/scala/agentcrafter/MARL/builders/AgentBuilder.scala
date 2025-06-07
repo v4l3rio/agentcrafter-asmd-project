@@ -52,8 +52,8 @@ class AgentBuilder(parent: SimulationBuilder):
     this
   }
 
-  def noGoal(): SimulationBuilder = end()
-  def end(): SimulationBuilder =
+  def noGoal(): SimulationBuilder = build()
+  def build(): SimulationBuilder =
     val spec = AgentSpec(id, st, gl, learner)
     parent.addAgent(id, spec)
     parent

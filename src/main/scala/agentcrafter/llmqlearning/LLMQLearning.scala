@@ -63,7 +63,7 @@ trait LLMQLearning extends SimulationDSL:
         case None =>
           println(s"Failed to obtain Q‑table from LLM (${llmConfig.model}); proceeding with normal simulation.")
 
-    wrapper.builder.play()
+    wrapper.builder.build()
 
 
 private def loadQTableFromLLM(builder: SimulationBuilder, model: String): Option[String] =

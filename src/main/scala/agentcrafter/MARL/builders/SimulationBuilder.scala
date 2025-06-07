@@ -66,6 +66,6 @@ class SimulationBuilder:
   /* trainer options */
   def episodes(n: Int): SimulationBuilder = { nEpisodes = n; this }
 
-  def play(): Unit =
+  def build(): Unit =
     val spec = WorldSpec(rows, cols, walls.toSet, triggers.toList, agents.values.toList, nEpisodes, stepLimit, stepDelay, showAfter)
     new Runner(spec, gui).run()

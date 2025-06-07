@@ -37,7 +37,6 @@ class Runner(spec: WorldSpec, showGui: Boolean):
   private var episodeReward = 0.0
   private var currentEpisode = 0
 
-  /* ---------- geometric helpers ------------------------------------- */
   private inline def clamp(x: Int, lo: Int, hi: Int) = Math.min(Math.max(x, lo), hi)
 
   private def isWall(p: State): Boolean =
@@ -48,7 +47,6 @@ class Runner(spec: WorldSpec, showGui: Boolean):
       clamp(p.c + a.delta._2, 0, spec.cols - 1))
     if isWall(cand) then p else cand
 
-  /* ---------- trigger effects --------------------------------------- */
   private def applyEffects(effs: List[Effect]): Double =
     var bonus = 0.0
     effs.foreach {
