@@ -47,7 +47,7 @@ object WallScenario extends App with SimulationDSL:
       onGoal:
         Give >> 25.0  // Reward for reaching the goal
         OpenWall >> (4, 6)
-        EndEpisode >> true  // End episode when Runner reaches the goal
+        EndEpisode >> false  // End episode when Runner reaches the goal
     
     // Agent that needs to reach the other side
     agent:

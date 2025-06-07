@@ -48,6 +48,6 @@ object LabyrinthScenario extends App with SimulationDSL:
     
     Episodes >> 15_000
     Steps >> 500
-    ShowAfter >> 1100
+    ShowAfter >> 1500
     Delay >> 50
     WithGUI >> true
