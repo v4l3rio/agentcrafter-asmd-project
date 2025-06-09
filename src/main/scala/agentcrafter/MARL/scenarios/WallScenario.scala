@@ -64,7 +64,7 @@ object WallScenario extends App with SimulationDSL:
       onGoal:
         Give >> 55.0  // Reward for reaching the goal
         EndEpisode >> true  // End episode when Opener reaches the switch
-    
+    Penalty >> -3.0
     Episodes >> 12_000
     Steps >> 300
     ShowAfter >> 10_000

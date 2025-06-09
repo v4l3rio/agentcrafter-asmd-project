@@ -16,6 +16,7 @@ case class LearnerConfig(
                         )
 
 enum SimulationProperty[T]:
+  case Penalty extends SimulationProperty[Double]
   case Episodes extends SimulationProperty[Int]
   case Steps extends SimulationProperty[Int]
   case ShowAfter extends SimulationProperty[Int]
@@ -24,6 +25,7 @@ enum SimulationProperty[T]:
   
   @targetName("to")
   infix def >>(obj: T)(using wrapper: SimulationWrapper): Unit = this match
+    case SimulationProperty.Penalty => wrapper.builder = wrapper.builder.stepPenalty(obj.asInstanceOf[Double])
     case SimulationProperty.Episodes => wrapper.builder = wrapper.builder.episodes(obj.asInstanceOf[Int])
     case SimulationProperty.Steps => wrapper.builder = wrapper.builder.steps(obj.asInstanceOf[Int])
     case SimulationProperty.ShowAfter => wrapper.builder = wrapper.builder.showAfter(obj.asInstanceOf[Int])

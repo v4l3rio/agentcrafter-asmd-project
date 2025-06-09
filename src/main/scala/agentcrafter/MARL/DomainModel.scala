@@ -78,6 +78,7 @@ case class AgentSpec(id: String,
  */
 case class WorldSpec(rows: Int,
                      cols: Int,
+                     stepPenalty: Double,
                      staticWalls: Set[State],
                      triggers: List[Trigger],
                      agents: List[AgentSpec],

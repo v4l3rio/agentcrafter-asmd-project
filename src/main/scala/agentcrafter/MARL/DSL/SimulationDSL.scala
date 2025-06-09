@@ -41,6 +41,9 @@ trait SimulationDSL:
    */
   extension(n: Int) infix def x(other:Int):(Int, Int) = (n, other)
 
+  def penalty(n: Double)(using wrapper: SimulationWrapper) =
+    wrapper.builder = wrapper.builder.stepPenalty(n)
+
   /**
    * Defines walls using ASCII art representation.
    * 

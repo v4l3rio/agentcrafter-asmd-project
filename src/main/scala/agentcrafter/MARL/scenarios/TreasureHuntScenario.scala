@@ -86,7 +86,7 @@ object TreasureHuntScenario extends App with SimulationDSL:
       onGoal:
         Give >> 100.0  // Big reward for reaching treasure
         EndEpisode >> true  // End episode when treasure is claimed
-
+    Penalty >> -3.0
     Episodes >> 20_000
     Steps >> 600
     ShowAfter >> 17_000

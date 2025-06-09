@@ -15,7 +15,6 @@ object LabyrinthScenario extends App with SimulationDSL:
   simulation:
     grid:
       12 x 12
-    
     // Create a labyrinth using ASCII art
     asciiWalls:
       """############
@@ -45,9 +44,9 @@ object LabyrinthScenario extends App with SimulationDSL:
       onGoal:
         Give >> 100
         EndEpisode >> true
-    
+    Penalty >> -3.0
     Episodes >> 15_000
     Steps >> 500
     ShowAfter >> 12_000
-    Delay >> 100
+    Delay >> 1000
     WithGUI >> true

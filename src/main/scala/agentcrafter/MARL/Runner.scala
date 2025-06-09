@@ -11,13 +11,13 @@ import scala.collection.mutable
 class Runner(spec: WorldSpec, showGui: Boolean):
 
   /* ---------- optional visualization --------------------------------- */
-  private var vis: Option[Visualizer] = None          // lazy
+  private var vis: Option[Visualizer] = None // lazy
   private var qTableVis: List[QTableVisualizer] = List.empty
 
   private def maybeInitGui(ep: Int): Unit =
     if vis.isEmpty && ep >= spec.showAfter then
       vis = Some(new Visualizer("MARL Simulation", spec.rows, spec.cols, cell = 48, delayMs = spec.stepDelay))
-      vis.foreach(_.configureMultiAgent(spec))                // configure for multi-agent mode
+      vis.foreach(_.configureMultiAgent(spec)) // configure for multi-agent mode
       // Crea visualizzatori Q-table per ogni agente
       qTableVis = agentsQL.map { case (id, learner) =>
         new QTableVisualizer(id, learner, spec)
@@ -31,14 +31,21 @@ class Runner(spec: WorldSpec, showGui: Boolean):
 
   private val agentMap = spec.agents.map(a => a.id -> a).toMap // id → spec
   private var state = agentMap.view.mapValues(_.start).toMap // id → pos
-  
+
   // Reward tracking for GUI
   private var totalReward = 0.0
   private var episodeReward = 0.0
   private var currentEpisode = 0
 
+  /**
+   * The -- operator is subtracting the elements in dynamicWalls from the staticWalls set.
+   * This means that any wall positions present in dynamicWalls will be excluded from the resulting set.
+   * This operation ensures that the GridWorld reflects the current state of the environment,
+   * where dynamic walls (walls that have been opened or removed during the simulation)
+   * are no longer considered obstacles.
+   */
   private def grid: GridWorld =
-    GridWorld(spec.rows, spec.cols, staticWalls.toSet -- dynamicWalls)
+    GridWorld(spec.rows, spec.cols, staticWalls.toSet -- dynamicWalls, spec.stepPenalty)
 
   private def applyEffects(effs: List[Effect]): Double =
     var bonus = 0.0
@@ -93,11 +100,11 @@ class Runner(spec: WorldSpec, showGui: Boolean):
 
       state = nextPos
       steps += 1
-      
+
       // Update episode reward (including step penalty for each agent)
       val stepRewardSum = agentsQL.keys.map(id => rewardFor(id)).sum
       episodeReward += stepRewardSum
-      
+
       // Update GUI with cumulative episode reward
       val isExploring = anyAgentExploring
       val currentEpsilon = agentsQL.values.headOption.map(_.eps).getOrElse(0.0)
@@ -118,7 +125,7 @@ class Runner(spec: WorldSpec, showGui: Boolean):
       episodeReward = 0.0
       val steps = runEpisode()
       agentsQL.values.foreach(_.incEp())
-      
+
       // Update total reward
       totalReward += episodeReward
 
@@ -129,7 +136,7 @@ class Runner(spec: WorldSpec, showGui: Boolean):
   private def greedyDemo(): Unit =
     resetEpisode()
     var done = false
-    var k    = 0
+    var k = 0
 
     while !done && k < spec.stepLimit do
       // 1. ridisegna
@@ -151,13 +158,13 @@ class Runner(spec: WorldSpec, showGui: Boolean):
       activeTriggers = remainingDemo
 
       // 5. CONDIZIONE DI USCITA PARAMETRICA
-        done = agentMap.exists { case (id, spec) =>
+      done = agentMap.exists { case (id, spec) =>
         spec.goal == nxt(id) // true se quell'agente ha un goal
       }
 
       // 6. aggiorna stato e step
       state = nxt
-      k    += 1
+      k += 1
     end while
 
     // ultimo frame

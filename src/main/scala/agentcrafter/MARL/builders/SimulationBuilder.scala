@@ -17,6 +17,7 @@ class SimulationBuilder:
   private var stepLimit  = 400
   private var stepDelay = 70 // ms between steps in GUI mode
   private var showAfter = 0
+  private var stepPenalty = -3.0 // default step penalty for agents
 
   private var gui = false
 
@@ -26,6 +27,10 @@ class SimulationBuilder:
 
   /* grid size */
   def grid(r: Int, c: Int): SimulationBuilder = { rows = r; cols = c; this }
+
+  def stepPenalty(penalty: Double): SimulationBuilder = {
+    stepPenalty = penalty; this
+  }
 
   /* add walls */
   def wall(r: Int, c: Int): SimulationBuilder = { walls += State(r, c); this }
@@ -67,5 +72,5 @@ class SimulationBuilder:
   def episodes(n: Int): SimulationBuilder = { nEpisodes = n; this }
 
   def build(): Unit =
-    val spec = WorldSpec(rows, cols, walls.toSet, triggers.toList, agents.values.toList, nEpisodes, stepLimit, stepDelay, showAfter)
+    val spec = WorldSpec(rows, cols, stepPenalty, walls.toSet, triggers.toList, agents.values.toList, nEpisodes, stepLimit, stepDelay, showAfter)
     new Runner(spec, gui).run()

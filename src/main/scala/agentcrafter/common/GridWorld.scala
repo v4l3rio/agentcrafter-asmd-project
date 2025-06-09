@@ -1,7 +1,5 @@
 package agentcrafter.common
 
-import agentcrafter.common.GridWorld.stepPenalty
-
 case class StepResult(state: State, reward: Double)
 
 object GridWorld:
@@ -9,10 +7,8 @@ object GridWorld:
             cols: Int = 15,
             walls: Set[State] = Set(
               State(1, 2), State(2, 2)
-            )): GridWorld = new GridWorld(rows, cols, walls)
-
-  /** Penalty applied for each step taken (encourages shorter paths) */
-  private val stepPenalty = -3.0
+            ),
+            stepPenalty: Double = -3.0): GridWorld = new GridWorld(rows, cols, walls, stepPenalty)
 
 /**
  * Represents a 2D grid-based reinforcement learning environment.
@@ -34,7 +30,7 @@ object GridWorld:
  * @param cols  The number of columns in the grid (width)
  * @param walls Set of states that represent impassable obstacles
  */
-class GridWorld private (val rows: Int, val cols: Int, val walls: Set[State]):
+class GridWorld private (val rows: Int, val cols: Int, val walls: Set[State], stepPenalty: Double):
 
   /**
    * Executes one step in the environment given a current state and action.
