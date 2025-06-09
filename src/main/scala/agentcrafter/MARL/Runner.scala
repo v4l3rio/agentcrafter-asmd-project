@@ -1,7 +1,7 @@
 package agentcrafter.MARL
 
 import agentcrafter.MARL.visualizers.{QTableVisualizer, Visualizer}
-import agentcrafter.common.{Action, QLearner, State}
+import agentcrafter.common.{Action, GridWorld, QLearner, State, StepResult}
 
 import scala.collection.mutable
 
@@ -37,15 +37,8 @@ class Runner(spec: WorldSpec, showGui: Boolean):
   private var episodeReward = 0.0
   private var currentEpisode = 0
 
-  private inline def clamp(x: Int, lo: Int, hi: Int) = Math.min(Math.max(x, lo), hi)
-
-  private def isWall(p: State): Boolean =
-    staticWalls.contains(p) && !dynamicWalls.contains(p)
-
-  private def move(p: State, a: Action): State =
-    val cand = State(clamp(p.r + a.delta._1, 0, spec.rows - 1),
-      clamp(p.c + a.delta._2, 0, spec.cols - 1))
-    if isWall(cand) then p else cand
+  private def grid: GridWorld =
+    GridWorld(spec.rows, spec.cols, staticWalls.toSet -- dynamicWalls)
 
   private def applyEffects(effs: List[Effect]): Double =
     var bonus = 0.0
@@ -70,10 +63,13 @@ class Runner(spec: WorldSpec, showGui: Boolean):
       val jointActions: Map[String, Action] = jointActionsWithExploration.view.mapValues(_._1).toMap
       val anyAgentExploring = jointActionsWithExploration.values.exists(_._2)
 
-      // 2. transition
-      val nextPos = jointActions.foldLeft(state) { case (acc, (id, act)) =>
-        acc + (id -> move(acc(id), act))
-      }
+      // 2. transition using GridWorld for movement and step penalty
+      val (nextPos, stepRewardsMap) =
+        jointActions.foldLeft(state -> Map.empty[String, Double]) {
+          case ((posAcc, rewAcc), (id, act)) =>
+            val StepResult(next, reward) = grid.step(posAcc(id), act)
+            (posAcc + (id -> next), rewAcc + (id -> reward))
+        }
 
       val (fired, remaining) = activeTriggers.partition(t => nextPos(t.who) == t.at)
       activeTriggers = remaining
@@ -86,21 +82,21 @@ class Runner(spec: WorldSpec, showGui: Boolean):
       }
 
       def rewardFor(agentId: String): Double =
-        agentRewards(agentId) - 1.0
+        stepRewardsMap.getOrElse(agentId, 0.0) + agentRewards(agentId)
 
       // 5. update Q
       agentsQL.foreach { case (id, learner) =>
         val act = jointActions(id)
         val r = rewardFor(id)
-        learner.update(state(id), act, r, nextPos(id))
+        learner.updateWithGoal(state(id), act, r, nextPos(id))
       }
 
       state = nextPos
       steps += 1
       
       // Update episode reward (including step penalty for each agent)
-      val stepRewards = agentsQL.keys.map(id => rewardFor(id)).sum
-      episodeReward += stepRewards
+      val stepRewardSum = agentsQL.keys.map(id => rewardFor(id)).sum
+      episodeReward += stepRewardSum
       
       // Update GUI with cumulative episode reward
       val isExploring = anyAgentExploring
@@ -145,7 +141,8 @@ class Runner(spec: WorldSpec, showGui: Boolean):
 
       // 3. transizione
       val nxt = actions.foldLeft(state) { case (acc, (id, act)) =>
-        acc + (id -> move(acc(id), act))
+        val StepResult(next, _) = grid.step(acc(id), act)
+        acc + (id -> next)
       }
 
       // 4. applica eventuali trigger

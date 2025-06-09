@@ -130,5 +130,17 @@ class QLearner private(
   def update(state: State, action: Action, reward: Reward, nextState: State): Unit =
     Q.update(state, action, reward, nextState)
 
+  /**
+   * Update Q-value using the learner's goal reward logic.
+   *
+   * This mirrors the update step performed inside [[episode]].
+   * The provided environment reward is combined with the goal reward
+   * if the next state matches the configured goal state.
+   */
+  def updateWithGoal(state: State, action: Action, envReward: Reward, nextState: State): Unit =
+    val isGoal = nextState == goalState
+    val reward = if isGoal then goalReward else envReward
+    Q.update(state, action, reward, nextState)
+
   def incEp(): Unit =
     ep += 1
