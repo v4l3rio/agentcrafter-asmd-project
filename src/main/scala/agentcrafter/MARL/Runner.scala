@@ -1,7 +1,7 @@
 package agentcrafter.MARL
 
 import agentcrafter.MARL.visualizers.{QTableVisualizer, Visualizer}
-import agentcrafter.common.{Action, GridWorld, QLearner, State, StepResult}
+import agentcrafter.common.{Action, GridWorld, Learner, State, StepResult}
 
 import scala.collection.mutable
 
@@ -57,7 +57,7 @@ class Runner(spec: WorldSpec, showGui: Boolean):
     bonus
 
   /* map id → learner - now using the learner from AgentSpec */
-  private val agentsQL: Map[String, QLearner] =
+  private val agentsQL: Map[String, Learner] =
     agentMap.map { case (id, agentSpec) => id -> agentSpec.learner }
 
   /* ---------- single episode ---------------------------------------- */

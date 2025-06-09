@@ -13,6 +13,7 @@ class RunnerTest extends AnyFunSuite with Matchers:
   private def createSimpleWorldSpec(
     rows: Int = 5,
     cols: Int = 5,
+    penalty: Double = -3.0,
     staticWalls: Set[State] = Set.empty,
     agents: List[AgentSpec] = List.empty,
     triggers: List[Trigger] = List.empty,
@@ -21,7 +22,7 @@ class RunnerTest extends AnyFunSuite with Matchers:
     stepDelay: Int = 0,
     showAfter: Int = 100
   ): WorldSpec = 
-    WorldSpec(rows, cols, staticWalls, triggers, agents, episodes, stepLimit, stepDelay, showAfter)
+    WorldSpec(rows, cols, penalty, staticWalls, triggers, agents, episodes, stepLimit, stepDelay, showAfter)
 
   private def createSimpleGrid(): GridWorld =
     GridWorld(rows = 3, cols = 3, walls = Set.empty)

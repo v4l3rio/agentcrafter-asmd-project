@@ -1,7 +1,7 @@
 package agentcrafter.MARL.builders
 
 import agentcrafter.MARL.{AgentSpec, Trigger}
-import agentcrafter.common.{GridWorld, LearningParameters, QLearner, State, StepResult}
+import agentcrafter.common.{GridWorld, LearningParameters, Learner, QLearner, State, StepResult}
 
 import scala.compiletime.uninitialized
 
@@ -9,7 +9,7 @@ class AgentBuilder(parent: SimulationBuilder):
   private var id: String = ""
   private var st: State = State(0, 0)
   private var gl: State = State(0, 0)
-  private var learner: QLearner = QLearner(
+  private var learner: Learner = QLearner(
     learningParameters = LearningParameters(),
     goalState = gl,
     goalReward = 0.0,

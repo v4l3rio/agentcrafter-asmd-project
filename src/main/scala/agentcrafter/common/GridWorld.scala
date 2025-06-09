@@ -30,7 +30,7 @@ object GridWorld:
  * @param cols  The number of columns in the grid (width)
  * @param walls Set of states that represent impassable obstacles
  */
-class GridWorld private (val rows: Int, val cols: Int, val walls: Set[State], stepPenalty: Double):
+class GridWorld private (val rows: Int, val cols: Int, val walls: Set[State], stepPenalty: Double) extends Environment:
 
   /**
    * Executes one step in the environment given a current state and action.

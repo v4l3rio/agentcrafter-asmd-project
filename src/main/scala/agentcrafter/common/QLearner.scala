@@ -45,7 +45,7 @@ class QLearner private(
                         goalReward: Reward,
                         updateFunction: UpdateFunction,
                         resetFunction: ResetFunction
-                      ):
+                      ) extends Learner:
   /** Random number generator for stochastic action selection */
   private given rng: Random = Random()
 

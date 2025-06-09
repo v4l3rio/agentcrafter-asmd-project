@@ -1,6 +1,6 @@
 package agentcrafter.llmqlearning
 
-import agentcrafter.common.{Action, QLearner, State}
+import agentcrafter.common.{Action, Learner, QLearner, State}
 import play.api.libs.json.*
 
 import scala.collection.mutable
@@ -8,7 +8,7 @@ import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
 
 /**
- * Pure helpers to **serialise / deserialize** a Q‑table carried by a [[QLearner]].
+ * Pure helpers to **serialise / deserialize** a Q‑table carried by a [[Learner]].
  */
 object QTableLoader:
   
@@ -45,16 +45,19 @@ object QTableLoader:
   
 
   /** Load a Q‑table (produced by an LLM) into the learner; reflection is hidden here. */
-  def loadQTableFromJson(raw: String, learner: QLearner): Try[Unit] =
-    for
-      cleaned <- Success(stripLlMDecorations(raw))
-      table   <- Json.parse(cleaned).validate[Map[(State, Action), Double]].asEither
-        .fold(err => Failure(new RuntimeException(err.toString)), Success.apply)
-      _       <- inject(learner, table)
-    yield ()
+  def loadQTableFromJson(raw: String, learner: Learner): Try[Unit] =
+    learner match
+      case ql: QLearner =>
+        for
+          cleaned <- Success(stripLlMDecorations(raw))
+          table   <- Json.parse(cleaned).validate[Map[(State, Action), Double]].asEither
+            .fold(err => Failure(new RuntimeException(err.toString)), Success.apply)
+          _       <- inject(ql, table)
+        yield ()
+      case _ => Failure(new IllegalArgumentException("Unsupported learner implementation"))
 
   /** Serialise the learner's current Q‑table. */
-  def qTableToJson(learner: QLearner): String =
+  def qTableToJson(learner: Learner): String =
     Json.prettyPrint(Json.toJson(learner.QTableSnapshot))
 
   private def stripLlMDecorations(s: String): String =

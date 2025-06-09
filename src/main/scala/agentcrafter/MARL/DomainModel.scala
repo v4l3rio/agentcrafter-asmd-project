@@ -1,6 +1,6 @@
 package agentcrafter.MARL
 
-import agentcrafter.common.{Action, QLearner, State}
+import agentcrafter.common.{Learner, State}
 
 /**
  * Domain model for Multi-Agent Reinforcement Learning (MARL) simulations.
@@ -58,7 +58,7 @@ case class Trigger(who: String, at: State, effects: List[Effect])
 case class AgentSpec(id: String,
                      start: State,
                      goal: State,
-                     learner: QLearner)
+                     learner: Learner)
 
 /**
  * Complete specification for a MARL world/environment.

@@ -1,7 +1,7 @@
 package agentcrafter.MARL.visualizers
 
 import agentcrafter.MARL.WorldSpec
-import agentcrafter.common.{Action, QLearner}
+import agentcrafter.common.{Action, Learner}
 
 import java.awt.Font
 import javax.swing.JTable
@@ -11,7 +11,7 @@ import scala.swing.{MainFrame, Panel, ScrollPane}
 /**
  * Visualizer for Q-Tables of individual agents
  */
-class QTableVisualizer(agentId: String, learner: QLearner, spec: WorldSpec):
+class QTableVisualizer(agentId: String, learner: Learner, spec: WorldSpec):
 
   private val cellSize = 60
   private val fontSize = 10
