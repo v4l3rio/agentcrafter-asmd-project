@@ -30,8 +30,6 @@ object WallsFromLLMExample extends App with LLMQLearning:
         - Interesting chokepoints and open areas
         - The maze should encourage exploration and strategic thinking
         - Include some rooms connected by narrow corridors
-        - Add a critical wall at position (6, 7) that blocks a key passage
-        - Include a switch location at (3, 3) that should be accessible from the start
         """
     
     // Agent 1: SwitchOperator - must reach the switch to open the wall

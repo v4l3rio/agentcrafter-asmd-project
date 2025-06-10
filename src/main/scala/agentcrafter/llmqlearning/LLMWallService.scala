@@ -52,16 +52,9 @@ object LLMWallService:
    */
   private def buildWallPrompt(builder: SimulationBuilder, userPrompt: String): String =
     val basePrompt = Prompts.walls
-    val gridInfo = getGridInfo(builder)
-    val agentInfo = getAgentInfo(builder)
     
     s"""
     |$basePrompt
-    |
-    |CURRENT SIMULATION CONTEXT:
-    |$gridInfo
-    |
-    |$agentInfo
     |
     |SPECIFIC USER REQUEST:
     |$userPrompt
@@ -69,40 +62,7 @@ object LLMWallService:
     |Please generate the ASCII map now based on the above requirements and context:
     """.stripMargin
 
-  /**
-   * Extracts grid information from the simulation builder.
-   */
-  private def getGridInfo(builder: SimulationBuilder): String =
-    try
-      val rowsField = builder.getClass.getDeclaredField("rows")
-      val colsField = builder.getClass.getDeclaredField("cols")
-      rowsField.setAccessible(true)
-      colsField.setAccessible(true)
-      val rows = rowsField.get(builder).asInstanceOf[Int]
-      val cols = colsField.get(builder).asInstanceOf[Int]
-      s"Grid size: $rows rows x $cols columns"
-    catch
-      case _: Exception => "Grid size: 10 rows x 10 columns (default)"
 
-  /**
-   * Extracts agent information from the simulation builder.
-   */
-  private def getAgentInfo(builder: SimulationBuilder): String =
-    try
-      val agentsField = builder.getClass.getDeclaredField("agents")
-      agentsField.setAccessible(true)
-      val agents = agentsField.get(builder).asInstanceOf[scala.collection.mutable.Map[String, _]]
-      
-      if agents.isEmpty then
-        "No agents defined yet"
-      else
-        val agentDescriptions = agents.map { case (id, spec) =>
-          // Extract agent information using reflection if needed
-          s"Agent '$id': (positions will be defined in DSL)"
-        }.mkString("\n")
-        s"Agents:\n$agentDescriptions"
-    catch
-      case _: Exception => "Agent information not available"
 
   /**
    * Extracts ASCII map from LLM response.
