@@ -11,3 +11,10 @@ object Prompts:
    */
   lazy val qTable: String =
     Using.resource(Source.fromResource("prompts/qtable_prompt.txt"))(_.mkString)
+
+  /**
+   * Walls generation prompt, loaded lazily from
+   * `src/main/resources/prompts/walls_prompt.txt` (bundled in the JAR).
+   */
+  lazy val walls: String =
+    Using.resource(Source.fromResource("prompts/walls_prompt.txt"))(_.mkString)

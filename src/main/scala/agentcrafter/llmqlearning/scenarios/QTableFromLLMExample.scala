@@ -1,14 +1,13 @@
-package agentcrafter.llmqlearning
+package agentcrafter.llmqlearning.scenarios
 
-import LLMProperty.*
-import agentcrafter.MARL.DSL.{AgentProperty, LearnerProperty, LineProperty, SimulationDSL, TriggerProperty, WallProperty, block}
+import agentcrafter.MARL.DSL.*
+import agentcrafter.llmqlearning.LLMProperty.{Enabled, Model}
+import agentcrafter.llmqlearning.LLMQLearning
 
-object SimulationApp extends App with LLMQLearning:
+object QTableFromLLMExample extends App with LLMQLearning:
   import AgentProperty.*
-  import TriggerProperty.*
   import LearnerProperty.*
-  import WallProperty.*
-  import LineProperty.*
+  import TriggerProperty.*
   import agentcrafter.MARL.DSL.SimulationProperty.*
   
   simulation:

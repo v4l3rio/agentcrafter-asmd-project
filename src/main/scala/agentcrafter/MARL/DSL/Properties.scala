@@ -15,6 +15,11 @@ case class LearnerConfig(
                           var optimistic: Double = 0.0
                         )
 
+case class WallLLMConfig(
+                          var model: String = "",
+                          var prompt: String = ""
+                        )
+
 enum SimulationProperty[T]:
   case Penalty extends SimulationProperty[Double]
   case Episodes extends SimulationProperty[Int]
@@ -123,3 +128,11 @@ enum LearnerProperty[T]:
     case LearnerProperty.EpsMin => config.epsMin = obj.asInstanceOf[Double]
     case LearnerProperty.Warm => config.warm = obj.asInstanceOf[Int]
     case LearnerProperty.Optimistic => config.optimistic = obj.asInstanceOf[Double]
+
+enum WallLLMProperty[T]:
+  case Model extends WallLLMProperty[String]
+  case Prompt extends WallLLMProperty[String]
+  @targetName("to")
+  infix def >>(obj: T)(using config: WallLLMConfig): Unit = this match
+    case WallLLMProperty.Model => config.model = obj.asInstanceOf[String]
+    case WallLLMProperty.Prompt => config.prompt = obj.asInstanceOf[String]

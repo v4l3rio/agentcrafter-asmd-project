@@ -3,7 +3,13 @@ package agentcrafter.llmqlearning
 import scala.annotation.targetName
 
 /** LLM configuration wrapper for the DSL. */
-case class LLMConfig(var enabled: Boolean = false, var model: String = "gpt-4o")
+case class LLMConfig(
+  var enabled: Boolean = false, 
+  var model: String = "gpt-4o",
+  var wallsEnabled: Boolean = false,
+  var wallsModel: String = "gpt-4o",
+  var wallsPrompt: String = ""
+)
 
 // ── DSL property objects ──────────────────────────────────────────────
 object Enabled:

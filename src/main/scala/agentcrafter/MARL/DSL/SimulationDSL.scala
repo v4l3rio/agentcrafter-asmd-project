@@ -52,10 +52,54 @@ trait SimulationDSL:
     wrapper.builder = wrapper.builder.wallsFromAscii(ascii.stripMargin)
 
   /**
+   * Generates walls from LLM using a configuration block.
+   * 
+   * @param block Configuration block for LLM wall generation (model, prompt)
+   */
+  def wallsFromLLM(block: WallLLMConfig ?=> Unit)(using wrapper: SimulationWrapper): Unit =
+    val config = WallLLMConfig()
+    given WallLLMConfig = config
+    block
+    
+    if config.model.nonEmpty && config.prompt.nonEmpty then
+      import agentcrafter.llmqlearning.LLMWallService
+      val simulationFilePath = findSimulationFile()
+      LLMWallService.generateWallsFromLLM(wrapper.builder, config.model, config.prompt, Some(simulationFilePath)) match
+        case Some(asciiWalls) =>
+          println(s"LLM wall generation successful, loading walls...")
+          LLMWallService.loadWallsIntoBuilder(wrapper.builder, asciiWalls)
+        case None =>
+          println("LLM wall generation failed, proceeding without generated walls")
+    else
+      throw new IllegalArgumentException("wallsFromLLM requires both Model and Prompt to be specified")
+
+  /**
    * Opens a walls configuration block.
    * 
    * @param block Configuration block for defining walls
    */
+  /**
+   * Finds the simulation file by inspecting the stack trace to locate the file
+   * that contains the wallsFromLLM call.
+   */
+  private def findSimulationFile(): String =
+    val stackTrace = Thread.currentThread().getStackTrace
+    
+    // Find the first stack frame that's not from this trait or system classes
+    val callingFrame = stackTrace.find { frame =>
+      !frame.getClassName.contains("SimulationDSL") &&
+      !frame.getClassName.startsWith("java.") &&
+      !frame.getClassName.startsWith("scala.") &&
+      frame.getClassName.contains("agentcrafter")
+    }
+    
+    callingFrame match
+      case Some(frame) =>
+        val className = frame.getClassName.stripSuffix("$")
+        s"src/main/scala/${className.replace('.', '/')}.scala"
+      case None =>
+        throw new RuntimeException("Could not determine simulation file from stack trace")
+
   def walls(block: SimulationWrapper ?=> Unit)(using wrapper: SimulationWrapper): Unit =
     block
 

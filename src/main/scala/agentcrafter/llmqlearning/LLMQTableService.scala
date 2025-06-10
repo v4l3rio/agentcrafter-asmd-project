@@ -14,14 +14,15 @@ object LLMQTableService:
    * 
    * @param builder The simulation builder
    * @param model The LLM model to use
+   * @param simulationFilePath Path to the file containing simulation DSL content
    * @return Some(qTableJson) if successful, None otherwise
    */
-  def loadQTableFromLLM(builder: SimulationBuilder, model: String): Option[String] =
+  def loadQTableFromLLM(builder: SimulationBuilder, model: String, simulationFilePath: String): Option[String] =
     val client = LLMApiClient()
     val prompt = Prompts.qTable
 
     println(s"Calling LLM API ($model) to generate Q‑table…")
-    client.callLLM(prompt, model) match
+    client.callLLM(prompt, model, simulationFilePath = Some(simulationFilePath)) match
       case Success(response) => Some(response)
       case Failure(ex) =>
         println(s"LLM API call failed: ${ex.getMessage}")
