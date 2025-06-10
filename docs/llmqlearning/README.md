@@ -14,7 +14,6 @@ The LLM Q-Learning extension integrates Large Language Models directly into the 
 
 The following diagram shows the complete LLM integration architecture:
 
-```plantuml
 @startuml LLM Integration Architecture
 !theme plain
 title AgentCrafter - LLM Integration Architecture
@@ -132,7 +131,6 @@ note bottom of LLMApiClient : "Handles all external\nAPI communication"
 note left of PromptBuilder : "Generates context-aware\nprompts for different tasks"
 
 @enduml
-```
 
 ## Key Features
 

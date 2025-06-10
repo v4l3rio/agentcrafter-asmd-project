@@ -14,7 +14,6 @@ The MARL framework is built on a sophisticated multi-agent coordination architec
 
 The following diagram illustrates how multiple agents coordinate through triggers, effects, and shared world state:
 
-```plantuml
 @startuml Multi-Agent Coordination
 !theme plain
 title AgentCrafter - Multi-Agent Coordination Architecture
@@ -136,13 +135,11 @@ note right of Trigger : "Enables cooperative\nbehaviors"
 note bottom of Effect : "Modifies world state\nbased on agent actions"
 
 @enduml
-```
 
 ### Learning Architecture for Multi-Agent Systems
 
 This diagram shows how the Q-Learning components work together in a multi-agent environment:
 
-```plantuml
 @startuml MARL Learning Architecture
 !theme plain
 title Multi-Agent Reinforcement Learning - Learning Architecture
@@ -289,7 +286,6 @@ note right of ExperienceBuffer : "Shared learning\nexperiences"
 note bottom of CooperativeReward : "Rewards cooperative\nbehaviors"
 
 @enduml
-```
 
 ## Key Concepts
 

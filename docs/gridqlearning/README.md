@@ -10,7 +10,6 @@ Grid Q-Learning serves as the bedrock of the AgentCrafter project, implementing 
 
 The Grid Q-Learning architecture forms the foundation of all AgentCrafter simulations, providing the core reinforcement learning infrastructure:
 
-```plantuml
 @startuml Grid Q-Learning Architecture
 !theme plain
 title AgentCrafter - Grid Q-Learning Foundation
@@ -135,7 +134,6 @@ note bottom of QTable : "Stores state-action\nvalue estimates"
 note left of RewardFunction : "Defines learning\nobjectives and penalties"
 
 @enduml
-```
 
 ## Core Concepts
 

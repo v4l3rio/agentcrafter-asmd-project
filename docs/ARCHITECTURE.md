@@ -6,7 +6,6 @@ This document provides a comprehensive overview of the AgentCrafter system archi
 
 AgentCrafter is built on a layered architecture that separates concerns and provides flexibility for different types of reinforcement learning scenarios.
 
-```plantuml
 @startuml AgentCrafter System Architecture
 !theme plain
 title AgentCrafter - High-Level System Architecture
@@ -182,13 +181,11 @@ Visualizer --> WorldSpec
 QTableVisualizer --> QLearner
 
 @enduml
-```
 
 ## DSL Configuration Flow
 
 The following diagram shows how user configurations flow through the system:
 
-```plantuml
 @startuml DSL Flow and Builder Pattern
 !theme plain
 title AgentCrafter DSL - Configuration Flow
@@ -260,13 +257,11 @@ SB -> Runner : create and start
 activate Runner
 
 @enduml
-```
 
 ## LLM Integration Architecture
 
 The system provides comprehensive LLM integration capabilities:
 
-```plantuml
 @startuml LLM Integration Architecture
 !theme plain
 title AgentCrafter - LLM Integration Architecture
@@ -384,7 +379,6 @@ note bottom of LLMApiClient : "Handles all external\nAPI communication"
 note left of PromptBuilder : "Generates context-aware\nprompts for different tasks"
 
 @enduml
-```
 
 ## Design Principles
 
