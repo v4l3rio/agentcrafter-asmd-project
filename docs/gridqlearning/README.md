@@ -8,9 +8,7 @@ Grid Q-Learning serves as the bedrock of the AgentCrafter project, implementing 
 
 ## Architecture Overview
 
-The Grid Q-Learning architecture forms the foundation of all AgentCrafter simulations, providing the core reinforcement learning infrastructure:
-
-![Grid Q-Learning Foundation Architecture](../schemas/grid-qlearning-architecture.svg)
+The Grid Q-Learning architecture forms the foundation of all AgentCrafter simulations, providing the core reinforcement learning infrastructure.
 
 ## Core Concepts
 

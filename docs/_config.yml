@@ -16,13 +16,6 @@ header_pages:
   - visualqlearning/README.md
   - marl/README.md
 
-plantuml:
-  plantuml_jar: plantuml.jar # path to plantuml.jar
-  type: utxt                         # type (passed as -t option, ex: -tutxt)
-  extension: txt                     # output extension override
-  plantuml_args: -nometadata         # extra args to be passed to plantuml
-  java_args: -Xmx1G                  # extra args to be passed to java
-
 # Markdown settings
 markdown: kramdown
 kramdown:

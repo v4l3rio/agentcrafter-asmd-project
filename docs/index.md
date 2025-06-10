@@ -21,15 +21,7 @@ The project is built around a sophisticated **Multi-Agent Reinforcement Learning
 - **LLM Wall Generation**: Automatic maze and environment generation from natural language descriptions
 - **Intelligent Bootstrapping**: Pre-computed optimal policies to accelerate learning
 
-## Architecture Documentation
 
-For a comprehensive understanding of the system architecture, see the **[Architecture Documentation](architecture.md)** which includes detailed PlantUML diagrams showing:
-
-- **System Overview**: Complete architecture with all major components and relationships
-- **DSL Configuration Flow**: How the Domain-Specific Language processes user configurations
-- **LLM Integration**: Large Language Model services and API integration architecture
-
-Each documentation section also includes relevant architecture diagrams specific to that component.
 
 ## Documentation Sections
 

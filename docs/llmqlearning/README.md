@@ -12,9 +12,7 @@ The LLM Q-Learning extension integrates Large Language Models directly into the 
 
 ### LLM Services and API Integration
 
-The following diagram shows the complete LLM integration architecture:
-
-![LLM Integration Architecture](../schemas/llm-integration.svg)
+The system provides complete LLM integration architecture for enhanced reinforcement learning capabilities.
 
 ## Key Features
 

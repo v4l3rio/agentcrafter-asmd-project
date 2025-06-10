@@ -12,15 +12,7 @@ The MARL framework is built on a sophisticated multi-agent coordination architec
 
 ### Multi-Agent Coordination Architecture
 
-The following diagram illustrates how multiple agents coordinate through triggers, effects, and shared world state:
-
-![Multi-Agent Coordination Architecture](../schemas/multi-agent-coordination.svg)
-
-### Learning Architecture for Multi-Agent Systems
-
-This diagram shows how the Q-Learning components work together in a multi-agent environment:
-
-![Multi-Agent Reinforcement Learning Architecture](../schemas/marl-learning-architecture.svg)
+The system enables multiple agents to coordinate through triggers, effects, and shared world state, with Q-Learning components working together in a multi-agent environment.
 
 ## Key Concepts
 
