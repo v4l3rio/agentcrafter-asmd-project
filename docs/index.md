@@ -1,29 +1,75 @@
-# Advanced Software Modeling and Design - Reinforcement Learning Project
+# AgentCrafter: Advanced Software Modeling and Design Project
 
-This project is part of the **Advanced Software Modeling and Design** exam, exploring different approaches to Reinforcement Learning (RL) implementation and optimization.
+This project is part of the **Advanced Software Modeling and Design** exam, exploring different approaches to Reinforcement Learning (RL) implementation and optimization with innovative LLM integration.
 
 ## Project Overview
 
-This repository contains the implementation and documentation of a multi-agent reinforcement learning system, developed through three distinct phases of refinement and improvement.
+This repository contains the implementation and documentation of a multi-agent reinforcement learning system with cutting-edge Large Language Model (LLM) integration capabilities. The project demonstrates the evolution from basic Q-Learning to advanced AI-assisted reinforcement learning.
+
+## Current Architecture
+
+The project is built around a sophisticated **Multi-Agent Reinforcement Learning (MARL)** framework with the following key components:
+
+### Core Framework
+- **MARL DSL**: A powerful Domain-Specific Language for defining simulations using Scala 3
+- **Multi-Agent Support**: Sophisticated coordination mechanisms between multiple learning agents
+- **Flexible Environment**: Grid-based environments with walls, triggers, and dynamic interactions
+- **Advanced Learning**: Q-Learning with configurable parameters and optimization strategies
+
+### LLM Integration Extensions
+- **LLM Q-Table Generation**: AI-powered Q-Table initialization using GPT models
+- **LLM Wall Generation**: Automatic maze and environment generation from natural language descriptions
+- **Intelligent Bootstrapping**: Pre-computed optimal policies to accelerate learning
+
+## Architecture Diagrams
+
+The following PlantUML diagrams illustrate the high-level architecture and key components:
+
+- **[System Overview](architecture-overview.puml)**: Complete system architecture showing all major components and their relationships
+- **[DSL Flow](dsl-flow.puml)**: How the Domain-Specific Language processes configuration and builds simulations
+- **[Learning Architecture](learning-architecture.puml)**: Q-Learning components, LLM integration, and execution flow
+- **[Multi-Agent Coordination](multi-agent-coordination.puml)**: Agent interaction mechanisms, triggers, and effects
+- **[LLM Integration](llm-integration.puml)**: Large Language Model services and API integration
 
 ## Documentation Sections
 
-### 1. [Grid Q-Learning](gridqlearning/)
-The initial approach to the problem, implementing a basic Q-Learning algorithm on a grid-based environment. This section covers the foundational concepts and the first implementation of the reinforcement learning solution.
+### 1. [Multi-Agent Reinforcement Learning (MARL)](marl/)
+The core framework implementing sophisticated multi-agent systems with coordination mechanisms, triggers, and complex environment interactions. This is the foundation of the entire project.
 
-### 2. [Visual Q-Learning](visualqlearning/)
-A refined approach that introduces visual elements and improved learning mechanisms. This section documents the second iteration of the project, focusing on enhanced visualization and learning efficiency.
+### 2. [LLM Q-Learning Extensions](llmqlearning/)
+Innovative extensions that integrate Large Language Models for intelligent Q-Table generation and environment bootstrapping. This demonstrates how AI can enhance traditional reinforcement learning.
 
-### 3. [Multi-Agent Reinforcement Learning (MARL)](marl/)
-The final and most advanced implementation, featuring multi-agent systems and sophisticated reinforcement learning techniques. This section presents the culmination of the project with advanced RL concepts and implementations.
+### 3. [LLM Wall Generation](wallsfromllm/)
+A unique feature that allows automatic generation of maze layouts and wall configurations using LLMs directly within the simulation DSL, enabling endless variety in environment design.
 
-### 4. [LLM Q-Learning Extensions](llmqlearning/)
-An innovative extension to the MARL framework that integrates Large Language Models (LLMs) for intelligent Q-Table generation. This section demonstrates how AI can be used to bootstrap reinforcement learning with pre-computed optimal policies.
+### 4. [Grid Q-Learning](gridqlearning/)
+The foundational implementation showcasing basic Q-Learning concepts. This serves as a reference for understanding the evolution to more advanced approaches.
+
+### 5. [Visual Q-Learning](visualqlearning/)
+Enhanced implementation with visualization capabilities and improved learning mechanisms, bridging basic and advanced approaches.
+
+## Key Features
+
+- **Scala 3 DSL**: Clean, type-safe domain-specific language for simulation configuration
+- **LLM Integration**: First-class support for GPT-4o and other OpenAI models
+- **Real-time Visualization**: Live rendering of learning processes and agent behaviors
+- **Cooperative Scenarios**: Multi-agent coordination with switches, triggers, and shared objectives
+- **Flexible Architecture**: Modular design supporting various learning algorithms and environments
+- **Comprehensive Testing**: BDD-style testing with Cucumber for behavior verification
+
+## Getting Started
+
+To understand the project:
+
+1. Start with [MARL](marl/) to understand the core framework
+2. Explore [LLM Q-Learning](llmqlearning/) for AI-enhanced learning
+3. Try [LLM Wall Generation](wallsfromllm/) for automatic environment creation
+4. Review the foundational concepts in [Grid Q-Learning](gridqlearning/)
 
 ## Navigation
 
-Use the links above to explore each section of the project documentation. Each section contains detailed explanations, implementation details, and analysis of the respective approach.
+Use the links above to explore each section of the project documentation. Each section contains detailed explanations, implementation details, and practical examples.
 
 ---
 
-*This project demonstrates the evolution of reinforcement learning implementations, from basic Q-Learning to advanced multi-agent systems, showcasing various software modeling and design principles.*
+*This project demonstrates the cutting-edge integration of Large Language Models with reinforcement learning, showcasing how AI can enhance traditional RL approaches through intelligent initialization and environment generation.*

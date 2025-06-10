@@ -1,0 +1,148 @@
+@startuml Learning Architecture
+!theme plain
+title AgentCrafter - Learning Architecture
+
+package "Learning Core" {
+  abstract class Learner {
+    +learn(episodes: Int): Unit
+    +greedyEpisode(): EpisodeOutcome
+    +reset(): State
+    +step(state: State, action: Action): StepResult
+  }
+  
+  class QLearner {
+    -qTable: Map[(State, Action), Double]
+    -learningParameters: LearningParameters
+    -goalState: State
+    -goalReward: Double
+    -updateFunction: UpdateFunction
+    -resetFunction: ResetFunction
+    +learn(episodes: Int): Unit
+    +greedyEpisode(): EpisodeOutcome
+    +chooseAction(state: State, epsilon: Double): Action
+    +updateQValue(state: State, action: Action, reward: Double, nextState: State): Unit
+  }
+  
+  class LearningParameters {
+    +alpha: Double
+    +gamma: Double
+    +eps0: Double
+    +epsMin: Double
+    +warm: Int
+    +optimistic: Double
+    +calculateEpsilon(episode: Int): Double
+  }
+}
+
+package "Environment" {
+  interface Environment {
+    +rows: Int
+    +cols: Int
+    +step(state: State, action: Action): StepResult
+  }
+  
+  class GridWorld {
+    +walls: Set[State]
+    +stepPenalty: Double
+    +step(state: State, action: Action): StepResult
+    +isValidMove(from: State, to: State): Boolean
+  }
+  
+  class State {
+    +row: Int
+    +col: Int
+  }
+  
+  enum Action {
+    UP
+    DOWN
+    LEFT
+    RIGHT
+  }
+  
+  class StepResult {
+    +nextState: State
+    +reward: Double
+    +isTerminal: Boolean
+  }
+}
+
+package "LLM Enhancement" {
+  class LLMQTableService {
+    +loadQTableFromLLM(builder: SimulationBuilder, model: String, filePath: String): Option[String]
+    +loadQTableIntoAgents(builder: SimulationBuilder, qTableJson: String): Unit
+    +parseQTableJson(json: String): Map[(State, Action), Double]
+  }
+  
+  class LLMApiClient {
+    +generateQTable(prompt: String, model: String): Option[String]
+    +makeApiCall(prompt: String, model: String): String
+  }
+  
+  class QTableLoader {
+    +loadFromJson(json: String): Map[(State, Action), Double]
+    +validateQTable(qTable: Map[(State, Action), Double]): Boolean
+  }
+}
+
+package "Execution Flow" {
+  class EpisodeManager {
+    +runEpisodes(learner: Learner, episodes: Int): Unit
+    +runSingleEpisode(learner: Learner): EpisodeOutcome
+    +handleTriggers(state: State, agentId: String): List[Effect]
+  }
+  
+  class Runner {
+    +run(world: WorldSpec): Unit
+    +setupAgents(agents: Map[String, AgentSpec]): Map[String, Learner]
+    +executeSimulation(): Unit
+  }
+}
+
+package "Visualization" {
+  class Visualizer {
+    +updateSingleAgent(pos: State, qInfo: String): Unit
+    +updateMultiAgent(agents: Map[String, State], rewards: Map[String, Double]): Unit
+    +render(): Unit
+  }
+  
+  class QTableVisualizer {
+    +visualizeQTable(qTable: Map[(State, Action), Double]): Unit
+    +showBestActions(state: State): Unit
+  }
+}
+
+' Relationships
+Learner <|-- QLearner
+QLearner --> LearningParameters : uses
+QLearner --> Environment : interacts with
+Environment <|-- GridWorld
+GridWorld --> State : manages
+GridWorld --> Action : processes
+GridWorld --> StepResult : returns
+
+LLMQTableService --> LLMApiClient : uses
+LLMQTableService --> QTableLoader : uses
+QLearner --> LLMQTableService : enhanced by
+
+EpisodeManager --> Learner : manages
+Runner --> EpisodeManager : uses
+Runner --> Visualizer : optionally uses
+Visualizer --> QTableVisualizer : delegates to
+
+note right of QLearner
+  Core Q-Learning algorithm with:
+  - Epsilon-greedy exploration
+  - Q-value updates using Bellman equation
+  - Configurable learning parameters
+  - Optional LLM initialization
+end note
+
+note right of LLMQTableService
+  LLM Integration:
+  - Generates initial Q-tables using GPT models
+  - Parses and validates LLM responses
+  - Bootstraps learning with intelligent policies
+end note
+
+@enduml

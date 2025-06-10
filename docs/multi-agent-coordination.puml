@@ -1,0 +1,145 @@
+@startuml Multi-Agent Coordination
+!theme plain
+title AgentCrafter - Multi-Agent Coordination Architecture
+
+package "Agent System" {
+  class AgentSpec {
+    +id: String
+    +start: State
+    +goal: State
+    +learner: Learner
+    +triggers: List[Trigger]
+  }
+  
+  class Agent {
+    +id: String
+    +currentState: State
+    +learner: QLearner
+    +totalReward: Double
+    +move(action: Action): StepResult
+    +receiveReward(amount: Double): Unit
+  }
+}
+
+package "Coordination Mechanisms" {
+  class Trigger {
+    +who: String
+    +at: State
+    +effects: List[Effect]
+    +isTriggeredBy(agentId: String, state: State): Boolean
+  }
+  
+  abstract class Effect {
+    +apply(world: WorldSpec, agent: Agent): Unit
+  }
+  
+  class OpenWall extends Effect {
+    +pos: State
+    +apply(world: WorldSpec, agent: Agent): Unit
+  }
+  
+  class EndEpisode extends Effect {
+    +apply(world: WorldSpec, agent: Agent): Unit
+  }
+  
+  class Reward extends Effect {
+    +delta: Double
+    +apply(world: WorldSpec, agent: Agent): Unit
+  }
+}
+
+package "World Management" {
+  class WorldSpec {
+    +rows: Int
+    +cols: Int
+    +walls: Set[State]
+    +agents: Map[String, AgentSpec]
+    +triggers: List[Trigger]
+    +dynamicWalls: Set[State]
+    +removeWall(pos: State): Unit
+    +addWall(pos: State): Unit
+  }
+  
+  class GridWorld {
+    +walls: Set[State]
+    +stepPenalty: Double
+    +isWallAt(state: State): Boolean
+    +step(state: State, action: Action): StepResult
+  }
+}
+
+package "Execution Control" {
+  class EpisodeManager {
+    +world: WorldSpec
+    +agents: Map[String, Agent]
+    +runMultiAgentEpisode(): Map[String, EpisodeOutcome]
+    +processAgentMove(agent: Agent, action: Action): Unit
+    +checkTriggers(agentId: String, state: State): List[Effect]
+    +applyEffects(effects: List[Effect], agent: Agent): Unit
+  }
+  
+  class Simulation {
+    +world: WorldSpec
+    +episodeManager: EpisodeManager
+    +visualizer: Option[Visualizer]
+    +run(): Unit
+  }
+}
+
+package "Visualization" {
+  class Visualizer {
+    +multiAgentState: Map[String, State]
+    +goalCells: Set[State]
+    +switchCells: Set[State]
+    +updateMultiAgent(agents: Map[String, State], rewards: Map[String, Double]): Unit
+    +highlightTrigger(pos: State): Unit
+    +showWallChange(pos: State, removed: Boolean): Unit
+  }
+}
+
+' Relationships
+AgentSpec --> Agent : instantiates
+Agent --> Trigger : can activate
+Trigger --> Effect : contains
+Effect <|-- OpenWall
+Effect <|-- EndEpisode
+Effect <|-- Reward
+
+WorldSpec --> AgentSpec : contains
+WorldSpec --> Trigger : manages
+WorldSpec --> GridWorld : configures
+
+EpisodeManager --> WorldSpec : manages
+EpisodeManager --> Agent : coordinates
+EpisodeManager --> Trigger : processes
+EpisodeManager --> Effect : applies
+
+Simulation --> EpisodeManager : uses
+Simulation --> Visualizer : optionally uses
+Visualizer --> Agent : observes
+
+' Interaction Flow
+note as N1
+  **Multi-Agent Coordination Flow:**
+  1. Agents move independently in the environment
+  2. EpisodeManager checks for trigger activation
+  3. When agent reaches trigger position, effects are applied
+  4. Effects can modify the world (open walls) or agent state (rewards)
+  5. Changes are reflected in visualization
+  6. Coordination emerges through shared triggers and effects
+end note
+
+note as N2
+  **Effect Types:**
+  • **OpenWall**: Removes walls, enabling new paths
+  • **Reward**: Provides additional rewards to agents
+  • **EndEpisode**: Terminates current episode
+  
+  Effects enable complex coordination scenarios
+  where agents must work together to achieve goals.
+end note
+
+N1 .. EpisodeManager
+N2 .. Effect
+
+@enduml
