@@ -6,13 +6,133 @@ The **LLM Q-Learning Extensions** represent a groundbreaking integration of Larg
 
 This innovative extension leverages the power of Large Language Models (specifically GPT-4o and other OpenAI models) to generate optimal or near-optimal Q-Tables for reinforcement learning scenarios. By using AI to pre-compute intelligent policies, agents can start learning from a much more informed baseline, dramatically accelerating convergence and improving final performance.
 
-## Architecture Diagrams
+## LLM Integration Architecture
 
-For a visual understanding of the LLM integration architecture, refer to these PlantUML diagrams:
+The LLM Q-Learning extension integrates Large Language Models directly into the reinforcement learning pipeline, providing AI-enhanced learning capabilities.
 
-- **[LLM Integration](../llm-integration.puml)**: Complete LLM services and API integration architecture
-- **[Learning Architecture](../learning-architecture.puml)**: How LLM enhancement integrates with Q-Learning
-- **[System Overview](../architecture-overview.puml)**: Overall system showing LLM components
+### LLM Services and API Integration
+
+The following diagram shows the complete LLM integration architecture:
+
+```plantuml
+@startuml LLM Integration Architecture
+!theme plain
+title AgentCrafter - LLM Integration Architecture
+
+package "DSL Layer" {
+  trait LLMQLearning {
+    -llmConfig: LLMConfig
+    +useLLM(block: LLMConfig ?=> Unit): Unit
+    +simulation(block: SimulationWrapper ?=> Unit): Unit
+  }
+  
+  class LLMConfig {
+    +enabled: Boolean
+    +model: String
+    +wallsEnabled: Boolean
+    +wallsModel: String
+    +wallsPrompt: String
+  }
+  
+  enum LLMProperty {
+    Enabled
+    Model
+    WallsEnabled
+    WallsModel
+    WallsPrompt
+    +>>(value: T): Unit
+  }
+}
+
+package "LLM Services" {
+  class LLMApiClient {
+    -apiKey: String
+    -baseUrl: String
+    +generateQTable(prompt: String, model: String): Option[String]
+    +generateWalls(prompt: String, model: String): Option[String]
+    +makeApiCall(prompt: String, model: String): String
+    -buildRequestPayload(prompt: String, model: String): String
+    -parseResponse(response: String): Option[String]
+  }
+  
+  class LLMQTableService {
+    +loadQTableFromLLM(builder: SimulationBuilder, model: String, filePath: String): Option[String]
+    +loadQTableIntoAgents(builder: SimulationBuilder, qTableJson: String): Unit
+    -generateQTablePrompt(world: WorldSpec): String
+    -parseQTableResponse(response: String): Map[(State, Action), Double]
+  }
+  
+  class LLMWallService {
+    +generateWallsFromPrompt(prompt: String, model: String, rows: Int, cols: Int): Set[State]
+    -parseWallResponse(response: String, rows: Int, cols: Int): Set[State]
+    -validateWallConfiguration(walls: Set[State], rows: Int, cols: Int): Set[State]
+  }
+}
+
+package "Prompt Management" {
+  class PromptTemplate {
+    +qTablePrompt: String
+    +wallGenerationPrompt: String
+    +scenarioPrompt: String
+    +generatePrompt(template: String, params: Map[String, Any]): String
+  }
+  
+  class PromptBuilder {
+    +buildQTablePrompt(world: WorldSpec): String
+    +buildWallPrompt(requirements: String, dimensions: (Int, Int)): String
+    +addContext(context: String): PromptBuilder
+    +addConstraints(constraints: List[String]): PromptBuilder
+  }
+}
+
+package "External API" {
+  class OpenAIClient {
+    +chat(messages: List[Message], model: String): String
+    +completion(prompt: String, model: String): String
+    -handleRateLimit(): Unit
+    -retryOnFailure(request: () => String): String
+  }
+  
+  class APIResponse {
+    +content: String
+    +usage: TokenUsage
+    +model: String
+    +finishReason: String
+  }
+}
+
+package "Integration Points" {
+  class LLMSimulationWrapper {
+    +withLLMQTable(): Unit
+    +withLLMWalls(): Unit
+    +enableLLMFeatures(): Unit
+  }
+  
+  class ConfigurationValidator {
+    +validateLLMConfig(config: LLMConfig): Boolean
+    +validateAPIKey(): Boolean
+    +validateModelAvailability(model: String): Boolean
+  }
+}
+
+' Relationships
+LLMQLearning --> LLMConfig
+LLMQLearning --> LLMQTableService
+LLMQLearning --> LLMWallService
+LLMQTableService --> LLMApiClient
+LLMWallService --> LLMApiClient
+LLMApiClient --> OpenAIClient
+LLMApiClient --> PromptBuilder
+PromptBuilder --> PromptTemplate
+OpenAIClient --> APIResponse
+LLMSimulationWrapper --> ConfigurationValidator
+
+note right of LLMQLearning : "Extends SimulationDSL\nwith LLM capabilities"
+note bottom of LLMApiClient : "Handles all external\nAPI communication"
+note left of PromptBuilder : "Generates context-aware\nprompts for different tasks"
+
+@enduml
+```
 
 ## Key Features
 

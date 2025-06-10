@@ -1,104 +1,390 @@
-# AgentCrafter Architecture Documentation
+# AgentCrafter System Architecture
 
-This document provides an overview of the PlantUML architecture diagrams that illustrate the high-level design and component relationships in the AgentCrafter system.
+This document provides a comprehensive overview of the AgentCrafter system architecture, illustrating the key components and their relationships through PlantUML diagrams.
 
-## Viewing the Diagrams
+## System Overview
 
-The diagrams are written in PlantUML format (`.puml` files). To view them, you can:
+AgentCrafter is built on a layered architecture that separates concerns and provides flexibility for different types of reinforcement learning scenarios.
 
-1. **Online PlantUML Server**: Copy the content of any `.puml` file to [PlantUML Online Server](http://www.plantuml.com/plantuml/uml/)
-2. **VS Code Extension**: Install the "PlantUML" extension for Visual Studio Code
-3. **IntelliJ Plugin**: Use the PlantUML integration plugin for IntelliJ IDEA
-4. **Local PlantUML**: Install PlantUML locally and generate PNG/SVG files
+```plantuml
+@startuml AgentCrafter System Architecture
+!theme plain
+title AgentCrafter - High-Level System Architecture
 
-## Architecture Diagrams Overview
+package "DSL Layer" {
+  interface SimulationDSL {
+    +simulation()
+    +grid()
+    +agent()
+    +walls()
+    +asciiWalls()
+    +wallsFromLLM()
+  }
+  
+  class LLMQLearning {
+    +useLLM()
+    -llmConfig: LLMConfig
+  }
+  
+  class Properties {
+    +SimulationProperty
+    +AgentProperty
+    +LearnerProperty
+    +WallProperty
+  }
+}
 
-### 1. System Overview (`architecture-overview.puml`)
+package "Builder Pattern" {
+  class SimulationBuilder {
+    -rows, cols: Int
+    -walls: Set[State]
+    -agents: Map[String, AgentSpec]
+    -triggers: Buffer[Trigger]
+    +build(): Unit
+  }
+  
+  class AgentBuilder {
+    +withLearner()
+    +onGoal()
+    +build(): AgentSpec
+  }
+  
+  class TriggerBuilder {
+    +openWall()
+    +endEpisode()
+    +give()
+  }
+  
+  class WallLineBuilder {
+    +direction()
+    +from()
+    +to()
+  }
+}
 
-**Purpose**: Provides a complete bird's-eye view of the entire AgentCrafter system.
+package "Domain Model" {
+  class AgentSpec {
+    +id: String
+    +start: State
+    +goal: State
+    +learner: Learner
+    +triggers: List[Trigger]
+  }
+  
+  class WorldSpec {
+    +rows, cols: Int
+    +walls: Set[State]
+    +agents: Map[String, AgentSpec]
+    +triggers: List[Trigger]
+  }
+  
+  abstract class Effect
+  class OpenWall extends Effect
+  class EndEpisode extends Effect
+  class Reward extends Effect
+  
+  class Trigger {
+    +who: String
+    +at: State
+    +effects: List[Effect]
+  }
+}
 
-**Key Components Shown**:
-- DSL Layer (SimulationDSL, LLMQLearning, Properties)
-- Builder Pattern (SimulationBuilder, AgentBuilder, etc.)
-- Domain Model (AgentSpec, WorldSpec, Effects, Triggers)
-- Learning Core (Environment, QLearner, GridWorld)
-- LLM Integration (API clients, services, configuration)
-- Visualization (Visualizer, QTableVisualizer)
-- Execution (Runner, EpisodeManager, Simulation)
+package "Learning Core" {
+  interface Environment {
+    +rows, cols: Int
+    +step(state, action): StepResult
+  }
+  
+  abstract class Learner {
+    +learn(episodes: Int): Unit
+    +greedyEpisode(): EpisodeOutcome
+  }
+  
+  class QLearner {
+    -qTable: Map[(State, Action), Double]
+    -learningParameters: LearningParameters
+    +learn(episodes: Int): Unit
+    +chooseAction(state: State, epsilon: Double): Action
+  }
+  
+  class GridWorld {
+    +walls: Set[State]
+    +stepPenalty: Double
+    +step(state: State, action: Action): StepResult
+  }
+}
 
-**Use Case**: Understanding the overall system architecture and how major components interact.
+package "LLM Integration" {
+  class LLMApiClient {
+    +generateQTable(prompt: String): Option[String]
+    +generateWalls(prompt: String): Option[String]
+  }
+  
+  class LLMQTableService {
+    +loadQTableFromLLM(builder: SimulationBuilder): Unit
+  }
+  
+  class LLMWallService {
+    +generateWallsFromPrompt(prompt: String): Set[State]
+  }
+}
 
-### 2. DSL Flow (`dsl-flow.puml`)
+package "Visualization" {
+  class Visualizer {
+    +render(world: WorldSpec, agents: Map[String, Agent]): Unit
+    +showQValues(qTable: Map[(State, Action), Double]): Unit
+  }
+  
+  class QTableVisualizer {
+    +displayQTable(qTable: Map[(State, Action), Double]): Unit
+    +highlightOptimalPath(start: State, goal: State): Unit
+  }
+}
 
-**Purpose**: Illustrates the sequence of operations when using the DSL to configure a simulation.
+package "Execution" {
+  class Runner {
+    +run(simulation: WorldSpec): Unit
+    +runEpisode(): EpisodeOutcome
+  }
+  
+  class EpisodeManager {
+    +executeEpisode(agents: List[Agent]): EpisodeOutcome
+    +handleTriggers(agent: Agent, state: State): Unit
+  }
+  
+  class Simulation {
+    +world: WorldSpec
+    +agents: Map[String, Agent]
+    +currentEpisode: Int
+    +step(): Unit
+  }
+}
 
-**Key Flow Shown**:
-- User writes DSL configuration
-- SimulationDSL processes the configuration
-- Builder pattern constructs the simulation
-- Properties are applied using the `>>` operator
-- Final simulation is built and executed
+' Relationships
+SimulationDSL --> SimulationBuilder
+SimulationBuilder --> AgentBuilder
+SimulationBuilder --> TriggerBuilder
+SimulationBuilder --> WallLineBuilder
+SimulationBuilder --> WorldSpec
+AgentBuilder --> AgentSpec
+TriggerBuilder --> Trigger
+AgentSpec --> Learner
+QLearner --> Environment
+GridWorld --> Environment
+LLMQLearning --> LLMApiClient
+LLMQTableService --> LLMApiClient
+LLMWallService --> LLMApiClient
+Runner --> Simulation
+Simulation --> WorldSpec
+Simulation --> Agent
+Visualizer --> WorldSpec
+QTableVisualizer --> QLearner
 
-**Use Case**: Understanding how the DSL syntax translates to actual object construction.
+@enduml
+```
 
-### 3. Learning Architecture (`learning-architecture.puml`)
+## DSL Configuration Flow
 
-**Purpose**: Focuses on the reinforcement learning components and their relationships.
+The following diagram shows how user configurations flow through the system:
 
-**Key Components Shown**:
-- Core learning interfaces (Learner, Environment)
-- Q-Learning implementation (QLearner, LearningParameters)
-- Environment management (GridWorld, State, Action)
-- LLM enhancement services
-- Execution and visualization components
+```plantuml
+@startuml DSL Flow and Builder Pattern
+!theme plain
+title AgentCrafter DSL - Configuration Flow
 
-**Use Case**: Understanding the Q-Learning implementation and how LLM integration enhances it.
+actor User
+participant "SimulationDSL" as DSL
+participant "SimulationWrapper" as Wrapper
+participant "SimulationBuilder" as SB
+participant "AgentBuilder" as AB
+participant "Properties" as Props
+participant "WorldSpec" as World
+participant "Runner" as Runner
 
-### 4. Multi-Agent Coordination (`multi-agent-coordination.puml`)
+User -> DSL : simulation { ... }
+activate DSL
 
-**Purpose**: Shows how multiple agents coordinate through triggers and effects.
+DSL -> Wrapper : create SimulationWrapper
+activate Wrapper
+DSL -> SB : new SimulationBuilder
+activate SB
 
-**Key Components Shown**:
-- Agent system (AgentSpec, Agent)
-- Coordination mechanisms (Trigger, Effect types)
-- World management (WorldSpec, GridWorld)
-- Execution control (EpisodeManager, Simulation)
-- Visualization of multi-agent scenarios
+User -> DSL : grid: 10 x 10
+DSL -> SB : grid(10, 10)
 
-**Use Case**: Understanding how agents interact and coordinate in multi-agent scenarios.
+User -> DSL : agent: { ... }
+DSL -> AB : new AgentBuilder
+activate AB
 
-### 5. LLM Integration (`llm-integration.puml`)
+User -> Props : Name >> "Agent1"
+Props -> AB : setName("Agent1")
 
-**Purpose**: Details the Large Language Model integration architecture.
+User -> Props : Start >> (0, 0)
+Props -> AB : setStart(State(0, 0))
 
-**Key Components Shown**:
-- DSL integration (LLMQLearning, LLMConfig, LLMProperty)
-- LLM services (LLMApiClient, LLMQTableService, LLMWallService)
-- Prompt management and API communication
-- Integration points with the main system
+User -> DSL : withLearner: { ... }
+DSL -> AB : withLearner()
 
-**Use Case**: Understanding how LLM capabilities are integrated into the reinforcement learning system.
+User -> Props : Alpha >> 0.1
+Props -> AB : setAlpha(0.1)
 
-## Component Relationships
+User -> Props : Gamma >> 0.9
+Props -> AB : setGamma(0.9)
 
-### Layered Architecture
+User -> DSL : onGoal: { ... }
+DSL -> AB : onGoal()
 
-The system follows a layered architecture:
+User -> Props : Give >> 100
+Props -> AB : addReward(100)
 
-1. **DSL Layer**: User-facing domain-specific language
-2. **Builder Layer**: Fluent API for constructing simulations
-3. **Domain Layer**: Core business objects and logic
-4. **Service Layer**: LLM integration and external services
-5. **Execution Layer**: Runtime simulation management
-6. **Visualization Layer**: GUI and rendering components
+User -> Props : EndEpisode >> true
+Props -> AB : addEndEpisode()
 
-### Key Patterns
+AB -> SB : addAgent(agentSpec)
+deactivate AB
 
-- **Builder Pattern**: Used extensively for fluent DSL construction
-- **Strategy Pattern**: Different learner implementations
-- **Observer Pattern**: Visualization updates
-- **Factory Pattern**: Agent and simulation creation
-- **Service Layer**: LLM integration abstraction
+User -> DSL : walls: { ... }
+DSL -> SB : addWalls()
+
+User -> Props : Episodes >> 1000
+Props -> SB : setEpisodes(1000)
+
+User -> Props : WithGUI >> true
+Props -> SB : withGUI(true)
+
+DSL -> SB : build()
+SB -> World : create WorldSpec
+activate World
+SB -> Runner : create and start
+activate Runner
+
+@enduml
+```
+
+## LLM Integration Architecture
+
+The system provides comprehensive LLM integration capabilities:
+
+```plantuml
+@startuml LLM Integration Architecture
+!theme plain
+title AgentCrafter - LLM Integration Architecture
+
+package "DSL Layer" {
+  trait LLMQLearning {
+    -llmConfig: LLMConfig
+    +useLLM(block: LLMConfig ?=> Unit): Unit
+    +simulation(block: SimulationWrapper ?=> Unit): Unit
+  }
+  
+  class LLMConfig {
+    +enabled: Boolean
+    +model: String
+    +wallsEnabled: Boolean
+    +wallsModel: String
+    +wallsPrompt: String
+  }
+  
+  enum LLMProperty {
+    Enabled
+    Model
+    WallsEnabled
+    WallsModel
+    WallsPrompt
+    +>>(value: T): Unit
+  }
+}
+
+package "LLM Services" {
+  class LLMApiClient {
+    -apiKey: String
+    -baseUrl: String
+    +generateQTable(prompt: String, model: String): Option[String]
+    +generateWalls(prompt: String, model: String): Option[String]
+    +makeApiCall(prompt: String, model: String): String
+    -buildRequestPayload(prompt: String, model: String): String
+    -parseResponse(response: String): Option[String]
+  }
+  
+  class LLMQTableService {
+    +loadQTableFromLLM(builder: SimulationBuilder, model: String, filePath: String): Option[String]
+    +loadQTableIntoAgents(builder: SimulationBuilder, qTableJson: String): Unit
+    -generateQTablePrompt(world: WorldSpec): String
+    -parseQTableResponse(response: String): Map[(State, Action), Double]
+  }
+  
+  class LLMWallService {
+    +generateWallsFromPrompt(prompt: String, model: String, rows: Int, cols: Int): Set[State]
+    -parseWallResponse(response: String, rows: Int, cols: Int): Set[State]
+    -validateWallConfiguration(walls: Set[State], rows: Int, cols: Int): Set[State]
+  }
+}
+
+package "Prompt Management" {
+  class PromptTemplate {
+    +qTablePrompt: String
+    +wallGenerationPrompt: String
+    +scenarioPrompt: String
+    +generatePrompt(template: String, params: Map[String, Any]): String
+  }
+  
+  class PromptBuilder {
+    +buildQTablePrompt(world: WorldSpec): String
+    +buildWallPrompt(requirements: String, dimensions: (Int, Int)): String
+    +addContext(context: String): PromptBuilder
+    +addConstraints(constraints: List[String]): PromptBuilder
+  }
+}
+
+package "External API" {
+  class OpenAIClient {
+    +chat(messages: List[Message], model: String): String
+    +completion(prompt: String, model: String): String
+    -handleRateLimit(): Unit
+    -retryOnFailure(request: () => String): String
+  }
+  
+  class APIResponse {
+    +content: String
+    +usage: TokenUsage
+    +model: String
+    +finishReason: String
+  }
+}
+
+package "Integration Points" {
+  class LLMSimulationWrapper {
+    +withLLMQTable(): Unit
+    +withLLMWalls(): Unit
+    +enableLLMFeatures(): Unit
+  }
+  
+  class ConfigurationValidator {
+    +validateLLMConfig(config: LLMConfig): Boolean
+    +validateAPIKey(): Boolean
+    +validateModelAvailability(model: String): Boolean
+  }
+}
+
+' Relationships
+LLMQLearning --> LLMConfig
+LLMQLearning --> LLMQTableService
+LLMQLearning --> LLMWallService
+LLMQTableService --> LLMApiClient
+LLMWallService --> LLMApiClient
+LLMApiClient --> OpenAIClient
+LLMApiClient --> PromptBuilder
+PromptBuilder --> PromptTemplate
+OpenAIClient --> APIResponse
+LLMSimulationWrapper --> ConfigurationValidator
+
+note right of LLMQLearning : "Extends SimulationDSL\nwith LLM capabilities"
+note bottom of LLMApiClient : "Handles all external\nAPI communication"
+note left of PromptBuilder : "Generates context-aware\nprompts for different tasks"
+
+@enduml
+```
 
 ## Design Principles
 
@@ -107,15 +393,21 @@ The system follows a layered architecture:
 - Learning algorithms are independent of visualization
 - LLM integration is optional and modular
 
-### Extensibility
-- New learner types can be added easily
-- Additional effect types can be implemented
-- New LLM services can be integrated
+### Layered Architecture
+The system follows a layered architecture:
+1. **DSL Layer**: User-facing domain-specific language
+2. **Builder Layer**: Fluent API for constructing simulations
+3. **Domain Layer**: Core business objects and logic
+4. **Service Layer**: LLM integration and external services
+5. **Execution Layer**: Runtime simulation management
+6. **Visualization Layer**: GUI and rendering components
 
-### Type Safety
-- Scala 3's type system ensures compile-time safety
-- DSL properties are type-checked
-- Builder pattern prevents invalid configurations
+### Key Patterns
+- **Builder Pattern**: Used extensively for fluent DSL construction
+- **Strategy Pattern**: Different learner implementations
+- **Observer Pattern**: Visualization updates
+- **Factory Pattern**: Agent and simulation creation
+- **Service Layer**: LLM integration abstraction
 
 ## Usage Guidelines
 
