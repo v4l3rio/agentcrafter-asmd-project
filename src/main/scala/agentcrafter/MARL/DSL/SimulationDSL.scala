@@ -19,7 +19,7 @@ trait SimulationDSL:
    * 
    * @param block Configuration block that defines the simulation setup
    */
-  def simulation(block: SimulationWrapper ?=> Unit) =
+  def simulation(block: SimulationWrapper ?=> Unit): Unit =
     given wrapper: SimulationWrapper = SimulationWrapper(new SimulationBuilder)
     block
     wrapper.builder.build()
@@ -29,19 +29,18 @@ trait SimulationDSL:
    * 
    * @param size Tuple containing (rows, columns) for the grid
    */
-  def grid(size: (Int, Int))(using wrapper: SimulationWrapper) =
+  def grid(size: (Int, Int))(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.grid(size._1, size._2)
   
   /**
    * Infix operator to create grid size tuples in a readable format.
-   * 
-   * @param other The second dimension
+   *
    * @return Tuple representing grid dimensions
    * @example `10 x 10` creates a (10, 10) tuple
    */
   extension(n: Int) infix def x(other:Int):(Int, Int) = (n, other)
 
-  def penalty(n: Double)(using wrapper: SimulationWrapper) =
+  def penalty(n: Double)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.stepPenalty(n)
 
   /**
@@ -49,7 +48,7 @@ trait SimulationDSL:
    * 
    * @param ascii String containing ASCII representation of walls
    */
-  def asciiWalls(ascii: String)(using wrapper: SimulationWrapper) =
+  def asciiWalls(ascii: String)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.wallsFromAscii(ascii.stripMargin)
 
   /**
@@ -57,7 +56,7 @@ trait SimulationDSL:
    * 
    * @param block Configuration block for defining walls
    */
-  def walls(block: SimulationWrapper ?=> Unit)(using wrapper: SimulationWrapper) =
+  def walls(block: SimulationWrapper ?=> Unit)(using wrapper: SimulationWrapper): Unit =
     block
 
   /**
@@ -80,7 +79,7 @@ trait SimulationDSL:
    * 
    * @param block Configuration block for the agent (id, start, goal, learner, etc.)
    */
-  def agent(block: AgentWrapper ?=> Unit)(using wrapper: SimulationWrapper) =
+  def agent(block: AgentWrapper ?=> Unit)(using wrapper: SimulationWrapper): Unit =
     given agentWrapper: AgentWrapper = AgentWrapper(new AgentBuilder(wrapper.builder))
     block
     wrapper.builder = agentWrapper.builder.build()
@@ -90,7 +89,7 @@ trait SimulationDSL:
    * 
    * @param block Configuration block for learner parameters (alpha, gamma, epsilon, etc.)
    */
-  def withLearner(using agentWrapper: AgentWrapper)(block: LearnerConfig ?=> Unit) =
+  def withLearner(using agentWrapper: AgentWrapper)(block: LearnerConfig ?=> Unit): Unit =
     val config = LearnerConfig() // Configurazione predefinita
     given LearnerConfig = config
     block // Applica le modifiche definite nel blocco
@@ -143,7 +142,7 @@ trait SimulationDSL:
    * @param n Number of episodes
    * @deprecated Use `Episodes >> n` syntax instead for consistency with other DSL properties
    */
-  def episodes(n: Int)(using wrapper: SimulationWrapper) =
+  def episodes(n: Int)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.episodes(n)
 
   /**
@@ -152,7 +151,7 @@ trait SimulationDSL:
    * @param n Maximum steps per episode
    * @deprecated Use `Steps >> n` syntax instead for consistency with other DSL properties
    */
-  def steps(n: Int)(using wrapper: SimulationWrapper) =
+  def steps(n: Int)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.steps(n)
 
   /**
@@ -161,7 +160,7 @@ trait SimulationDSL:
    * @param n Episode number to start showing visualization
    * @deprecated Use `ShowAfter >> n` syntax instead for consistency with other DSL properties
    */
-  def showAfter(n: Int)(using wrapper: SimulationWrapper) =
+  def showAfter(n: Int)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.showAfter(n)
 
   /**
@@ -170,7 +169,7 @@ trait SimulationDSL:
    * @param ms Delay in milliseconds
    * @deprecated Use `Delay >> ms` syntax instead for consistency with other DSL properties
    */
-  def delay(ms: Int)(using wrapper: SimulationWrapper) =
+  def delay(ms: Int)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.delay(ms)
 
   /**
@@ -179,5 +178,5 @@ trait SimulationDSL:
    * @param flag True to enable GUI, false to disable
    * @deprecated Use `WithGUI >> flag` syntax instead for consistency with other DSL properties
    */
-  def withGUI(flag: Boolean)(using wrapper: SimulationWrapper) =
+  def withGUI(flag: Boolean)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.withGUI(flag)
