@@ -17,7 +17,7 @@ header_pages:
   - marl/README.md
 
 plantuml:
-  plantuml_jar: ../assets/plantuml.jar # path to plantuml.jar
+  plantuml_jar: plantuml.jar # path to plantuml.jar
   type: utxt                         # type (passed as -t option, ex: -tutxt)
   extension: txt                     # output extension override
   plantuml_args: -nometadata         # extra args to be passed to plantuml

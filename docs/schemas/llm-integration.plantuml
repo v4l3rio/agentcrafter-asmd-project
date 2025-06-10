@@ -1,0 +1,117 @@
+@startuml LLM Integration Architecture
+!theme plain
+title AgentCrafter - LLM Integration Architecture
+
+package "DSL Layer" {
+  trait LLMQLearning {
+    -llmConfig: LLMConfig
+    +useLLM(block: LLMConfig ?=> Unit): Unit
+    +simulation(block: SimulationWrapper ?=> Unit): Unit
+  }
+  
+  class LLMConfig {
+    +enabled: Boolean
+    +model: String
+    +wallsEnabled: Boolean
+    +wallsModel: String
+    +wallsPrompt: String
+  }
+  
+  enum LLMProperty {
+    Enabled
+    Model
+    WallsEnabled
+    WallsModel
+    WallsPrompt
+    +>>(value: T): Unit
+  }
+}
+
+package "LLM Services" {
+  class LLMApiClient {
+    -apiKey: String
+    -baseUrl: String
+    +generateQTable(prompt: String, model: String): Option[String]
+    +generateWalls(prompt: String, model: String): Option[String]
+    +makeApiCall(prompt: String, model: String): String
+    -buildRequestPayload(prompt: String, model: String): String
+    -parseResponse(response: String): Option[String]
+  }
+  
+  class LLMQTableService {
+    +loadQTableFromLLM(builder: SimulationBuilder, model: String, filePath: String): Option[String]
+    +loadQTableIntoAgents(builder: SimulationBuilder, qTableJson: String): Unit
+    -generateQTablePrompt(world: WorldSpec): String
+    -parseQTableResponse(response: String): Map[(State, Action), Double]
+  }
+  
+  class LLMWallService {
+    +generateWallsFromPrompt(prompt: String, model: String, rows: Int, cols: Int): Set[State]
+    -parseWallResponse(response: String, rows: Int, cols: Int): Set[State]
+    -validateWallConfiguration(walls: Set[State], rows: Int, cols: Int): Set[State]
+  }
+}
+
+package "Prompt Management" {
+  class PromptTemplate {
+    +qTablePrompt: String
+    +wallGenerationPrompt: String
+    +scenarioPrompt: String
+    +generatePrompt(template: String, params: Map[String, Any]): String
+  }
+  
+  class PromptBuilder {
+    +buildQTablePrompt(world: WorldSpec): String
+    +buildWallPrompt(requirements: String, dimensions: (Int, Int)): String
+    +addContext(context: String): PromptBuilder
+    +addConstraints(constraints: List[String]): PromptBuilder
+  }
+}
+
+package "External API" {
+  class OpenAIClient {
+    +chat(messages: List[Message], model: String): String
+    +completion(prompt: String, model: String): String
+    -handleRateLimit(): Unit
+    -retryOnFailure(request: () => String): String
+  }
+  
+  class APIResponse {
+    +content: String
+    +usage: TokenUsage
+    +model: String
+    +finishReason: String
+  }
+}
+
+package "Integration Points" {
+  class LLMSimulationWrapper {
+    +withLLMQTable(): Unit
+    +withLLMWalls(): Unit
+    +enableLLMFeatures(): Unit
+  }
+  
+  class ConfigurationValidator {
+    +validateLLMConfig(config: LLMConfig): Boolean
+    +validateAPIKey(): Boolean
+    +validateModelAvailability(model: String): Boolean
+  }
+}
+
+' Relationships
+LLMQLearning --> LLMConfig
+LLMQLearning --> LLMQTableService
+LLMQLearning --> LLMWallService
+LLMQTableService --> LLMApiClient
+LLMWallService --> LLMApiClient
+LLMApiClient --> OpenAIClient
+LLMApiClient --> PromptBuilder
+PromptBuilder --> PromptTemplate
+OpenAIClient --> APIResponse
+LLMSimulationWrapper --> ConfigurationValidator
+
+note right of LLMQLearning : "Extends SimulationDSL\nwith LLM capabilities"
+note bottom of LLMApiClient : "Handles all external\nAPI communication"
+note left of PromptBuilder : "Generates context-aware\nprompts for different tasks"
+
+@enduml

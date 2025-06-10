@@ -1,0 +1,121 @@
+@startuml Multi-Agent Coordination
+!theme plain
+title AgentCrafter - Multi-Agent Coordination Architecture
+
+package "Agent System" {
+  class AgentSpec {
+    +id: String
+    +start: State
+    +goal: State
+    +learner: Learner
+    +triggers: List[Trigger]
+  }
+  
+  class Agent {
+    +id: String
+    +currentState: State
+    +learner: QLearner
+    +totalReward: Double
+    +move(action: Action): StepResult
+    +receiveReward(amount: Double): Unit
+  }
+}
+
+package "Coordination Mechanisms" {
+  class Trigger {
+    +who: String
+    +at: State
+    +effects: List[Effect]
+    +isTriggeredBy(agentId: String, state: State): Boolean
+  }
+  
+  abstract class Effect {
+    +apply(world: WorldSpec, agent: Agent): Unit
+  }
+  
+  class OpenWall extends Effect {
+    +pos: State
+    +apply(world: WorldSpec, agent: Agent): Unit
+  }
+  
+  class EndEpisode extends Effect {
+    +apply(world: WorldSpec, agent: Agent): Unit
+  }
+  
+  class Reward extends Effect {
+    +delta: Double
+    +apply(world: WorldSpec, agent: Agent): Unit
+  }
+}
+
+package "World Management" {
+  class WorldSpec {
+    +rows: Int
+    +cols: Int
+    +walls: Set[State]
+    +agents: Map[String, AgentSpec]
+    +triggers: List[Trigger]
+    +dynamicWalls: Set[State]
+    +removeWall(pos: State): Unit
+    +addWall(pos: State): Unit
+  }
+  
+  class GridWorld {
+    +walls: Set[State]
+    +stepPenalty: Double
+    +isWallAt(state: State): Boolean
+    +step(state: State, action: Action): StepResult
+  }
+}
+
+package "Execution Control" {
+  class EpisodeManager {
+    +executeEpisode(agents: List[Agent]): EpisodeOutcome
+    +handleTriggers(agent: Agent, state: State): Unit
+    +synchronizeAgents(): Unit
+    +updateWorldState(): Unit
+  }
+  
+  class Simulation {
+    +world: WorldSpec
+    +agents: Map[String, Agent]
+    +currentEpisode: Int
+    +step(): Unit
+    +isComplete(): Boolean
+  }
+  
+  class CoordinationEngine {
+    +processAgentActions(actions: Map[String, Action]): Unit
+    +resolveTriggers(agentStates: Map[String, State]): List[Effect]
+    +applyEffects(effects: List[Effect]): Unit
+  }
+}
+
+package "Visualization" {
+  class MultiAgentVisualizer {
+    +renderAgents(agents: Map[String, Agent]): Unit
+    +showCoordination(triggers: List[Trigger]): Unit
+    +highlightInteractions(): Unit
+  }
+}
+
+' Relationships
+AgentSpec --> Agent : "instantiates"
+Agent --> QLearner : "uses"
+Agent --> Trigger : "activates"
+Trigger --> Effect : "produces"
+Effect --> WorldSpec : "modifies"
+WorldSpec --> GridWorld : "implements"
+EpisodeManager --> Agent : "manages"
+EpisodeManager --> CoordinationEngine : "uses"
+Simulation --> WorldSpec : "contains"
+Simulation --> Agent : "executes"
+CoordinationEngine --> Trigger : "processes"
+MultiAgentVisualizer --> Agent : "displays"
+MultiAgentVisualizer --> WorldSpec : "renders"
+
+note top of CoordinationEngine : "Handles simultaneous\nagent interactions"
+note right of Trigger : "Enables cooperative\nbehaviors"
+note bottom of Effect : "Modifies world state\nbased on agent actions"
+
+@enduml

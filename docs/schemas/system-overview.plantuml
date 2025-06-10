@@ -1,0 +1,175 @@
+@startuml AgentCrafter System Architecture
+!theme plain
+title AgentCrafter - High-Level System Architecture
+
+package "DSL Layer" {
+  interface SimulationDSL {
+    +simulation()
+    +grid()
+    +agent()
+    +walls()
+    +asciiWalls()
+    +wallsFromLLM()
+  }
+  
+  class LLMQLearning {
+    +useLLM()
+    -llmConfig: LLMConfig
+  }
+  
+  class Properties {
+    +SimulationProperty
+    +AgentProperty
+    +LearnerProperty
+    +WallProperty
+  }
+}
+
+package "Builder Pattern" {
+  class SimulationBuilder {
+    -rows, cols: Int
+    -walls: Set[State]
+    -agents: Map[String, AgentSpec]
+    -triggers: Buffer[Trigger]
+    +build(): Unit
+  }
+  
+  class AgentBuilder {
+    +withLearner()
+    +onGoal()
+    +build(): AgentSpec
+  }
+  
+  class TriggerBuilder {
+    +openWall()
+    +endEpisode()
+    +give()
+  }
+  
+  class WallLineBuilder {
+    +direction()
+    +from()
+    +to()
+  }
+}
+
+package "Domain Model" {
+  class AgentSpec {
+    +id: String
+    +start: State
+    +goal: State
+    +learner: Learner
+    +triggers: List[Trigger]
+  }
+  
+  class WorldSpec {
+    +rows, cols: Int
+    +walls: Set[State]
+    +agents: Map[String, AgentSpec]
+    +triggers: List[Trigger]
+  }
+  
+  abstract class Effect
+  class OpenWall extends Effect
+  class EndEpisode extends Effect
+  class Reward extends Effect
+  
+  class Trigger {
+    +who: String
+    +at: State
+    +effects: List[Effect]
+  }
+}
+
+package "Learning Core" {
+  interface Environment {
+    +rows, cols: Int
+    +step(state, action): StepResult
+  }
+  
+  abstract class Learner {
+    +learn(episodes: Int): Unit
+    +greedyEpisode(): EpisodeOutcome
+  }
+  
+  class QLearner {
+    -qTable: Map[(State, Action), Double]
+    -learningParameters: LearningParameters
+    +learn(episodes: Int): Unit
+    +chooseAction(state: State, epsilon: Double): Action
+  }
+  
+  class GridWorld {
+    +walls: Set[State]
+    +stepPenalty: Double
+    +step(state: State, action: Action): StepResult
+  }
+}
+
+package "LLM Integration" {
+  class LLMApiClient {
+    +generateQTable(prompt: String): Option[String]
+    +generateWalls(prompt: String): Option[String]
+  }
+  
+  class LLMQTableService {
+    +loadQTableFromLLM(builder: SimulationBuilder): Unit
+  }
+  
+  class LLMWallService {
+    +generateWallsFromPrompt(prompt: String): Set[State]
+  }
+}
+
+package "Visualization" {
+  class Visualizer {
+    +render(world: WorldSpec, agents: Map[String, Agent]): Unit
+    +showQValues(qTable: Map[(State, Action), Double]): Unit
+  }
+  
+  class QTableVisualizer {
+    +displayQTable(qTable: Map[(State, Action), Double]): Unit
+    +highlightOptimalPath(start: State, goal: State): Unit
+  }
+}
+
+package "Execution" {
+  class Runner {
+    +run(simulation: WorldSpec): Unit
+    +runEpisode(): EpisodeOutcome
+  }
+  
+  class EpisodeManager {
+    +executeEpisode(agents: List[Agent]): EpisodeOutcome
+    +handleTriggers(agent: Agent, state: State): Unit
+  }
+  
+  class Simulation {
+    +world: WorldSpec
+    +agents: Map[String, Agent]
+    +currentEpisode: Int
+    +step(): Unit
+  }
+}
+
+' Relationships
+SimulationDSL --> SimulationBuilder
+SimulationBuilder --> AgentBuilder
+SimulationBuilder --> TriggerBuilder
+SimulationBuilder --> WallLineBuilder
+SimulationBuilder --> WorldSpec
+AgentBuilder --> AgentSpec
+TriggerBuilder --> Trigger
+AgentSpec --> Learner
+QLearner --> Environment
+GridWorld --> Environment
+LLMQLearning --> LLMApiClient
+LLMQTableService --> LLMApiClient
+LLMWallService --> LLMApiClient
+Runner --> Simulation
+Simulation --> WorldSpec
+Simulation --> Agent
+Visualizer --> WorldSpec
+QTableVisualizer --> QLearner
+
+@enduml

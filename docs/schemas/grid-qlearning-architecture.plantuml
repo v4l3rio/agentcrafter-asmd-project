@@ -1,0 +1,124 @@
+@startuml Grid Q-Learning Foundation
+!theme plain
+title Grid Q-Learning Foundation - Core Architecture
+
+package "Core Environment" {
+  class GridEnvironment {
+    +width: Int
+    +height: Int
+    +walls: Set[Position]
+    +agents: Map[String, Agent]
+    +triggers: Map[String, Trigger]
+    +isValidPosition(pos: Position): Boolean
+    +getNeighbors(pos: Position): List[Position]
+    +applyAction(agent: Agent, action: Action): EnvironmentState
+  }
+  
+  class Position {
+    +x: Int
+    +y: Int
+    +distance(other: Position): Double
+    +neighbors(): List[Position]
+  }
+  
+  enum Action {
+    Up
+    Down
+    Left
+    Right
+    Stay
+  }
+}
+
+package "Q-Learning Core" {
+  class QLearningAgent {
+    +learningRate: Double
+    +discountFactor: Double
+    +explorationRate: Double
+    -qTable: Map[(State, Action), Double]
+    +selectAction(state: State): Action
+    +updateQValue(state: State, action: Action, reward: Double, nextState: State): Unit
+    +exploreAction(state: State): Action
+    +exploitAction(state: State): Action
+  }
+  
+  class QTable {
+    -values: Map[(State, Action), Double]
+    +getValue(state: State, action: Action): Double
+    +setValue(state: State, action: Action, value: Double): Unit
+    +getBestAction(state: State): Action
+    +export(): String
+    +import(data: String): Unit
+  }
+  
+  class State {
+    +position: Position
+    +agentId: String
+    +environmentState: Map[String, Any]
+    +equals(other: State): Boolean
+    +hashCode(): Int
+  }
+}
+
+package "Learning Process" {
+  class Episode {
+    +steps: List[Step]
+    +totalReward: Double
+    +isComplete: Boolean
+    +addStep(step: Step): Unit
+  }
+  
+  class Step {
+    +state: State
+    +action: Action
+    +reward: Double
+    +nextState: State
+    +timestamp: Long
+  }
+  
+  class RewardFunction {
+    +calculateReward(state: State, action: Action, nextState: State): Double
+    +goalReward: Double
+    +stepPenalty: Double
+    +wallPenalty: Double
+  }
+}
+
+package "Simulation Control" {
+  class Simulation {
+    +environment: GridEnvironment
+    +agents: List[QLearningAgent]
+    +maxEpisodes: Int
+    +maxStepsPerEpisode: Int
+    +run(): List[Episode]
+    +step(): SimulationState
+  }
+  
+  class SimulationState {
+    +currentEpisode: Int
+    +currentStep: Int
+    +agentPositions: Map[String, Position]
+    +isTerminal: Boolean
+  }
+}
+
+' Relationships
+GridEnvironment --> Position
+GridEnvironment --> Action
+QLearningAgent --> QTable
+QLearningAgent --> State
+QLearningAgent --> Action
+State --> Position
+Episode --> Step
+Step --> State
+Step --> Action
+Simulation --> GridEnvironment
+Simulation --> QLearningAgent
+Simulation --> Episode
+Simulation --> RewardFunction
+
+note right of QLearningAgent : "Implements epsilon-greedy\nexploration strategy"
+note bottom of QTable : "Stores state-action\nvalue estimates"
+note left of RewardFunction : "Defines learning\nobjectives and penalties"
+
+@enduml
