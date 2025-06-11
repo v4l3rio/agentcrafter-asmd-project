@@ -12,9 +12,9 @@ object MDPLearnerExample extends App with SimulationDSL:
   import SimulationProperty.*
 
   simulation:
-    Episodes >> 1000
-    Steps >> 100
-    Penalty >> -0.01
+    Episodes >> 10000
+    Steps >> 1000
+    Penalty >> -2.0
     ShowAfter >> 100
     WithGUI >> true
 
@@ -36,6 +36,9 @@ object MDPLearnerExample extends App with SimulationDSL:
         EpsMin >> 0.1
         Warm >> 1000
         Optimistic >> 0.0
+      onGoal:
+        Give >> 50.0  // Reward for reaching the goal
+        EndEpisode >> true  // End episode after reaching goal
     
     // Agent using the traditional GridWorld Q-learning for comparison
     agent:
@@ -50,3 +53,6 @@ object MDPLearnerExample extends App with SimulationDSL:
         EpsMin >> 0.1
         Warm >> 1000
         Optimistic >> 0.0
+      onGoal:
+        Give >> 30.0 // Reward for reaching the goal
+        EndEpisode >> true // End episode after reaching goal
