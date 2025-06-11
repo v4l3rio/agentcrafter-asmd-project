@@ -1,4 +1,4 @@
-package agentcrafter.visualqlearning
+package agentcrafter.examples.basic
 
 import agentcrafter.common.{GridWorld, LearningParameters, QLearner, State, Action}
 import agentcrafter.MARL.visualizers.Visualizer

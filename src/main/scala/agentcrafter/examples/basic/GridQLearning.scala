@@ -1,4 +1,4 @@
-package agentcrafter.gridqlearning
+package agentcrafter.examples.basic
 
 import agentcrafter.common.*
 import agentcrafter.visualizers.ConsoleVisualizer
@@ -11,10 +11,10 @@ import scala.collection.immutable.Vector
  * using the (pure) Draw helpers.
  */
 @main def Train(): Unit =
-  val start = State(0, 0) // agent start position
-  val goal = State(5, 5) // agent goal position
+  val start = State(0, 1) // agent start position
+  val goal = State(5, 4) // agent goal position
 
-  val env = GridWorld(rows = 10, cols = 10, walls = Set(State(1, 1), State(1, 2), State(1, 3), State(2, 3), State(3, 3), State(4, 3), State(5, 3), State(6, 3), State(7, 3), State(8, 3)))
+  val env = GridWorld(rows = 10, cols = 10, walls = Set(State(1, 2), State(1, 3), State(2, 3), State(3, 3), State(4, 3), State(5, 3), State(6, 3), State(7, 3), State(8, 3)))
   val agent = QLearner(
     goalState = goal,
     goalReward = 50,
