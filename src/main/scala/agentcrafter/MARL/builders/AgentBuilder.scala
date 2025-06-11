@@ -1,7 +1,7 @@
 package agentcrafter.MARL.builders
 
 import agentcrafter.MARL.{AgentSpec, Trigger}
-import agentcrafter.common.{GridWorld, LearningParameters, Learner, QLearner, State, StepResult}
+import agentcrafter.common.{GridWorld, Learner, QLearner, State, StepResult, MDPLearner, LearningParameters}
 
 import scala.compiletime.uninitialized
 
@@ -36,19 +36,31 @@ class AgentBuilder(parent: SimulationBuilder):
                   eps0: Double = 0.9,
                   epsMin: Double = 0.15,
                   warm: Int = 10_000,
-                  optimistic: Double = 0.0): AgentBuilder = {
-    // Create a GridWorld environment for this agent
-    // We'll use the agent's start and goal positions to configure the environment
-    val gridWorld = GridWorld(
-      rows = parent.getRows,
-      cols = parent.getCols,
-      walls = parent.getWalls
-    )
-    learner = QLearner(learningParameters = LearningParameters(alpha, gamma, eps0, epsMin, warm, optimistic),
-                            goalState = gl,
-                            goalReward = 0.0,
-                            updateFunction = gridWorld.step,
-                            resetFunction = () => st)
+                  optimistic: Double = 0.0,
+                  learnerType: String = "qlearner"): AgentBuilder = {
+    val newLearner = learnerType.toLowerCase match {
+      case "qlearner" =>
+        val gridWorld = GridWorld(
+          rows = parent.getRows,
+          cols = parent.getCols,
+          walls = parent.getWalls
+        )
+        QLearner(learningParameters = LearningParameters(alpha, gamma, eps0, epsMin, warm, optimistic),
+          goalState = gl,
+          goalReward = 0.0,
+          updateFunction = gridWorld.step,
+          resetFunction = () => st)
+      case "mdplearner" =>
+        val learningParams = LearningParameters(alpha, gamma, eps0, epsMin, warm, optimistic)
+        val gridWorld = GridWorld(
+          rows = parent.getRows,
+          cols = parent.getCols,
+          walls = parent.getWalls
+        )
+        new MDPLearner(learningParams, gl, 0.0, gridWorld, st)
+      case _ => throw new IllegalArgumentException(s"Unknown learner type: $learnerType")
+    }
+    learner = newLearner
     this
   }
 

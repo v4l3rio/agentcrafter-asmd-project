@@ -143,7 +143,8 @@ trait SimulationDSL:
       eps0 = config.eps0,
       epsMin = config.epsMin,
       warm = config.warm,
-      optimistic = config.optimistic
+      optimistic = config.optimistic,
+      learnerType = config.learnerType
     )
 
   /**

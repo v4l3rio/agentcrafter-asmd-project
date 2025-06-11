@@ -1,0 +1,128 @@
+package agentcrafter.common
+
+import scala.util.Random
+import scala.collection.mutable
+import scala.annotation.tailrec
+
+/**
+ * Simplified MDP-based Q-Learning implementation following SOLID principles
+ */
+class MDPLearner(
+  learningParameters: LearningParameters,
+  goalState: State,
+  goalReward: Double,
+  gridWorld: GridWorld,
+  initialState: State
+) extends Learner:
+
+  private given rng: Random = Random()
+  private var ep = 0
+  private val qTable = new QTable(learningParameters.optimistic)
+  private val policy = new EpsilonGreedyPolicy(qTable)
+  
+  // Learner interface implementation
+  def choose(state: State): (Action, Boolean) =
+    val epsilon = learningParameters.calculateEpsilon(ep)
+    policy.selectAction(state, epsilon)
+  
+  def update(state: State, action: Action, reward: Reward, nextState: State): Unit =
+    val isGoal = nextState == goalState
+    val finalReward = if isGoal then goalReward else reward
+    qTable.update(state, action, finalReward, nextState, learningParameters)
+  
+  def updateWithGoal(state: State, action: Action, envReward: Reward, nextState: State): Unit =
+    update(state, action, envReward, nextState)
+  
+  def episode(maxSteps: Int = 200): EpisodeOutcome =
+    ep += 1
+    val episodeRunner = new EpisodeRunner(gridWorld, qTable, policy, goalState, goalReward)
+    episodeRunner.run(initialState, maxSteps, learningParameters.calculateEpsilon(ep), learningParameters)
+  
+  def eps: Double = learningParameters.calculateEpsilon(ep)
+  def incEp(): Unit = ep += 1
+  def QTableSnapshot: Map[(State, Action), Double] = qTable.snapshot()
+  def getQValue(state: State, action: Action): Double = qTable.getValue(state, action)
+
+/**
+ * Separated Q-Table management
+ */
+private class QTable(optimisticValue: Double):
+  private val table: mutable.Map[(State, Action), Double] = mutable.Map()
+  
+  def getValue(state: State, action: Action): Double =
+    table.getOrElse((state, action), optimisticValue)
+  
+  def update(state: State, action: Action, reward: Double, nextState: State, params: LearningParameters): Unit =
+    val currentQ = getValue(state, action)
+    val maxNextQ = Action.values.map(getValue(nextState, _)).maxOption.getOrElse(0.0)
+    val newQ = currentQ + params.alpha * (reward + params.gamma * maxNextQ - currentQ)
+    table((state, action)) = newQ
+  
+  def getBestAction(state: State): Action =
+    Action.values.maxBy(getValue(state, _))
+  
+  def snapshot(): Map[(State, Action), Double] = table.toMap
+
+/**
+ * Separated policy management
+ */
+private class EpsilonGreedyPolicy(qTable: QTable)(using rng: Random):
+  def selectAction(state: State, epsilon: Double): (Action, Boolean) =
+    val isExploring = rng.nextDouble() < epsilon
+    val action = if isExploring then
+      Action.values.toVector(rng.nextInt(Action.values.length))
+    else
+      qTable.getBestAction(state)
+    (action, isExploring)
+
+/**
+ * Separated episode execution
+ */
+private class EpisodeRunner(
+  gridWorld: GridWorld,
+  qTable: QTable,
+  policy: EpsilonGreedyPolicy,
+  goalState: State,
+  goalReward: Double
+):
+  def run(startState: State, maxSteps: Int, epsilon: Double, learningParams: LearningParameters): EpisodeOutcome =
+    @tailrec
+    def loop(state: State, steps: Int, trajectory: List[(State, Action, Boolean, Array[Double])]): EpisodeOutcome =
+      if steps >= maxSteps then (false, steps, trajectory.reverse)
+      else
+        val (action, isExploring) = policy.selectAction(state, epsilon)
+        val stepResult = gridWorld.step(state, action)
+        val isGoal = stepResult.state == goalState
+        val reward = if isGoal then goalReward else stepResult.reward
+        
+        // Update Q-table
+        qTable.update(state, action, reward, stepResult.state, learningParams)
+        
+        val qValues = Action.values.map(qTable.getValue(state, _))
+        val newTrajectory = (state, action, isExploring, qValues) :: trajectory
+        
+        if isGoal then (true, steps + 1, newTrajectory.reverse)
+        else loop(stepResult.state, steps + 1, newTrajectory)
+    
+    loop(startState, 0, Nil)
+
+object MDPLearner:
+  def apply(
+    alpha: Double,
+    gamma: Double,
+    eps0: Double,
+    epsMin: Double,
+    warm: Int,
+    optimistic: Double,
+    simulationBuilder: agentcrafter.MARL.builders.SimulationBuilder,
+    goalState: State,
+    goalReward: Double,
+    initialState: State = State(0, 0)
+  ): MDPLearner =
+    val learningParams = LearningParameters(alpha, gamma, eps0, epsMin, warm, optimistic)
+    val gridWorld = GridWorld(
+      rows = simulationBuilder.getRows,
+      cols = simulationBuilder.getCols,
+      walls = simulationBuilder.getWalls
+    )
+    new MDPLearner(learningParams, goalState, goalReward, gridWorld, initialState)
