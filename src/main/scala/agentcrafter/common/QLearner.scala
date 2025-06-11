@@ -78,7 +78,7 @@ class QLearner private(
   /** Array of all possible actions */
   private val A = Action.values
 
-  private val Q: QTable = QTable()
+  private val Q: QTable = new QTable()
 
   private var ep = 0
 

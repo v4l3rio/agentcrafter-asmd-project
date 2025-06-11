@@ -32,8 +32,8 @@ import agentcrafter.MARL.visualizers.Visualizer
     updateFunction = env.step,
     resetFunction = () => start,
     learningParameters = LearningParameters(
-      eps0 = 0.9,
-      epsMin = 0.15,
+      eps0 = 0.95,
+      epsMin = 0.1,
       warm = 1_000, 
       optimistic = 5.0
     )
