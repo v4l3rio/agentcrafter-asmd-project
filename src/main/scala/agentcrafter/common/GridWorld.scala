@@ -1,8 +1,32 @@
 package agentcrafter.common
 
+/**
+ * Represents the result of taking a step in the environment.
+ * 
+ * This case class encapsulates the outcome of an agent's action in the environment,
+ * containing both the resulting state and the reward received for the transition.
+ * 
+ * @param state The new state after taking the action
+ * @param reward The immediate reward received for the state transition
+ */
 case class StepResult(state: State, reward: Double)
 
+/**
+ * Factory object for creating GridWorld instances.
+ * 
+ * Provides convenient factory methods with sensible defaults for creating
+ * grid world environments commonly used in reinforcement learning experiments.
+ */
 object GridWorld:
+  /**
+   * Creates a new GridWorld instance with configurable parameters.
+   * 
+   * @param rows The number of rows in the grid (default: 13)
+   * @param cols The number of columns in the grid (default: 15)
+   * @param walls Set of wall positions that block agent movement (default: some example walls)
+   * @param stepPenalty The penalty applied for each step taken (default: -3.0)
+   * @return A new GridWorld instance with the specified configuration
+   */
   def apply(rows: Int = 13,
             cols: Int = 15,
             walls: Set[State] = Set(

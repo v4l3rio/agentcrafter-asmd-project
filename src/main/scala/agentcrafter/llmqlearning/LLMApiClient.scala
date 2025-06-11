@@ -16,11 +16,16 @@ val dotenv: Dotenv =
     .load()
 
 /**
- * Pure‑Scala LLM API client based on **sttp‑client v4** (quick layer).
- *
- * * No external JSON lib – minimal `escapeJson` helper only.
- * * Safer URI construction that always preserves host/port and endpoint path.
- * * Clearer error messages when the connection fails (e.g. server down).
+ * Client for interacting with Large Language Model APIs.
+ * 
+ * This class provides a robust interface for making HTTP requests to LLM services,
+ * handling authentication, retries, and response parsing. It's designed to work
+ * with OpenAI-compatible APIs and includes error handling and timeout management.
+ * 
+ * @param apiKey API key for authentication with the LLM service
+ * @param baseUrl Base URL for the LLM API (defaults to OpenAI's API)
+ * @param timeout Maximum time to wait for API responses
+ * @param maxRetries Maximum number of retry attempts for failed requests
  */
 class LLMApiClient(
                     baseUrl: String = "https://api.openai.com",

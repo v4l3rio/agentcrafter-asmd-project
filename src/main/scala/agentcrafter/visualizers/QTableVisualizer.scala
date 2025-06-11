@@ -9,14 +9,26 @@ import javax.swing.table.DefaultTableModel
 import scala.swing.{MainFrame, Panel, ScrollPane}
 
 /**
- * Visualizer for Q-Tables of individual agents
+ * Visualizer for displaying Q-Tables of individual agents in a graphical interface.
+ * 
+ * This class creates a Swing-based table that shows the Q-values for each state-action pair
+ * of a specific agent. The table updates dynamically as the agent learns, providing
+ * real-time insight into the agent's value function.
+ * 
+ * @param agentId Unique identifier for the agent whose Q-table is being visualized
+ * @param learner The learning algorithm instance containing the Q-table data
+ * @param spec World specification containing environment details
  */
 class QTableVisualizer(agentId: String, learner: Learner, spec: WorldSpec):
 
   private val cellSize = 60
   private val fontSize = 10
 
-  // Get all states that have Q-values
+  /**
+   * Extracts Q-table data and formats it for display in the table.
+   * 
+   * @return A 2D array where each row represents a state and columns represent actions
+   */
   private def getQTableData: Array[Array[String]] = {
     val qValues = learner.QTableSnapshot
     val data = collection.mutable.ArrayBuffer[Array[String]]()
@@ -75,6 +87,12 @@ class QTableVisualizer(agentId: String, learner: Learner, spec: WorldSpec):
     visible = true
   }
 
+  /**
+   * Updates the Q-table display with the latest values from the learner.
+   * 
+   * This method should be called periodically to refresh the visualization
+   * with the most recent Q-values as the agent continues learning.
+   */
   def update(): Unit = {
     // Clear existing data
     tableModel.setRowCount(0)

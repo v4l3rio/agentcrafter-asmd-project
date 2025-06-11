@@ -4,21 +4,55 @@ import scala.collection.mutable
 import agentcrafter.MARL.{Effect, EndEpisode, OpenWall, Reward, Trigger}
 import agentcrafter.common.State
 
+/**
+ * Builder for configuring triggers that activate when specific agents reach certain positions.
+ * 
+ * Triggers can cause various effects such as opening walls, ending episodes, or giving rewards
+ * when a specific agent reaches a designated position in the grid.
+ * 
+ * @param who The agent identifier that can activate this trigger
+ * @param r Row coordinate where the trigger is located
+ * @param c Column coordinate where the trigger is located
+ * @param parent The parent SimulationBuilder
+ */
 class TriggerBuilder(who: String, r: Int, c: Int, parent: SimulationBuilder):
   private val eff = mutable.Buffer.empty[Effect]
   
+  /**
+   * Adds an effect to open a wall when this trigger is activated.
+   * 
+   * @param r Row coordinate of the wall to open
+   * @param c Column coordinate of the wall to open
+   * @return This builder instance for method chaining
+   */
   def openWall(r: Int, c: Int): TriggerBuilder = 
     eff += OpenWall(State(r, c))
     this
     
+  /**
+   * Adds an effect to end the current episode when this trigger is activated.
+   * 
+   * @return This builder instance for method chaining
+   */
   def endEpisode(): TriggerBuilder = 
     eff += EndEpisode
     this
     
+  /**
+   * Adds an effect to give a reward bonus when this trigger is activated.
+   * 
+   * @param bonus The reward amount to give (can be positive or negative)
+   * @return This builder instance for method chaining
+   */
   def give(bonus: Double): TriggerBuilder =
     eff += Reward(bonus)
     this
 
+  /**
+   * Builds and adds this trigger to the parent simulation.
+   * 
+   * @return The parent SimulationBuilder for continued configuration
+   */
   private[MARL] def build(): SimulationBuilder =
     parent.addTrigger(Trigger(who, State(r, c), eff.toList))
     parent

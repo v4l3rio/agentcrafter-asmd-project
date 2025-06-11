@@ -5,7 +5,18 @@ import scala.collection.mutable
 import scala.annotation.tailrec
 
 /**
- * Simplified MDP-based Q-Learning implementation following SOLID principles
+ * Markov Decision Process (MDP) based Q-learning implementation.
+ * 
+ * This class implements Q-learning using an MDP-based approach that separates
+ * the learning algorithm from the action selection policy. It provides an
+ * alternative to the traditional QLearner with potentially different convergence
+ * characteristics and exploration strategies.
+ * 
+ * @param learningParameters Configuration parameters for the learning algorithm
+ * @param goalState The target state that terminates episodes successfully
+ * @param goalReward The reward given when reaching the goal state
+ * @param gridWorld The grid world environment for the agent
+ * @param initialState The starting state for episodes
  */
 class MDPLearner(
   learningParameters: LearningParameters,
@@ -20,27 +31,77 @@ class MDPLearner(
   private val qTable = new QTable(learningParameters.optimistic)
   private val policy = new EpsilonGreedyPolicy(qTable)
   
-  // Learner interface implementation
+  /**
+   * Chooses an action for the given state using epsilon-greedy policy.
+   * 
+   * @param state The current state
+   * @return The selected action and whether it was exploratory
+   */
   def choose(state: State): (Action, Boolean) =
     val epsilon = learningParameters.calculateEpsilon(ep)
     policy.selectAction(state, epsilon)
   
+  /**
+   * Updates the Q-table based on the observed transition and reward.
+   * 
+   * @param state The previous state
+   * @param action The action that was taken
+   * @param reward The reward received for the transition
+   * @param nextState The resulting state after taking the action
+   */
   def update(state: State, action: Action, reward: Reward, nextState: State): Unit =
     val isGoal = nextState == goalState
     val finalReward = if isGoal then goalReward else reward
     qTable.update(state, action, finalReward, nextState, learningParameters)
   
+  /**
+   * Updates the Q-table with goal-specific logic.
+   * 
+   * @param state The previous state
+   * @param action The action that was taken
+   * @param envReward The environment reward received
+   * @param nextState The resulting state after taking the action
+   */
   def updateWithGoal(state: State, action: Action, envReward: Reward, nextState: State): Unit =
     update(state, action, envReward, nextState)
   
+  /**
+   * Runs a complete episode using the MDP-based approach.
+   * 
+   * @param maxSteps Maximum number of steps allowed in the episode
+   * @return The outcome of the episode
+   */
   def episode(maxSteps: Int = 200): EpisodeOutcome =
     ep += 1
     val episodeRunner = new EpisodeRunner(gridWorld, qTable, policy, goalState, goalReward)
     episodeRunner.run(initialState, maxSteps, learningParameters.calculateEpsilon(ep), learningParameters)
   
+  /**
+   * Gets the current epsilon value for exploration.
+   * 
+   * @return The current epsilon value
+   */
   def eps: Double = learningParameters.calculateEpsilon(ep)
+  
+  /**
+   * Increments the episode counter.
+   */
   def incEp(): Unit = ep += 1
+  
+  /**
+   * Creates a complete snapshot of the current Q-table.
+   * 
+   * @return An immutable map containing all state-action Q-values
+   */
   def QTableSnapshot: Map[(State, Action), Double] = qTable.snapshot()
+  
+  /**
+   * Gets the Q-value for a specific state-action pair.
+   * 
+   * @param state The state to query
+   * @param action The action to query
+   * @return The Q-value for the given state-action pair
+   */
   def getQValue(state: State, action: Action): Double = qTable.getValue(state, action)
 
 /**
