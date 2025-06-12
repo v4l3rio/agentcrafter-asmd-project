@@ -43,10 +43,10 @@ object LLMProperties extends Properties("LLM") with Matchers:
 
   // Property 1: LLM configuration should maintain valid state
   property("LLM configuration maintains valid state") = forAll(llmConfigGen) { config =>
-    config.enabled || !config.enabled &&
-      config.model.nonEmpty &&
-      config.wallsEnabled || !config.wallsEnabled &&
-      config.wallsModel.nonEmpty
+    config.model.nonEmpty &&
+      config.wallsModel.nonEmpty &&
+      config.enabled || !config.enabled &&
+      config.wallsEnabled || !config.wallsEnabled
   }
 
   // Property 2: LLM property setters should update configuration correctly
@@ -65,16 +65,17 @@ object LLMProperties extends Properties("LLM") with Matchers:
     config.wallsModel == model
   }
 
-  // Property 3: JSON decoration stripping should work
-  property("JSON decoration stripping works") = forAll(validJsonGen) { json =>
-    // Test the regex pattern used in QTableLoader
-    val cleanJson = if json.trim.startsWith("```") then 
+  // Property 3: JSON decoration stripping should work correctly
+  property("JSON decoration stripping works correctly") = forAll(validJsonGen) { json =>
+    // Test the decoration stripping logic
+    val stripped = if json.trim.startsWith("```") then 
       json.trim.stripPrefix("```json").stripPrefix("```").stripSuffix("```")
     else json
     
-    val finalClean = cleanJson.replaceAll("(?i)^json\\s*", "").replaceAll("(?i)^here.*?:\\s*", "").trim
+    val finalStripped = stripped.replaceAll("(?i)^json\\s*", "").replaceAll("(?i)^here.*?:\\s*", "").trim
     
-    finalClean.nonEmpty
+    // Should not contain markdown code block markers and should be non-empty
+    !finalStripped.contains("```") && finalStripped.trim.nonEmpty
   }
 
   // Property 4: LLM config should handle boolean toggles correctly
@@ -99,34 +100,37 @@ object LLMProperties extends Properties("LLM") with Matchers:
     config.model == model1 && config.wallsModel == model2
   }
 
-  // Property 6: LLM configuration should support fluent DSL syntax
-  property("LLM configuration supports fluent DSL") = forAll(modelGen, Gen.alphaNumStr) { (model, prompt) =>
+  // Property 6: LLM configuration should support chained property updates
+  property("LLM configuration supports chained updates") = forAll(llmConfigGen) { originalConfig =>
     val config = LLMConfig()
     given LLMConfig = config
     
-    // Test fluent syntax
-    LLMProperty.Enabled >> true
-    LLMProperty.Model >> model
-    LLMProperty.WallsEnabled >> false
-    LLMProperty.WallsPrompt >> prompt
+    // Test chained property updates
+    LLMProperty.Enabled >> originalConfig.enabled
+    LLMProperty.Model >> originalConfig.model
+    LLMProperty.WallsEnabled >> originalConfig.wallsEnabled
+    LLMProperty.WallsModel >> originalConfig.wallsModel
+    LLMProperty.WallsPrompt >> originalConfig.wallsPrompt
     
-    config.enabled &&
-    config.model == model &&
-    !config.wallsEnabled &&
-    config.wallsPrompt == prompt
+    // Verify all properties were set correctly
+    config.enabled == originalConfig.enabled &&
+    config.model == originalConfig.model &&
+    config.wallsEnabled == originalConfig.wallsEnabled &&
+    config.wallsModel == originalConfig.wallsModel &&
+    config.wallsPrompt == originalConfig.wallsPrompt
   }
 
-  // Property 7: JSON decoration stripping should work correctly
-  property("JSON decoration stripping works") = forAll(validJsonGen) { json =>
-    // Test the decoration stripping logic manually since stripLlMDecorations is private
-    val stripped = if json.trim.startsWith("```") then 
-      json.trim.stripPrefix("```json").stripPrefix("```").stripSuffix("```")
-    else json
+  // Property 7: LLM configuration should handle edge cases
+  property("LLM configuration handles edge cases") = {
+    val config = LLMConfig()
+    given LLMConfig = config
     
-    val finalStripped = stripped.replaceAll("(?i)^json\\s*", "").replaceAll("(?i)^here.*?:\\s*", "").trim
+    // Test empty string handling
+    LLMProperty.Model >> ""
+    LLMProperty.WallsPrompt >> ""
     
-    // Should not contain markdown code block markers
-    !finalStripped.contains("```") && finalStripped.trim.nonEmpty
+    // Should accept empty strings
+    config.model.isEmpty && config.wallsPrompt.isEmpty
   }
 
   // Property 8: LLM config should have sensible defaults
@@ -166,22 +170,19 @@ object LLMProperties extends Properties("LLM") with Matchers:
     result1 && result2 && result3
   }
 
-  // Property 10: LLM properties should be type-safe
-  property("LLM properties are type-safe") = forAll(llmConfigGen) { originalConfig =>
-    val config = LLMConfig()
-    given LLMConfig = config
+  // Property 10: LLM configuration should be immutable between instances
+  property("LLM configurations are independent") = forAll(modelGen, modelGen) { (model1, model2) =>
+    val config1 = LLMConfig()
+    val config2 = LLMConfig()
+    given LLMConfig = config1
     
-    // Apply properties and verify they maintain type safety
-    LLMProperty.Enabled >> originalConfig.enabled
-    LLMProperty.Model >> originalConfig.model
-    LLMProperty.WallsEnabled >> originalConfig.wallsEnabled
-    LLMProperty.WallsModel >> originalConfig.wallsModel
-    LLMProperty.WallsPrompt >> originalConfig.wallsPrompt
+    // Modify first config
+    LLMProperty.Model >> model1
+    LLMProperty.Enabled >> true
     
-    // All values should be preserved correctly
-    config.enabled == originalConfig.enabled &&
-    config.model == originalConfig.model &&
-    config.wallsEnabled == originalConfig.wallsEnabled &&
-    config.wallsModel == originalConfig.wallsModel &&
-    config.wallsPrompt == originalConfig.wallsPrompt
+    // Second config should remain unchanged
+    config1.model == model1 &&
+    config1.enabled &&
+    config2.model == "gpt-4o" &&
+    !config2.enabled
   }
