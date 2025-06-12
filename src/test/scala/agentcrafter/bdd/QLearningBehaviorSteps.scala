@@ -1,4 +1,4 @@
-package agentcrafter.steps
+package agentcrafter.bdd
 
 import agentcrafter.common.{Action, GridWorld, QLearner, State, LearningParameters}
 import io.cucumber.scala.{EN, ScalaDsl}
