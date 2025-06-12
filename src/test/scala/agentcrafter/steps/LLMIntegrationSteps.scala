@@ -31,7 +31,13 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   
   // Mock LLM API client for testing
   private class MockLLMApiClient extends LLMApiClient("mock-url", "mock-key"):
-    override def callLLM(prompt: String, model: String, stream: Boolean, endpoint: String): Try[String] =
+    override def callLLM(
+      prompt: String = "",
+      model: String = "gpt-4o",
+      stream: Boolean = false,
+      endpoint: String = "/v1/chat/completions",
+      simulationFilePath: Option[String] = None
+    ): Try[String] =
       apiCallsMade = true
       
       if mockApiError.isDefined then
@@ -39,7 +45,7 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
       else
         mockApiResponse match
           case Some(response) => Success(response)
-          case None => Success("""{"(0, 0)": {"Up": 1.0, "Down": 1.0, "Left": 1.0, "Right": 1.0, "Stay": 1.0}}""")
+          case None => Success("""{"{(0, 0)": {"Up": 1.0, "Down": 1.0, "Left": 1.0, "Right": 1.0, "Stay": 1.0}}""")
 
   private def createSimpleGrid(): GridWorld =
     GridWorld(rows = 3, cols = 3, walls = Set.empty)
