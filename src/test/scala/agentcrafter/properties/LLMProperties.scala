@@ -54,10 +54,10 @@ object LLMProperties extends Properties("LLM") with Matchers:
     val config = LLMConfig()
     given LLMConfig = config
     
-    LLMProperty.Enabled >> true
-    LLMProperty.Model >> model
-    LLMProperty.WallsEnabled >> true
-    LLMProperty.WallsModel >> model
+    LLMDSLProperties.Enabled >> true
+    LLMDSLProperties.Model >> model
+    LLMDSLProperties.WallsEnabled >> true
+    LLMDSLProperties.WallsModel >> model
     
     config.enabled &&
       config.model == model &&
@@ -83,8 +83,8 @@ object LLMProperties extends Properties("LLM") with Matchers:
     val config = LLMConfig()
     given LLMConfig = config
     
-    LLMProperty.Enabled >> enabled
-    LLMProperty.WallsEnabled >> wallsEnabled
+    LLMDSLProperties.Enabled >> enabled
+    LLMDSLProperties.WallsEnabled >> wallsEnabled
     
     config.enabled == enabled && config.wallsEnabled == wallsEnabled
   }
@@ -94,8 +94,8 @@ object LLMProperties extends Properties("LLM") with Matchers:
     val config = LLMConfig()
     given LLMConfig = config
     
-    LLMProperty.Model >> model1
-    LLMProperty.WallsModel >> model2
+    LLMDSLProperties.Model >> model1
+    LLMDSLProperties.WallsModel >> model2
     
     config.model == model1 && config.wallsModel == model2
   }
@@ -106,11 +106,11 @@ object LLMProperties extends Properties("LLM") with Matchers:
     given LLMConfig = config
     
     // Test chained property updates
-    LLMProperty.Enabled >> originalConfig.enabled
-    LLMProperty.Model >> originalConfig.model
-    LLMProperty.WallsEnabled >> originalConfig.wallsEnabled
-    LLMProperty.WallsModel >> originalConfig.wallsModel
-    LLMProperty.WallsPrompt >> originalConfig.wallsPrompt
+    LLMDSLProperties.Enabled >> originalConfig.enabled
+    LLMDSLProperties.Model >> originalConfig.model
+    LLMDSLProperties.WallsEnabled >> originalConfig.wallsEnabled
+    LLMDSLProperties.WallsModel >> originalConfig.wallsModel
+    LLMDSLProperties.WallsPrompt >> originalConfig.wallsPrompt
     
     // Verify all properties were set correctly
     config.enabled == originalConfig.enabled &&
@@ -126,8 +126,8 @@ object LLMProperties extends Properties("LLM") with Matchers:
     given LLMConfig = config
     
     // Test empty string handling
-    LLMProperty.Model >> ""
-    LLMProperty.WallsPrompt >> ""
+    LLMDSLProperties.Model >> ""
+    LLMDSLProperties.WallsPrompt >> ""
     
     // Should accept empty strings
     config.model.isEmpty && config.wallsPrompt.isEmpty
@@ -177,8 +177,8 @@ object LLMProperties extends Properties("LLM") with Matchers:
     given LLMConfig = config1
     
     // Modify first config
-    LLMProperty.Model >> model1
-    LLMProperty.Enabled >> true
+    LLMDSLProperties.Model >> model1
+    LLMDSLProperties.Enabled >> true
     
     // Second config should remain unchanged
     config1.model == model1 &&

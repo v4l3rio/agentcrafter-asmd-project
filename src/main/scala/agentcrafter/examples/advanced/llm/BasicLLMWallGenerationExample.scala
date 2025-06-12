@@ -7,7 +7,7 @@ import agentcrafter.llmqlearning.LLMQLearning
  * Simple example demonstrating the wallsFromLLM feature.
  * This shows basic usage with a single agent navigating an LLM-generated environment.
  */
-object SimpleWallsLLMExample extends App with LLMQLearning:
+object BasicLLMWallGenerationExample extends App with LLMQLearning:
   import AgentProperty.*
   import LearnerProperty.*
   import SimulationProperty.*

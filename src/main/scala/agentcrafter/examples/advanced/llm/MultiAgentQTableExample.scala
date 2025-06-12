@@ -1,7 +1,7 @@
 package agentcrafter.examples.advanced.llm
 
 import agentcrafter.MARL.DSL.*
-import agentcrafter.llmqlearning.LLMProperty.{Enabled, Model}
+import agentcrafter.llmqlearning.LLMDSLProperties.{Enabled, Model}
 import agentcrafter.llmqlearning.LLMQLearning
 
 /**

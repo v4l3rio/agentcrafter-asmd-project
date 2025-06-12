@@ -22,21 +22,21 @@ import scala.annotation.targetName
  * LLMProperty.WallsEnabled >> false
  * }}}
  */
-enum LLMProperty[T]:
+enum LLMDSLProperties[T]:
   /** Enables or disables LLM integration for Q-learning */
-  case Enabled extends LLMProperty[Boolean]
+  case Enabled extends LLMDSLProperties[Boolean]
   
   /** Specifies the LLM model to use for Q-learning assistance */
-  case Model extends LLMProperty[String]
+  case Model extends LLMDSLProperties[String]
   
   /** Enables or disables LLM-powered dynamic wall generation */
-  case WallsEnabled extends LLMProperty[Boolean]
+  case WallsEnabled extends LLMDSLProperties[Boolean]
   
   /** Specifies the LLM model to use for wall generation */
-  case WallsModel extends LLMProperty[String]
+  case WallsModel extends LLMDSLProperties[String]
   
   /** Sets the custom prompt template for wall generation requests */
-  case WallsPrompt extends LLMProperty[String]
+  case WallsPrompt extends LLMDSLProperties[String]
 
   /**
    * Sets the property value using DSL syntax.
@@ -49,8 +49,8 @@ enum LLMProperty[T]:
    */
   @targetName("setProperty")
   infix def >>(value: T)(using config: LLMConfig): Unit = this match
-    case LLMProperty.Enabled => config.enabled = value.asInstanceOf[Boolean]
-    case LLMProperty.Model => config.model = value.asInstanceOf[String]
-    case LLMProperty.WallsEnabled => config.wallsEnabled = value.asInstanceOf[Boolean]
-    case LLMProperty.WallsModel => config.wallsModel = value.asInstanceOf[String]
-    case LLMProperty.WallsPrompt => config.wallsPrompt = value.asInstanceOf[String]
+    case LLMDSLProperties.Enabled => config.enabled = value.asInstanceOf[Boolean]
+    case LLMDSLProperties.Model => config.model = value.asInstanceOf[String]
+    case LLMDSLProperties.WallsEnabled => config.wallsEnabled = value.asInstanceOf[Boolean]
+    case LLMDSLProperties.WallsModel => config.wallsModel = value.asInstanceOf[String]
+    case LLMDSLProperties.WallsPrompt => config.wallsPrompt = value.asInstanceOf[String]

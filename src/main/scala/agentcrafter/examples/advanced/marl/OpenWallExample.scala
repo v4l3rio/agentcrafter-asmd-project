@@ -8,7 +8,7 @@ import agentcrafter.MARL.DSL.{SimulationDSL, *}
  * - Agent "Runner" must reach a goal on the other side of the wall
  * - The simulation ends when both agents reach their respective goals
  */
-object WallScenario extends App with SimulationDSL:
+object OpenWallExample extends App with SimulationDSL:
   import AgentProperty.*
   import TriggerProperty.*
   import LearnerProperty.*

@@ -18,7 +18,7 @@ object LLMQTableService:
    * @return Some(qTableJson) if successful, None otherwise
    */
   def loadQTableFromLLM(builder: SimulationBuilder, model: String, simulationFilePath: String): Option[String] =
-    val client = LLMApiClient()
+    val client = LLMHttpClient()
     val prompt = Prompts.qTable
 
     println(s"Calling LLM API ($model) to generate Q‑table…")

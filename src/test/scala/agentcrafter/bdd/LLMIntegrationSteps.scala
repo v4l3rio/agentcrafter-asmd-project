@@ -4,10 +4,10 @@ import io.cucumber.scala.{EN, ScalaDsl}
 import org.scalatest.matchers.should.Matchers
 import agentcrafter.MARL.AgentSpec
 import agentcrafter.MARL.DSL.{SimulationDSL, SimulationWrapper}
-import agentcrafter.llmqlearning.LLMProperty.*
+import agentcrafter.llmqlearning.LLMDSLProperties.*
 import agentcrafter.MARL.builders.SimulationBuilder
 import agentcrafter.common.{Action, GridWorld, QLearner, State}
-import agentcrafter.llmqlearning.{LLMApiClient, LLMConfig, LLMQLearning, QTableLoader}
+import agentcrafter.llmqlearning.{LLMHttpClient, LLMConfig, LLMQLearning, QTableLoader}
 
 import scala.util.{Failure, Success, Try}
 import scala.compiletime.uninitialized
@@ -30,7 +30,7 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   private var loggedWarnings: mutable.Buffer[String] = mutable.Buffer.empty
   
   // Mock LLM API client for testing
-  private class MockLLMApiClient extends LLMApiClient("mock-url", "mock-key"):
+  private class MockLLMApiClient extends LLMHttpClient("mock-url", "mock-key"):
     override def callLLM(
       prompt: String = "",
       model: String = "gpt-4o",

@@ -1,16 +1,16 @@
-package agentcrafter.MARL.scenarios
+package agentcrafter.examples.basic
 
-import agentcrafter.MARL.DSL.{SimulationDSL, *}
+import agentcrafter.MARL.DSL.*
 
 /**
  * Labyrinth Scenario: A single agent must navigate through a maze to reach the exit.
  * The maze has walls forming corridors and the agent must learn the optimal path.
  */
-object LabyrinthScenario extends App with SimulationDSL:
+object LabyrinthExample extends App with SimulationDSL:
   import AgentProperty.*
   import LearnerProperty.*
-  import TriggerProperty.*
   import SimulationProperty.*
+  import TriggerProperty.*
   
   simulation:
     grid:

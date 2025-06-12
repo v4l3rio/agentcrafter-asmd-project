@@ -24,10 +24,8 @@ val dotenv: Dotenv =
  * 
  * @param apiKey API key for authentication with the LLM service
  * @param baseUrl Base URL for the LLM API (defaults to OpenAI's API)
- * @param timeout Maximum time to wait for API responses
- * @param maxRetries Maximum number of retry attempts for failed requests
  */
-class LLMApiClient(
+class LLMHttpClient(
                     baseUrl: String = "https://api.openai.com",
                     apiKey: String = dotenv.get("OPENAI_API_KEY", "API")
                   ):

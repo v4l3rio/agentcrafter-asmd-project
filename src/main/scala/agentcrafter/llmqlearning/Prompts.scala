@@ -27,11 +27,11 @@ object Prompts:
    * Q-values, suggesting optimal actions, and understanding the learning progress
    * of agents in grid-based environments.
    * 
-   * The prompt is loaded lazily from `src/main/resources/prompts/qtable_prompt.txt`
+   * The prompt is loaded lazily from `src/main/resources/prompts/qtable_generation_prompt.txt`
    * and is bundled within the JAR for distribution.
    */
   lazy val qTable: String =
-    Using.resource(Source.fromResource("prompts/qtable_prompt.txt"))(_.mkString)
+    Using.resource(Source.fromResource("prompts/qtable_generation_prompt.txt"))(_.mkString)
 
   /**
    * Dynamic wall generation prompt template.
@@ -41,8 +41,8 @@ object Prompts:
    * creating balanced obstacle layouts that provide meaningful learning
    * challenges without making environments unsolvable.
    * 
-   * The prompt is loaded lazily from `src/main/resources/prompts/walls_prompt.txt`
+   * The prompt is loaded lazily from `src/main/resources/prompts/walls_generation_prompt.txt`
    * and is bundled within the JAR for distribution.
    */
   lazy val walls: String =
-    Using.resource(Source.fromResource("prompts/walls_prompt.txt"))(_.mkString)
+    Using.resource(Source.fromResource("prompts/walls_generation_prompt.txt"))(_.mkString)

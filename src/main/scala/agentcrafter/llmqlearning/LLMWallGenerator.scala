@@ -6,7 +6,7 @@ import scala.util.{Failure, Success, Try}
 import scala.util.matching.Regex
 
 /** Service responsible for LLM wall generation and loading into simulation. */
-object LLMWallService:
+object LLMWallGenerator:
 
   /**
    * Generates walls from LLM using the specified model and prompt.
@@ -18,7 +18,7 @@ object LLMWallService:
    * @return Some(asciiWalls) if successful, None otherwise
    */
   def generateWallsFromLLM(builder: SimulationBuilder, model: String, prompt: String, simulationFilePath: Option[String] = None): Option[String] =
-    val client = LLMApiClient()
+    val client = LLMHttpClient()
     val fullPrompt = buildWallPrompt(builder, prompt)
 
     println(s"Calling LLM API ($model) to generate walls…")

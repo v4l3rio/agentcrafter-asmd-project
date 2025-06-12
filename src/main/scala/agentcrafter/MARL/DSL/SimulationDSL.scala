@@ -62,12 +62,12 @@ trait SimulationDSL:
     block
     
     if config.model.nonEmpty && config.prompt.nonEmpty then
-      import agentcrafter.llmqlearning.LLMWallService
+      import agentcrafter.llmqlearning.LLMWallGenerator
       val simulationFilePath = findSimulationFile()
-      LLMWallService.generateWallsFromLLM(wrapper.builder, config.model, config.prompt, Some(simulationFilePath)) match
+      LLMWallGenerator.generateWallsFromLLM(wrapper.builder, config.model, config.prompt, Some(simulationFilePath)) match
         case Some(asciiWalls) =>
           println(s"LLM wall generation successful, loading walls...")
-          LLMWallService.loadWallsIntoBuilder(wrapper.builder, asciiWalls)
+          LLMWallGenerator.loadWallsIntoBuilder(wrapper.builder, asciiWalls)
         case None =>
           println("LLM wall generation failed, proceeding without generated walls")
     else
