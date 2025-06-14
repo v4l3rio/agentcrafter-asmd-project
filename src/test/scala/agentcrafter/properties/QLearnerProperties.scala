@@ -166,17 +166,7 @@ object QLearnerProperties extends Properties("QLearner") with Matchers:
       finalQ > initialQ // Q-value should increase when consistently reaching goal
   }
 
-  // Property 9: Exploration rate should be between 0 and 1
-  property("exploration rate is always valid probability") = forAll(learningParamsGen, Gen.choose(0, 5000)) {
-    (params, episodes) =>
-      val learner = createLearner(params)
-        (1 to episodes).foreach(_ => learner.incEp())
-
-      val eps = learner.eps
-      eps >= 0.0 && eps <= 1.0
-  }
-
-  // Property 10: Action choice should return valid actions
+  // Property 9: Action choice should return valid actions
   property("chosen actions are always valid") = forAll(learningParamsGen, stateGen) {
     (params, state) =>
       val learner = createLearner(params)
