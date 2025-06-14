@@ -10,14 +10,14 @@ import scala.swing.{MainFrame, Panel, ScrollPane}
 
 /**
  * Visualizer for displaying Q-Tables of individual agents in a graphical interface.
- * 
+ *
  * This class creates a Swing-based table that shows the Q-values for each state-action pair
  * of a specific agent. The table updates dynamically as the agent learns, providing
  * real-time insight into the agent's value function.
- * 
+ *
  * @param agentId Unique identifier for the agent whose Q-table is being visualized
  * @param learner The learning algorithm instance containing the Q-table data
- * @param spec World specification containing environment details
+ * @param spec    World specification containing environment details
  */
 class QTableVisualizer(agentId: String, learner: Learner, spec: WorldSpec):
 
@@ -26,7 +26,7 @@ class QTableVisualizer(agentId: String, learner: Learner, spec: WorldSpec):
 
   /**
    * Extracts Q-table data and formats it for display in the table.
-   * 
+   *
    * @return A 2D array where each row represents a state and columns represent actions
    */
   private def getQTableData: Array[Array[String]] = {
@@ -36,10 +36,10 @@ class QTableVisualizer(agentId: String, learner: Learner, spec: WorldSpec):
     // Group by state
     val byState = qValues.groupBy(_._1._1)
 
-    for (state <- byState.keys.toSeq.sortBy(s => (s.r, s.c))) {
+    for (state <- byState.keys.toSeq.sortBy(s => (s.x, s.y))) {
       val stateActions = byState(state)
       val row = Array.ofDim[String](6) // State(r,c), Up, Down, Left, Right, Stay
-      row(0) = s"(${state.r},${state.c})"
+      row(0) = s"(${state.x},${state.y})"
 
       // Fill action values
       for (action <- Action.values) {
@@ -73,7 +73,7 @@ class QTableVisualizer(agentId: String, learner: Learner, spec: WorldSpec):
 
   private val scrollPane = new ScrollPane {
     contents = scala.swing.Component.wrap(table)
-    preferredSize = new java.awt.Dimension(600, 400)  // Leggermente più largo per la colonna Stay
+    preferredSize = new java.awt.Dimension(600, 400) // Leggermente più largo per la colonna Stay
   }
 
   val frame: MainFrame = new MainFrame {
@@ -89,7 +89,7 @@ class QTableVisualizer(agentId: String, learner: Learner, spec: WorldSpec):
 
   /**
    * Updates the Q-table display with the latest values from the learner.
-   * 
+   *
    * This method should be called periodically to refresh the visualization
    * with the most recent Q-values as the agent continues learning.
    */

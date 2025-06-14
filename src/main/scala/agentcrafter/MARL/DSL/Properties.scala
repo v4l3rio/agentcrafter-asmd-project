@@ -1,11 +1,15 @@
 package agentcrafter.MARL.DSL
 
-import scala.annotation.targetName
 import agentcrafter.MARL.builders.{AgentBuilder, SimulationBuilder, TriggerBuilder, WallLineBuilder}
 
+import scala.annotation.targetName
+
 case class SimulationWrapper(var builder: SimulationBuilder)
+
 case class AgentWrapper(var builder: AgentBuilder)
+
 case class LineWallConfig(direction: String, from: (Int, Int), to: (Int, Int))
+
 case class LearnerConfig(
                           var alpha: Double = 0.1,
                           var gamma: Double = 0.9,
@@ -28,7 +32,7 @@ enum SimulationProperty[T]:
   case ShowAfter extends SimulationProperty[Int]
   case Delay extends SimulationProperty[Int]
   case WithGUI extends SimulationProperty[Boolean]
-  
+
   @targetName("to")
   infix def >>(obj: T)(using wrapper: SimulationWrapper): Unit = this match
     case SimulationProperty.Penalty => wrapper.builder = wrapper.builder.stepPenalty(obj.asInstanceOf[Double])
@@ -42,12 +46,13 @@ enum AgentProperty[T]:
   case Name extends AgentProperty[String]
   case Start extends AgentProperty[(Int, Int)]
   case Goal extends AgentProperty[(Int, Int)]
+
   @targetName("to")
-  infix def >>(obj: T)(using agentWrapper:AgentWrapper): AgentBuilder = this match
+  infix def >>(obj: T)(using agentWrapper: AgentWrapper): AgentBuilder = this match
     case AgentProperty.Name => agentWrapper.builder.name(obj.asInstanceOf[String])
     case AgentProperty.Start =>
       val (r, c) = obj.asInstanceOf[(Int, Int)]
-      agentWrapper.builder.start(r,c)
+      agentWrapper.builder.start(r, c)
     case AgentProperty.Goal =>
       val (r, c) = obj.asInstanceOf[(Int, Int)]
       agentWrapper.builder.goal(r, c)
@@ -56,6 +61,7 @@ enum TriggerProperty[T]:
   case OpenWall extends TriggerProperty[(Int, Int)]
   case Give extends TriggerProperty[Double]
   case EndEpisode extends TriggerProperty[Boolean]
+
   @targetName("to")
   infix def >>(obj: T)(using tb: TriggerBuilder): Unit = this match
     case TriggerProperty.OpenWall =>
@@ -122,6 +128,7 @@ enum LearnerProperty[T]:
   case Warm extends LearnerProperty[Int]
   case Optimistic extends LearnerProperty[Double]
   case LearnerType extends LearnerProperty[String]
+
   @targetName("to")
   infix def >>(obj: T)(using config: LearnerConfig): Unit = this match
     case LearnerProperty.Alpha => config.alpha = obj.asInstanceOf[Double]
@@ -135,6 +142,7 @@ enum LearnerProperty[T]:
 enum WallLLMProperty[T]:
   case Model extends WallLLMProperty[String]
   case Prompt extends WallLLMProperty[String]
+
   @targetName("to")
   infix def >>(obj: T)(using config: WallLLMConfig): Unit = this match
     case WallLLMProperty.Model => config.model = obj.asInstanceOf[String]

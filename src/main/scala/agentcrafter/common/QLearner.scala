@@ -1,19 +1,17 @@
 package agentcrafter.common
 
-import scala.util.Random
-import scala.collection.mutable
 import scala.annotation.tailrec
-
-import QLearner.*
+import scala.collection.mutable
+import scala.util.Random
 
 /**
  * Configuration parameters for Q-learning algorithms.
- * 
- * @param alpha Learning rate (0.0 to 1.0) - controls how much new information overrides old information
- * @param gamma Discount factor (0.0 to 1.0) - determines the importance of future rewards
- * @param eps0 Initial exploration rate for epsilon-greedy policy
- * @param epsMin Minimum exploration rate after warm-up period
- * @param warm Number of episodes for the warm-up period before epsilon decay begins
+ *
+ * @param alpha      Learning rate (0.0 to 1.0) - controls how much new information overrides old information
+ * @param gamma      Discount factor (0.0 to 1.0) - determines the importance of future rewards
+ * @param eps0       Initial exploration rate for epsilon-greedy policy
+ * @param epsMin     Minimum exploration rate after warm-up period
+ * @param warm       Number of episodes for the warm-up period before epsilon decay begins
  * @param optimistic Initial optimistic value for unvisited state-action pairs
  */
 case class LearningParameters(
@@ -26,7 +24,7 @@ case class LearningParameters(
                              ):
   /**
    * Calculates the current epsilon value based on the episode number.
-   * 
+   *
    * @param ep Current episode number
    * @return The epsilon value for the current episode
    */
@@ -51,11 +49,11 @@ extension [T](actions: Array[T])
 object QLearner:
   /**
    * Creates a new QLearner instance with the specified parameters.
-   * 
-   * @param goalState The target state that the agent should reach
-   * @param goalReward The reward given when the goal state is reached
-   * @param updateFunction Function that handles state transitions in the environment
-   * @param resetFunction Function that resets the environment to an initial state
+   *
+   * @param goalState          The target state that the agent should reach
+   * @param goalReward         The reward given when the goal state is reached
+   * @param updateFunction     Function that handles state transitions in the environment
+   * @param resetFunction      Function that resets the environment to an initial state
    * @param learningParameters Configuration parameters for the Q-learning algorithm
    * @return A new QLearner instance
    */
@@ -70,15 +68,15 @@ object QLearner:
 
 /**
  * Q-Learning implementation for reinforcement learning.
- * 
+ *
  * This class implements the Q-learning algorithm with epsilon-greedy exploration.
  * It maintains a Q-table that maps state-action pairs to expected future rewards.
- * 
+ *
  * @param learningParameters Configuration parameters for the learning algorithm
- * @param goalState The target state that terminates episodes successfully
- * @param goalReward The reward given when reaching the goal state
- * @param updateFunction Function that handles environment state transitions
- * @param resetFunction Function that resets the environment to initial conditions
+ * @param goalState          The target state that terminates episodes successfully
+ * @param goalReward         The reward given when reaching the goal state
+ * @param updateFunction     Function that handles environment state transitions
+ * @param resetFunction      Function that resets the environment to initial conditions
  */
 class QLearner private(
                         learningParameters: LearningParameters,
@@ -99,7 +97,7 @@ class QLearner private(
 
     /**
      * Creates an immutable snapshot of the current Q-table.
-     * 
+     *
      * @return A map containing all current Q-values
      */
     def tableSnapshot(): Map[(State, Action), Double] =
@@ -107,7 +105,7 @@ class QLearner private(
 
     /**
      * Gets Q-values for all actions from a given state.
-     * 
+     *
      * @param state The state to query
      * @return Array of Q-values for all possible actions
      */
@@ -115,10 +113,10 @@ class QLearner private(
 
     /**
      * Updates a Q-value using the Q-learning update rule.
-     * 
-     * @param state The current state
-     * @param action The action taken
-     * @param reward The immediate reward received
+     *
+     * @param state    The current state
+     * @param action   The action taken
+     * @param reward   The immediate reward received
      * @param newState The resulting state after taking the action
      */
     def update(state: State, action: Action, reward: Reward, newState: State): Unit =
@@ -130,7 +128,7 @@ class QLearner private(
 
     /**
      * Selects the greedy action (highest Q-value) for a given state.
-     * 
+     *
      * @param p The state to select an action for
      * @return The action with the highest Q-value (random tie-breaking)
      */
@@ -161,14 +159,14 @@ class QLearner private(
 
   /**
    * Gets the current exploration rate (epsilon).
-   * 
+   *
    * @return The current epsilon value based on the episode number
    */
   def eps: Double = learningParameters.calculateEpsilon(ep)
 
   /**
    * Internal method for choosing between exploration and exploitation.
-   * 
+   *
    * @param p The current state
    * @return A Choice indicating whether exploration or exploitation was used
    */
@@ -182,7 +180,8 @@ class QLearner private(
 
     @tailrec
     def loop(state: State, steps: Int, acc: List[(State, Action, Boolean, Array[Reward])]): EpisodeOutcome =
-      if steps >= maxSteps then (false, steps, acc.reverse)
+      if state == goalState then (true, steps, acc.reverse)
+      else if steps >= maxSteps then (false, steps, acc.reverse)
       else
         val (action, isExploring) = chooseInternal(state) match
           case Choice.Exploring(action) => (action, true)

@@ -5,11 +5,12 @@ import agentcrafter.llmqlearning.LLMDSLProperties.{Enabled, Model}
 import agentcrafter.llmqlearning.LLMQLearning
 
 object QTableFromLLMExample extends App with LLMQLearning:
+
   import AgentProperty.*
   import LearnerProperty.*
   import TriggerProperty.*
   import agentcrafter.MARL.DSL.SimulationProperty.*
-  
+
   simulation:
     useLLM:
       Enabled >> true
@@ -38,7 +39,7 @@ object QTableFromLLMExample extends App with LLMQLearning:
         EpsMin >> 0
         Warm >> 500
         Optimistic >> 0.2
-      Goal >> (3,4)
+      Goal >> (3, 4)
       onGoal:
         Give >> 100
         EndEpisode >> true

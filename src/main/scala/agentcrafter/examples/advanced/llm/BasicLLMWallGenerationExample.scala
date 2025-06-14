@@ -8,23 +8,25 @@ import agentcrafter.llmqlearning.LLMQLearning
  * This shows basic usage with a single agent navigating an LLM-generated environment.
  */
 object BasicLLMWallGenerationExample extends App with LLMQLearning:
+
   import AgentProperty.*
   import LearnerProperty.*
   import SimulationProperty.*
   import TriggerProperty.*
   import WallLLMProperty.*
-  
+
   simulation:
     grid:
       8 x 10
-    
+
     // Generate walls using LLM with a simple prompt
     wallsFromLLM:
       Model >> "gpt-4o"
-      Prompt >> """
+      Prompt >>
+        """
         Create a simple but interesting maze for a single agent.
         """
-    
+
     // Single agent trying to reach the goal
     agent:
       Name >> "Runner"
@@ -40,7 +42,7 @@ object BasicLLMWallGenerationExample extends App with LLMQLearning:
       onGoal:
         Give >> 100.0
         EndEpisode >> true
-    
+
     Episodes >> 3_000
     Steps >> 300
     ShowAfter >> 2_500

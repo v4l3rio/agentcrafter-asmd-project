@@ -7,11 +7,12 @@ import agentcrafter.MARL.DSL.*
  * The maze has walls forming corridors and the agent must learn the optimal path.
  */
 object LabyrinthExample extends App with SimulationDSL:
+
   import AgentProperty.*
   import LearnerProperty.*
   import SimulationProperty.*
   import TriggerProperty.*
-  
+
   simulation:
     grid:
       12 x 12
@@ -29,10 +30,10 @@ object LabyrinthExample extends App with SimulationDSL:
         |#...#....#.#
         |#####....#.#
         |############"""
-    
+
     agent:
       Name >> "Explorer"
-      Start >> (1, 1)  // Top-left corner inside the maze
+      Start >> (1, 1) // Top-left corner inside the maze
       withLearner:
         Alpha >> 0.1
         Gamma >> 0.95

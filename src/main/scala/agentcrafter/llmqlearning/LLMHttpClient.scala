@@ -1,14 +1,15 @@
 package agentcrafter.llmqlearning
 
+import io.github.cdimascio.dotenv.Dotenv
+import play.api.libs.json.*
 import sttp.client4.httpclient.HttpClientSyncBackend
-import scala.concurrent.duration.Duration
-import play.api.libs.json._
-import scala.util.{Failure, Try, Using}
-import scala.io.Source
-import java.io.File
 import sttp.client4.{Response, quickRequest}
 import sttp.model.Uri
-import io.github.cdimascio.dotenv.Dotenv
+
+import java.io.File
+import scala.concurrent.duration.Duration
+import scala.io.Source
+import scala.util.{Failure, Try, Using}
 
 val dotenv: Dotenv =
   Dotenv.configure()
@@ -17,25 +18,25 @@ val dotenv: Dotenv =
 
 /**
  * Client for interacting with Large Language Model APIs.
- * 
+ *
  * This class provides a robust interface for making HTTP requests to LLM services,
  * handling authentication, retries, and response parsing. It's designed to work
  * with OpenAI-compatible APIs and includes error handling and timeout management.
- * 
- * @param apiKey API key for authentication with the LLM service
+ *
+ * @param apiKey  API key for authentication with the LLM service
  * @param baseUrl Base URL for the LLM API (defaults to OpenAI's API)
  */
 class LLMHttpClient(
-                    baseUrl: String = "https://api.openai.com",
-                    apiKey: String = dotenv.get("OPENAI_API_KEY", "API")
-                  ):
+                     baseUrl: String = "https://api.openai.com",
+                     apiKey: String = dotenv.get("OPENAI_API_KEY", "API")
+                   ):
   /**
    * Trigger an LLM generation.
    *
-   * @param prompt   Extra text to prepend
-   * @param model    Model name (default: "gpt-4o")
-   * @param stream   Whether to request streaming output
-   * @param endpoint API path (default: "/v1/chat/completions")
+   * @param prompt             Extra text to prepend
+   * @param model              Model name (default: "gpt-4o")
+   * @param stream             Whether to request streaming output
+   * @param endpoint           API path (default: "/v1/chat/completions")
    * @param simulationFilePath Optional path to the file containing simulation DSL content
    */
   def callLLM(
@@ -47,7 +48,7 @@ class LLMHttpClient(
              ): Try[String] =
     for
       simContent <- readSimulationContent(simulationFilePath)
-      response   <- postRequest(prompt, model, stream, endpoint, simContent)
+      response <- postRequest(prompt, model, stream, endpoint, simContent)
     yield response
 
 
@@ -59,17 +60,17 @@ class LLMHttpClient(
    * @throws IllegalArgumentException if the resulting URI is invalid
    */
   private def fullUri(endpoint: String): Uri =
-    val cleanBase   = baseUrl.stripSuffix("/")
-    val cleanPath   = endpoint.stripPrefix("/")
+    val cleanBase = baseUrl.stripSuffix("/")
+    val cleanPath = endpoint.stripPrefix("/")
     Uri.parse(s"$cleanBase/$cleanPath").getOrElse(throw new IllegalArgumentException(s"Invalid URI: $cleanBase/$cleanPath"))
 
   /**
    * Performs the actual HTTP POST request to the LLM API.
    *
-   * @param prompt The user prompt
-   * @param model The LLM model to use
-   * @param stream Whether to enable streaming
-   * @param endpoint The API endpoint
+   * @param prompt     The user prompt
+   * @param model      The LLM model to use
+   * @param stream     Whether to enable streaming
+   * @param endpoint   The API endpoint
    * @param simContent The simulation DSL content to include
    * @return Try containing the LLM response or an error
    */
@@ -160,8 +161,8 @@ class LLMHttpClient(
           Using(Source.fromFile(file)) { src =>
             val content = src.mkString
             content.indexOf("simulation:") match
-              case -1  => throw new RuntimeException(s"File $filePath does not contain a simulation block")
-              case idx => 
+              case -1 => throw new RuntimeException(s"File $filePath does not contain a simulation block")
+              case idx =>
                 val simulationContent = content.substring(idx)
                 // Remove wallsFromLLM blocks to prevent prompt duplication
                 filterOutWallsFromLLM(simulationContent)
@@ -185,11 +186,11 @@ class LLMHttpClient(
     var insideWallsFromLLM = false
     var indentLevel = 0
     var wallsFromLLMIndent = 0
-    
+
     for (line <- lines) {
       val trimmed = line.trim
       val currentIndent = line.takeWhile(_.isWhitespace).length
-      
+
       if (trimmed.startsWith("wallsFromLLM:")) {
         insideWallsFromLLM = true
         wallsFromLLMIndent = currentIndent
@@ -206,5 +207,5 @@ class LLMHttpClient(
         result += line
       }
     }
-    
+
     result.mkString("\n")

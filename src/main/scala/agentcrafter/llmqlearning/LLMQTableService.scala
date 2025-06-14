@@ -1,7 +1,7 @@
 package agentcrafter.llmqlearning
 
-import agentcrafter.MARL.builders.SimulationBuilder
 import agentcrafter.MARL.AgentSpec
+import agentcrafter.MARL.builders.SimulationBuilder
 
 import scala.collection.mutable
 import scala.util.{Failure, Success}
@@ -11,9 +11,9 @@ object LLMQTableService:
 
   /**
    * Loads a Q-table from LLM using the specified model.
-   * 
-   * @param builder The simulation builder
-   * @param model The LLM model to use
+   *
+   * @param builder            The simulation builder
+   * @param model              The LLM model to use
    * @param simulationFilePath Path to the file containing simulation DSL content
    * @return Some(qTableJson) if successful, None otherwise
    */
@@ -30,8 +30,8 @@ object LLMQTableService:
 
   /**
    * Loads the Q-table JSON into all agents in the simulation builder.
-   * 
-   * @param builder The simulation builder containing agents
+   *
+   * @param builder    The simulation builder containing agents
    * @param qTableJson The Q-table JSON string to load
    */
   def loadQTableIntoAgents(builder: SimulationBuilder, qTableJson: String): Unit =
@@ -42,7 +42,7 @@ object LLMQTableService:
 
       agents.values.foreach { agentSpec =>
         QTableLoader.loadQTableFromJson(qTableJson, learner = agentSpec.learner) match
-          case Success(_)  => println(s"Loaded LLM Q‑table for agent: ${agentSpec.id}")
+          case Success(_) => println(s"Loaded LLM Q‑table for agent: ${agentSpec.id}")
           case Failure(ex) => println(s"Failed to load Q‑table for agent ${agentSpec.id}: ${ex.getMessage}")
       }
     catch

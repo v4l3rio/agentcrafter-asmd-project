@@ -1,20 +1,20 @@
 package agentcrafter.MARL.visualizers
 
 import agentcrafter.MARL.{OpenWall, WorldSpec}
-import agentcrafter.common.{State, Action}
+import agentcrafter.common.{Action, State}
 
 import java.awt.{Color, Graphics2D}
 import scala.swing.{MainFrame, Panel}
 
 /**
  * Unified visualization component for both single-agent Q-Learning and multi-agent simulations.
- * 
+ *
  * This class creates a Swing-based GUI that can display:
  * - Single-agent Q-Learning with detailed debug information (Q-values, actions, exploration mode)
  * - Multi-agent simulations with reward tracking and episode statistics
  * - Grid world environments with walls, goals, switches, and dynamic elements
  * - Real-time agent movement and state updates
- * 
+ *
  * Features from both visualizers:
  * - Configurable cell size and update delay
  * - Support for static and dynamic walls (openable walls)
@@ -22,31 +22,31 @@ import scala.swing.{MainFrame, Panel}
  * - Comprehensive information display (rewards, episodes, exploration mode)
  * - Q-value debugging for single-agent scenarios
  * - Switch/trigger visualization
- * 
+ *
  * @param windowTitle Window title for the visualization
- * @param rows Number of rows in the grid
- * @param cols Number of columns in the grid
- * @param cell Size of each grid cell in pixels (default: 60)
- * @param delayMs Delay between updates in milliseconds (default: 100)
+ * @param rows        Number of rows in the grid
+ * @param cols        Number of columns in the grid
+ * @param cell        Size of each grid cell in pixels (default: 60)
+ * @param delayMs     Delay between updates in milliseconds (default: 100)
  */
 class Visualizer(
-  windowTitle: String = "Unified Agent Visualizer",
-  rows: Int,
-  cols: Int,
-  cell: Int = 60,
-  delayMs: Int = 100
-):
+                  windowTitle: String = "Unified Agent Visualizer",
+                  rows: Int,
+                  cols: Int,
+                  cell: Int = 60,
+                  delayMs: Int = 100
+                ):
   // Single-agent state
   private var singleAgentPos: Option[State] = None
   private var startPos: Option[State] = None
   private var goalPos: Option[State] = None
   private var lastQInfo = ""
-  
+
   // Multi-agent state
   private var multiAgentState: Map[String, State] = Map.empty
   private var goalCells: Set[State] = Set.empty
   private var switchCells: Set[State] = Set.empty
-  
+
   // Common state
   private var staticWalls: Set[State] = Set.empty
   private var openWalls: Set[State] = Set.empty
@@ -55,21 +55,21 @@ class Visualizer(
   private var explorationMode = true
   private var episodeReward = 0.0
   private var epsilon = 0.0
-  
+
   // Visualization mode
   private var isSingleAgent = true
-  
+
   private val colors = Array(
     Color.blue, Color.magenta, new Color(255, 140, 0), Color.cyan,
     Color.pink, new Color(0, 128, 0), Color.red, new Color(128, 0, 128)
   )
-  
+
   private val panel = new Panel:
     preferredSize = new java.awt.Dimension(cols * cell, rows * cell + 100)
-    
+
     override def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
-      
+
       // Draw grid and walls
       for r <- 0 until rows; c <- 0 until cols do
         val p = State(r, c)
@@ -80,36 +80,36 @@ class Visualizer(
         g.fillRect(x, y, cell, cell)
         g.setColor(Color.lightGray)
         g.drawRect(x, y, cell, cell)
-      
+
       // Draw special cells
       def fillCells(cells: Set[State], color: Color): Unit =
         cells.foreach { p =>
           g.setColor(color)
-          g.fillRect(p.c * cell, p.r * cell, cell, cell)
+          g.fillRect(p.y * cell, p.x * cell, cell, cell)
         }
-      
+
       // Draw switch cells (yellow)
       fillCells(switchCells, Color.yellow)
-      
+
       // Draw goal cells (green)
       fillCells(goalCells, Color.green)
-      
+
       // Draw single-agent specific elements
       if isSingleAgent then
         startPos.foreach { s =>
           g.setColor(Color.cyan)
-          g.fillRect(s.c * cell, s.r * cell, cell, cell)
+          g.fillRect(s.y * cell, s.x * cell, cell, cell)
         }
         goalPos.foreach { s =>
           g.setColor(Color.green)
-          g.fillRect(s.c * cell, s.r * cell, cell, cell)
+          g.fillRect(s.y * cell, s.x * cell, cell, cell)
         }
-        
+
         // Draw single agent
         singleAgentPos.foreach { pos =>
           g.setColor(Color.blue)
           val m = cell / 6
-          g.fillOval(pos.c * cell + m, pos.r * cell + m, cell - 2 * m, cell - 2 * m)
+          g.fillOval(pos.y * cell + m, pos.x * cell + m, cell - 2 * m, cell - 2 * m)
         }
       else
         // Draw multiple agents
@@ -117,26 +117,26 @@ class Visualizer(
         multiAgentState.zipWithIndex.foreach { case ((id, p), idx) =>
           val col = colors(idx % colors.length)
           g.setColor(col)
-          g.fillOval(p.c * cell + m, p.r * cell + m, cell - 2 * m, cell - 2 * m)
+          g.fillOval(p.y * cell + m, p.x * cell + m, cell - 2 * m, cell - 2 * m)
         }
-      
+
       // Draw information overlay
       g.setColor(Color.black)
       val infoY = size.height - 80
-      
+
       // Display only requested fields
       g.drawString(s"Step: $step", 10, infoY)
       g.drawString(s"Episode: $episode", 10, infoY + 15)
       g.drawString(s"Mode: ${if explorationMode then "Exploration" else "Exploitation"}", 10, infoY + 30)
       g.drawString(s"Episode Reward: ${"%.2f".format(episodeReward)}", 10, infoY + 45)
       g.drawString(s"Epsilon: ${"%.3f".format(epsilon)}", 10, infoY + 60)
-  
+
   val frame: MainFrame = new MainFrame:
     title = windowTitle
     contents = panel
     centerOnScreen()
     visible = true
-  
+
   /**
    * Configure for single-agent Q-Learning visualization
    */
@@ -148,7 +148,7 @@ class Visualizer(
     singleAgentPos = Some(start)
     goalCells = Set(goal)
     switchCells = Set.empty
-  
+
   /**
    * Configure for multi-agent simulation visualization
    */
@@ -159,55 +159,55 @@ class Visualizer(
     switchCells = spec.triggers.collect {
       case t if t.effects.exists(_.isInstanceOf[OpenWall]) => t.at
     }.toSet
-  
+
   /**
    * Update for single-agent Q-Learning with detailed debug information
    */
   def updateSingleAgent(
-    pos: State,
-    action: Action,
-    explore: Boolean,
-    qValues: Array[Double],
-    stepNum: Int = 0,
-    episodeNum: Int = 0
-  ): Unit =
+                         pos: State,
+                         action: Action,
+                         explore: Boolean,
+                         qValues: Array[Double],
+                         stepNum: Int = 0,
+                         episodeNum: Int = 0
+                       ): Unit =
     singleAgentPos = Some(pos)
     explorationMode = explore
     step = stepNum
     episode = episodeNum
-    lastQInfo = f"s=(${pos.r},${pos.c})  a=$action  mode=${if explore then "explore" else "exploit"}  " +
+    lastQInfo = f"s=(${pos.x},${pos.y})  a=$action  mode=${if explore then "explore" else "exploit"}  " +
       f"Q=[U:${qValues(0)}%.1f  D:${qValues(1)}%.1f  L:${qValues(2)}%.1f  R:${qValues(3)}%.1f]"
     panel.repaint()
     Thread.sleep(delayMs)
-  
+
   /**
    * Update for multi-agent simulation
    */
   def updateMultiAgent(
-    agentStates: Map[String, State],
-    openedWalls: Set[State],
-    stepNum: Int
-  ): Unit =
+                        agentStates: Map[String, State],
+                        openedWalls: Set[State],
+                        stepNum: Int
+                      ): Unit =
     multiAgentState = agentStates
     openWalls = openedWalls
     step = stepNum
     panel.repaint()
     Thread.sleep(delayMs)
-  
+
   /**
    * Update simulation statistics (works for both modes)
    */
   def updateSimulationInfo(
-    episodeNum: Int,
-    exploration: Boolean,
-    epReward: Double,
-    eps: Double
-  ): Unit =
+                            episodeNum: Int,
+                            exploration: Boolean,
+                            epReward: Double,
+                            eps: Double
+                          ): Unit =
     episode = episodeNum
     explorationMode = exploration
     episodeReward = epReward
     epsilon = eps
-  
+
   /**
    * Simple update method for basic position changes
    */
@@ -216,7 +216,7 @@ class Visualizer(
       singleAgentPos = Some(pos)
     panel.repaint()
     Thread.sleep(delayMs)
-  
+
   /**
    * Update walls (for dynamic environments)
    */
@@ -224,7 +224,7 @@ class Visualizer(
     staticWalls = walls
     openWalls = opened
     panel.repaint()
-  
+
   /**
    * Close the visualization window
    */

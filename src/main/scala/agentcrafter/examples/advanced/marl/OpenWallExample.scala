@@ -1,6 +1,6 @@
 package agentcrafter.MARL.scenarios
 
-import agentcrafter.MARL.DSL.{SimulationDSL, *}
+import agentcrafter.MARL.DSL.*
 
 /**
  * Wall Scenario: Two agents cooperate to solve a task.
@@ -9,17 +9,17 @@ import agentcrafter.MARL.DSL.{SimulationDSL, *}
  * - The simulation ends when both agents reach their respective goals
  */
 object OpenWallExample extends App with SimulationDSL:
+
   import AgentProperty.*
-  import TriggerProperty.*
   import LearnerProperty.*
-  import WallProperty.*
   import LineProperty.*
   import SimulationProperty.*
-  
+  import TriggerProperty.*
+
   simulation:
     grid:
       8 x 12
-    
+
     walls:
       // Create a vertical wall dividing the grid
       line:
@@ -31,7 +31,7 @@ object OpenWallExample extends App with SimulationDSL:
       block >> (3, 2)
       block >> (5, 9)
       block >> (6, 9)
-    
+
     // Agent that needs to open the wall
     agent:
       Name >> "Opener"
@@ -43,12 +43,12 @@ object OpenWallExample extends App with SimulationDSL:
         EpsMin >> 0.1
         Warm >> 1_500
         Optimistic >> 0.5
-      Goal >> (6, 2)  // Switch location
+      Goal >> (6, 2) // Switch location
       onGoal:
-        Give >> 25.0  // Reward for reaching the goal
+        Give >> 25.0 // Reward for reaching the goal
         OpenWall >> (4, 6)
-        EndEpisode >> false  // End episode when Runner reaches the goal
-    
+        EndEpisode >> false // End episode when Runner reaches the goal
+
     // Agent that needs to reach the other side
     agent:
       Name >> "Runner"
@@ -60,10 +60,10 @@ object OpenWallExample extends App with SimulationDSL:
         EpsMin >> 0.1
         Warm >> 1_500
         Optimistic >> 0.5
-      Goal >> (6, 10)  // Goal on the other side
+      Goal >> (6, 10) // Goal on the other side
       onGoal:
-        Give >> 55.0  // Reward for reaching the goal
-        EndEpisode >> true  // End episode when Opener reaches the switch
+        Give >> 55.0 // Reward for reaching the goal
+        EndEpisode >> true // End episode when Opener reaches the switch
     Penalty >> -3.0
     Episodes >> 12_000
     Steps >> 300

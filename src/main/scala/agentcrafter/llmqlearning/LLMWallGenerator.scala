@@ -1,19 +1,19 @@
 package agentcrafter.llmqlearning
 
 import agentcrafter.MARL.builders.SimulationBuilder
-import agentcrafter.common.State
-import scala.util.{Failure, Success, Try}
+
 import scala.util.matching.Regex
+import scala.util.{Failure, Success}
 
 /** Service responsible for LLM wall generation and loading into simulation. */
 object LLMWallGenerator:
 
   /**
    * Generates walls from LLM using the specified model and prompt.
-   * 
-   * @param builder The simulation builder
-   * @param model The LLM model to use
-   * @param prompt The custom prompt for wall generation
+   *
+   * @param builder            The simulation builder
+   * @param model              The LLM model to use
+   * @param prompt             The custom prompt for wall generation
    * @param simulationFilePath Optional path to the simulation file for context
    * @return Some(asciiWalls) if successful, None otherwise
    */
@@ -23,10 +23,10 @@ object LLMWallGenerator:
 
     println(s"Calling LLM API ($model) to generate walls…")
     client.callLLM(fullPrompt, model, simulationFilePath = simulationFilePath) match
-      case Success(response) => 
+      case Success(response) =>
         extractAsciiFromResponse(response) match
           case Some(ascii) => Some(ascii)
-          case None => 
+          case None =>
             println("Failed to extract valid ASCII map from LLM response")
             None
       case Failure(ex) =>
@@ -35,8 +35,8 @@ object LLMWallGenerator:
 
   /**
    * Loads the ASCII walls into the simulation builder.
-   * 
-   * @param builder The simulation builder
+   *
+   * @param builder    The simulation builder
    * @param asciiWalls The ASCII representation of walls
    */
   def loadWallsIntoBuilder(builder: SimulationBuilder, asciiWalls: String): Unit =
@@ -52,16 +52,15 @@ object LLMWallGenerator:
    */
   private def buildWallPrompt(builder: SimulationBuilder, userPrompt: String): String =
     val basePrompt = Prompts.walls
-    
-    s"""
-    |$basePrompt
-    |
-    |SPECIFIC USER REQUEST:
-    |$userPrompt
-    |
-    |Please generate the ASCII map now based on the above requirements and context:
-    """.stripMargin
 
+    s"""
+       |$basePrompt
+       |
+       |SPECIFIC USER REQUEST:
+       |$userPrompt
+       |
+       |Please generate the ASCII map now based on the above requirements and context:
+    """.stripMargin
 
 
   /**
@@ -80,9 +79,9 @@ object LLMWallGenerator:
           case None =>
             // Last resort: try to find lines that look like ASCII art
             val lines = response.split("\\n")
-            val asciiLines = lines.filter(line => 
-              line.trim.nonEmpty && 
-              line.forall(c => c == '#' || c == '.' || c == ' ')
+            val asciiLines = lines.filter(line =>
+              line.trim.nonEmpty &&
+                line.forall(c => c == '#' || c == '.' || c == ' ')
             )
             if asciiLines.nonEmpty then Some(asciiLines.mkString("\\n"))
             else None

@@ -1,6 +1,6 @@
 package agentcrafter.bdd
 
-import agentcrafter.common.{Action, GridWorld, QLearner, State, LearningParameters}
+import agentcrafter.common.*
 import io.cucumber.scala.{EN, ScalaDsl}
 import org.scalatest.matchers.should.Matchers
 
@@ -49,7 +49,7 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
 
     // Calculate next state based on action
     val (deltaR, deltaC) = action.delta
-    val nextState = State(currentState.r + deltaR, currentState.c + deltaC)
+    val nextState = State(currentState.x + deltaR, currentState.y + deltaC)
 
     // Store initial Q-value for comparison
     initialQValue = agent.getQValue(currentState, action)
@@ -174,7 +174,7 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
       goalState = State(0, 0),
       goalReward = 0.0,
       updateFunction = gridWorld.step,
-      resetFunction = () => State(0,0),
+      resetFunction = () => State(0, 0),
       learningParameters = LearningParameters(eps0 = initialEpsilon, epsMin = 0.1, warm = warm)
     )
     (1 to warm).foreach(_ => testAgent.incEp())
@@ -183,10 +183,10 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
 
   Given("""the agent has learning rate alpha {double}""") { (alpha: Double) =>
     agent = QLearner(
-      goalState = State(0,0),
+      goalState = State(0, 0),
       goalReward = 0.0,
       updateFunction = gridWorld.step,
-      resetFunction = () => State(0,0),
+      resetFunction = () => State(0, 0),
       learningParameters = LearningParameters(alpha = alpha)
     )
   }
@@ -215,10 +215,10 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
   }
   When("""gamma is {double}""") { (gamma: Double) =>
     agent = QLearner(
-      goalState = State(0,0),
+      goalState = State(0, 0),
       goalReward = 0.0,
       updateFunction = gridWorld.step,
-      resetFunction = () => State(0,0),
+      resetFunction = () => State(0, 0),
       learningParameters = LearningParameters(alpha = 0.1, gamma = gamma)
     )
   }
@@ -228,7 +228,7 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
     agent.update(currentState, Action.Right, goalReward, nextState)
 
     val newQValue = agent.getQValue(currentState, Action.Right)
-    newQValue should be (expectedValue +- 0.1)
+    newQValue should be(expectedValue +- 0.1)
   }
   Then("""the update should follow the Q-learning formula""") { () =>
     // Q(s,a) ← (1-α)Q(s,a) + α[r + γ max Q(s',a')]
@@ -255,10 +255,10 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
 
   Given("""the agent is created with optimistic value {double}""") { (optimisticValue: Double) =>
     agent = QLearner(
-      goalState = State(0,0),
+      goalState = State(0, 0),
       goalReward = 0.0,
       updateFunction = gridWorld.step,
-      resetFunction = () => State(0,0),
+      resetFunction = () => State(0, 0),
       learningParameters = LearningParameters(optimistic = optimisticValue)
     )
   }
@@ -267,7 +267,7 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
   }
   Then("""the initial Q-value should be {double}""") { (expectedValue: Double) =>
     val qValue = agent.getQValue(currentState, Action.Up)
-    qValue should be (expectedValue +- 0.01)
+    qValue should be(expectedValue +- 0.01)
   }
   Then("""this should encourage exploration of unknown areas""") { () =>
     // Optimistic values encourage exploration by making unknown actions seem promising
@@ -278,10 +278,10 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
   Given("""the agent has learned some Q-values""") { () =>
     // Use alpha = 1 and gamma = 0 so that update sets the Q‑value exactly.
     agent = QLearner(
-      goalState = State(0,0),
+      goalState = State(0, 0),
       goalReward = 0.0,
       updateFunction = gridWorld.step,
-      resetFunction = () => State(0,0),
+      resetFunction = () => State(0, 0),
       learningParameters = LearningParameters(alpha = 1.0, gamma = 0.0, optimistic = 0.0)
     )
     agent.update(State(0, 0), Action.Right, 5.0, State(0, 0))
@@ -293,10 +293,10 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
   }
   When("""create a new agent""") { () =>
     agent = QLearner(
-      goalState = State(0,0),
+      goalState = State(0, 0),
       goalReward = 0.0,
       updateFunction = gridWorld.step,
-      resetFunction = () => State(0,0),
+      resetFunction = () => State(0, 0),
       learningParameters = LearningParameters(alpha = 1.0, gamma = 0.0, optimistic = 0.0)
     )
   }

@@ -27,15 +27,16 @@ class QLearnerTest extends AnyFunSuite with Matchers:
 
   test("Q-value update"):
     val l = learner(LearningParameters(alpha = 0.5, gamma = 0.0, optimistic = 0.0))
-    val s1 = State(0,0)
-    val s2 = State(0,1)
+    val s1 = State(0, 0)
+    val s2 = State(0, 1)
     l.update(s1, Action.Right, 10.0, s2)
     l.getQValue(s1, Action.Right) shouldBe 5.0
 
   test("epsilon decays after warm up"):
     val l = learner(LearningParameters(eps0 = 1.0, epsMin = 0.2, warm = 2))
     l.eps shouldBe 1.0
-    l.incEp(); l.incEp();
+    l.incEp();
+    l.incEp();
     l.eps shouldBe 1.0
     l.incEp();
     l.eps should be < 1.0

@@ -1,7 +1,7 @@
 package agentcrafter.llmqlearning
 
-import agentcrafter.MARL.builders.SimulationBuilder
 import agentcrafter.MARL.DSL.{SimulationDSL, SimulationWrapper}
+import agentcrafter.MARL.builders.SimulationBuilder
 
 /* ─────────────────────────── main DSL mix‑in ───────────────────────── */
 
@@ -17,12 +17,14 @@ trait LLMQLearning extends SimulationDSL:
   /** DSL keyword to configure/enable LLM support. */
   def useLLM(block: LLMConfig ?=> Unit)(using wrapper: SimulationWrapper): Unit =
     given config: LLMConfig = llmConfig
+
     block
     llmConfig = config
 
   /** Overrides the standard `simulation` to optionally bootstrap agents with an LLM‑generated Q‑table. */
   override def simulation(block: SimulationWrapper ?=> Unit): Unit =
     given wrapper: SimulationWrapper = SimulationWrapper(new SimulationBuilder)
+
     block
 
     if llmConfig.enabled then
@@ -43,15 +45,15 @@ trait LLMQLearning extends SimulationDSL:
    */
   private def findSimulationFile(): String =
     val stackTrace = Thread.currentThread().getStackTrace
-    
+
     // Find the first stack frame that's not from this trait or system classes
     val callingFrame = stackTrace.find { frame =>
       !frame.getClassName.contains("LLMQLearning") &&
-      !frame.getClassName.startsWith("java.") &&
-      !frame.getClassName.startsWith("scala.") &&
-      frame.getClassName.contains("agentcrafter")
+        !frame.getClassName.startsWith("java.") &&
+        !frame.getClassName.startsWith("scala.") &&
+        frame.getClassName.contains("agentcrafter")
     }
-    
+
     callingFrame match
       case Some(frame) =>
         val className = frame.getClassName.stripSuffix("$")

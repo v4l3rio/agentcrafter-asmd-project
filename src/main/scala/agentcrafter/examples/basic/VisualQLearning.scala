@@ -1,21 +1,21 @@
 package agentcrafter.examples.basic
 
-import agentcrafter.common.{GridWorld, LearningParameters, QLearner, State, Action}
 import agentcrafter.MARL.visualizers.Visualizer
+import agentcrafter.common.{GridWorld, LearningParameters, QLearner, State}
 
 /**
  * Main training program with real-time visualization.
- * 
+ *
  * This program trains a Q-learning agent on a grid world while providing
  * real-time visual feedback. The visualization shows the agent's movement
  * and decision-making process during greedy policy evaluation episodes.
- * 
+ *
  * Training configuration:
  * - High initial exploration (ε₀ = 0.9)
  * - Warm-up period of 1,000 episodes with full exploration
  * - Optimistic initialization (Q₀ = 5.0)
  * - Visual evaluation every 500 episodes
- * 
+ *
  * The visualization displays:
  * - Grid world layout with walls, start, and goal
  * - Agent position and movement
@@ -34,18 +34,18 @@ import agentcrafter.MARL.visualizers.Visualizer
     learningParameters = LearningParameters(
       eps0 = 0.95,
       epsMin = 0.1,
-      warm = 1_000, 
+      warm = 1_000,
       optimistic = 5.0
     )
   )
   val vis = Visualizer("Q-Learning live debug", env.rows, env.cols, cell = 60, delayMs = 100)
   vis.configureSingleAgent(start, goal, env.walls)
-  
-  val episodes  = 10_000
+
+  val episodes = 10_000
   val testEvery = 500
 
   for ep <- 1 to episodes do
-    agent.episode()                              // training
+    agent.episode() // training
     if ep % testEvery == 0 then
       val (_, _, path) = agent.episode() // greedy run
       path.foreach { case (s, a, e, q) => vis.updateSingleAgent(s, a, e, q) }

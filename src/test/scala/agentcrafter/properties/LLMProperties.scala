@@ -5,8 +5,6 @@ import agentcrafter.llmqlearning.*
 import org.scalacheck.Prop.{forAll, propBoolean}
 import org.scalacheck.{Gen, Properties}
 import org.scalatest.matchers.should.Matchers
-import play.api.libs.json.Json
-import scala.util.{Failure, Success, Try}
 
 /**
  * Property-based tests for LLM integration using ScalaCheck.
@@ -52,28 +50,29 @@ object LLMProperties extends Properties("LLM") with Matchers:
   // Property 2: LLM property setters should update configuration correctly
   property("LLM property setters update configuration") = forAll(modelGen) { model =>
     val config = LLMConfig()
+
     given LLMConfig = config
-    
+
     LLMDSLProperties.Enabled >> true
     LLMDSLProperties.Model >> model
     LLMDSLProperties.WallsEnabled >> true
     LLMDSLProperties.WallsModel >> model
-    
+
     config.enabled &&
       config.model == model &&
       config.wallsEnabled &&
-    config.wallsModel == model
+      config.wallsModel == model
   }
 
   // Property 3: JSON decoration stripping should work correctly
   property("JSON decoration stripping works correctly") = forAll(validJsonGen) { json =>
     // Test the decoration stripping logic
-    val stripped = if json.trim.startsWith("```") then 
+    val stripped = if json.trim.startsWith("```") then
       json.trim.stripPrefix("```json").stripPrefix("```").stripSuffix("```")
     else json
-    
+
     val finalStripped = stripped.replaceAll("(?i)^json\\s*", "").replaceAll("(?i)^here.*?:\\s*", "").trim
-    
+
     // Should not contain markdown code block markers and should be non-empty
     !finalStripped.contains("```") && finalStripped.trim.nonEmpty
   }
@@ -81,54 +80,58 @@ object LLMProperties extends Properties("LLM") with Matchers:
   // Property 4: LLM config should handle boolean toggles correctly
   property("LLM config handles boolean toggles") = forAll(Gen.oneOf(true, false), Gen.oneOf(true, false)) { (enabled, wallsEnabled) =>
     val config = LLMConfig()
+
     given LLMConfig = config
-    
+
     LLMDSLProperties.Enabled >> enabled
     LLMDSLProperties.WallsEnabled >> wallsEnabled
-    
+
     config.enabled == enabled && config.wallsEnabled == wallsEnabled
   }
 
   // Property 5: Model names should be preserved correctly
   property("Model names are preserved correctly") = forAll(modelGen, modelGen) { (model1, model2) =>
     val config = LLMConfig()
+
     given LLMConfig = config
-    
+
     LLMDSLProperties.Model >> model1
     LLMDSLProperties.WallsModel >> model2
-    
+
     config.model == model1 && config.wallsModel == model2
   }
 
   // Property 6: LLM configuration should support chained property updates
   property("LLM configuration supports chained updates") = forAll(llmConfigGen) { originalConfig =>
     val config = LLMConfig()
+
     given LLMConfig = config
-    
+
     // Test chained property updates
     LLMDSLProperties.Enabled >> originalConfig.enabled
     LLMDSLProperties.Model >> originalConfig.model
     LLMDSLProperties.WallsEnabled >> originalConfig.wallsEnabled
     LLMDSLProperties.WallsModel >> originalConfig.wallsModel
     LLMDSLProperties.WallsPrompt >> originalConfig.wallsPrompt
-    
+
     // Verify all properties were set correctly
     config.enabled == originalConfig.enabled &&
-    config.model == originalConfig.model &&
-    config.wallsEnabled == originalConfig.wallsEnabled &&
-    config.wallsModel == originalConfig.wallsModel &&
-    config.wallsPrompt == originalConfig.wallsPrompt
+      config.model == originalConfig.model &&
+      config.wallsEnabled == originalConfig.wallsEnabled &&
+      config.wallsModel == originalConfig.wallsModel &&
+      config.wallsPrompt == originalConfig.wallsPrompt
   }
 
   // Property 7: LLM configuration should handle edge cases
   property("LLM configuration handles edge cases") = {
     val config = LLMConfig()
+
     given LLMConfig = config
-    
+
     // Test empty string handling
     LLMDSLProperties.Model >> ""
     LLMDSLProperties.WallsPrompt >> ""
-    
+
     // Should accept empty strings
     config.model.isEmpty && config.wallsPrompt.isEmpty
   }
@@ -136,37 +139,37 @@ object LLMProperties extends Properties("LLM") with Matchers:
   // Property 8: LLM config should have sensible defaults
   property("LLM config has sensible defaults") = {
     val config = LLMConfig()
-    
+
     !config.enabled &&
-    config.model == "gpt-4o" &&
-    !config.wallsEnabled &&
-    config.wallsModel == "gpt-4o" &&
-    config.wallsPrompt.isEmpty
+      config.model == "gpt-4o" &&
+      !config.wallsEnabled &&
+      config.wallsModel == "gpt-4o" &&
+      config.wallsPrompt.isEmpty
   }
 
   // Property 9: State parsing should be robust
   property("State parsing handles various formats") = forAll(stateGen) { state =>
-    val stateString1 = s"(${state.r}, ${state.c})"
-    val stateString2 = s"(${state.r},${state.c})"
-    val stateString3 = s"( ${state.r} , ${state.c} )"
-    
+    val stateString1 = s"(${state.x}, ${state.y})"
+    val stateString2 = s"(${state.x},${state.y})"
+    val stateString3 = s"( ${state.x} , ${state.y} )"
+
     // Use a more flexible regex that handles spaces before digits
     val regex = """\(\s*(\d+)\s*,\s*(\d+)\s*\)""".r
-    
+
     def testMatch(str: String): Boolean = str match {
-      case regex(r, c) => 
+      case regex(r, c) =>
         try {
-          r.toInt == state.r && c.toInt == state.c
+          r.toInt == state.x && c.toInt == state.y
         } catch {
           case _: NumberFormatException => false
         }
       case _ => false
     }
-    
+
     val result1 = testMatch(stateString1)
-    val result2 = testMatch(stateString2) 
+    val result2 = testMatch(stateString2)
     val result3 = testMatch(stateString3)
-    
+
     result1 && result2 && result3
   }
 
@@ -174,15 +177,16 @@ object LLMProperties extends Properties("LLM") with Matchers:
   property("LLM configurations are independent") = forAll(modelGen, modelGen) { (model1, model2) =>
     val config1 = LLMConfig()
     val config2 = LLMConfig()
+
     given LLMConfig = config1
-    
+
     // Modify first config
     LLMDSLProperties.Model >> model1
     LLMDSLProperties.Enabled >> true
-    
+
     // Second config should remain unchanged
     config1.model == model1 &&
-    config1.enabled &&
-    config2.model == "gpt-4o" &&
-    !config2.enabled
+      config1.enabled &&
+      config2.model == "gpt-4o" &&
+      !config2.enabled
   }
