@@ -2,28 +2,28 @@ package agentcrafter.common
 
 /**
  * Represents the result of taking a step in the environment.
- *
+ * 
  * This case class encapsulates the outcome of an agent's action in the environment,
  * containing both the resulting state and the reward received for the transition.
- *
- * @param state  The new state after taking the action
+ * 
+ * @param state The new state after taking the action
  * @param reward The immediate reward received for the state transition
  */
 case class StepResult(state: State, reward: Double)
 
 /**
  * Factory object for creating GridWorld instances.
- *
+ * 
  * Provides convenient factory methods with sensible defaults for creating
  * grid world environments commonly used in reinforcement learning experiments.
  */
 object GridWorld:
   /**
    * Creates a new GridWorld instance with configurable parameters.
-   *
-   * @param rows        The number of rows in the grid (default: 13)
-   * @param cols        The number of columns in the grid (default: 15)
-   * @param walls       Set of wall positions that block agent movement (default: some example walls)
+   * 
+   * @param rows The number of rows in the grid (default: 13)
+   * @param cols The number of columns in the grid (default: 15)
+   * @param walls Set of wall positions that block agent movement (default: some example walls)
    * @param stepPenalty The penalty applied for each step taken (default: -3.0)
    * @return A new GridWorld instance with the specified configuration
    */
@@ -54,7 +54,7 @@ object GridWorld:
  * @param cols  The number of columns in the grid (width)
  * @param walls Set of states that represent impassable obstacles
  */
-class GridWorld private(val rows: Int, val cols: Int, val walls: Set[State], stepPenalty: Double) extends Environment:
+class GridWorld private (val rows: Int, val cols: Int, val walls: Set[State], stepPenalty: Double) extends Environment:
 
   /**
    * Executes one step in the environment given a current state and action.
@@ -70,15 +70,15 @@ class GridWorld private(val rows: Int, val cols: Int, val walls: Set[State], ste
    * @param a The action to be executed
    * @return StepResult containing next state and reward
    */
-  def step(s: State, a: Action): StepResult =
+  def step(s: State, a: Action): StepResult  =
     val (dr, dc) = a.delta
     val intendedNext = State(s.x + dr, s.y + dc)
-
+    
     // Check if the intended move is valid (within bounds and not a wall)
     val isValidMove = intendedNext.x >= 0 && intendedNext.x < rows &&
-      intendedNext.y >= 0 && intendedNext.y < cols &&
-      !walls.contains(intendedNext)
-
+                      intendedNext.y >= 0 && intendedNext.y < cols &&
+                      !walls.contains(intendedNext)
+    
     val next = if isValidMove then intendedNext else s
     // if you want to extend the implementation to make different
     // states give different rewards you can do it here,
