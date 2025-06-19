@@ -164,7 +164,7 @@ class QLearner private(
    * 
    * @return The current epsilon value based on the episode number
    */
-  def eps: Double = learningParameters.calculateEpsilon(ep)
+  override def eps: Double = learningParameters.calculateEpsilon(ep)
 
   /**
    * Internal method for choosing between exploration and exploitation.
@@ -177,7 +177,7 @@ class QLearner private(
       case d if d < eps => Choice.Exploring(A.draw)
       case _ => Choice.Exploiting(p)
 
-  def episode(maxSteps: Int = 200): EpisodeOutcome =
+  override def episode(maxSteps: Int = 200): EpisodeOutcome =
     ep += 1
 
     @tailrec
@@ -211,12 +211,12 @@ class QLearner private(
     Q.tableSnapshot().getOrElse((state, action), learningParameters.optimistic)
 
 
-  def choose(state: State): (Action, Boolean) =
+  override def choose(state: State): (Action, Boolean) =
     chooseInternal(state) match
       case Choice.Exploring(action) => (action, true)
       case Choice.Exploiting(_) => (Q.greedy(state), false)
 
-  def update(state: State, action: Action, reward: Reward, nextState: State): Unit =
+  override def update(state: State, action: Action, reward: Reward, nextState: State): Unit =
     Q.update(state, action, reward, nextState)
 
   /**
@@ -226,10 +226,10 @@ class QLearner private(
    * The provided environment reward is combined with the goal reward
    * if the next state matches the configured goal state.
    */
-  def updateWithGoal(state: State, action: Action, envReward: Reward, nextState: State): Unit =
+  override def updateWithGoal(state: State, action: Action, envReward: Reward, nextState: State): Unit =
     val isGoal = nextState == goalState
     val reward = if isGoal then goalReward else envReward
     Q.update(state, action, reward, nextState)
 
-  def incEp(): Unit =
+  override def incEp(): Unit =
     ep += 1

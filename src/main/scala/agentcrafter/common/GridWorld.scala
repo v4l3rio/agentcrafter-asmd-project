@@ -43,7 +43,7 @@ object GridWorld:
  * @param cols  The number of columns in the grid (width)
  * @param walls Set of states that represent impassable obstacles
  */
-class GridWorld private (val rows: Int, val cols: Int, val walls: Set[State], stepPenalty: Double) extends Environment:
+class GridWorld private (override val rows: Int, override val cols: Int, val walls: Set[State], stepPenalty: Double) extends Environment:
 
   /**
    * Executes one step in the environment given a current state and action.
@@ -59,7 +59,7 @@ class GridWorld private (val rows: Int, val cols: Int, val walls: Set[State], st
    * @param a The action to be executed
    * @return StepResult containing next state and reward
    */
-  def step(s: State, a: Action): StepResult  =
+  override def step(s: State, a: Action): StepResult  =
     val (dr, dc) = a.delta
     val intendedNext = State(s.x + dr, s.y + dc)
     

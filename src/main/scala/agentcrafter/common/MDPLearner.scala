@@ -37,7 +37,7 @@ class MDPLearner(
    * @param state The current state
    * @return The selected action and whether it was exploratory
    */
-  def choose(state: State): (Action, Boolean) =
+  override def choose(state: State): (Action, Boolean) =
     val epsilon = learningParameters.calculateEpsilon(ep)
     policy.selectAction(state, epsilon)
   
@@ -49,7 +49,7 @@ class MDPLearner(
    * @param reward The reward received for the transition
    * @param nextState The resulting state after taking the action
    */
-  def update(state: State, action: Action, reward: Reward, nextState: State): Unit =
+  override def update(state: State, action: Action, reward: Reward, nextState: State): Unit =
     val isGoal = nextState == goalState
     val finalReward = if isGoal then goalReward else reward
     qTable.update(state, action, finalReward, nextState, learningParameters)
@@ -62,7 +62,7 @@ class MDPLearner(
    * @param envReward The environment reward received
    * @param nextState The resulting state after taking the action
    */
-  def updateWithGoal(state: State, action: Action, envReward: Reward, nextState: State): Unit =
+  override def updateWithGoal(state: State, action: Action, envReward: Reward, nextState: State): Unit =
     update(state, action, envReward, nextState)
   
   /**
@@ -71,7 +71,7 @@ class MDPLearner(
    * @param maxSteps Maximum number of steps allowed in the episode
    * @return The outcome of the episode
    */
-  def episode(maxSteps: Int = 200): EpisodeOutcome =
+  override def episode(maxSteps: Int = 200): EpisodeOutcome =
     ep += 1
     val episodeRunner = new EpisodeRunner(gridWorld, qTable, policy, goalState, goalReward)
     episodeRunner.run(initialState, maxSteps, learningParameters.calculateEpsilon(ep), learningParameters)
@@ -81,12 +81,12 @@ class MDPLearner(
    * 
    * @return The current epsilon value
    */
-  def eps: Double = learningParameters.calculateEpsilon(ep)
+  override def eps: Double = learningParameters.calculateEpsilon(ep)
   
   /**
    * Increments the episode counter.
    */
-  def incEp(): Unit = ep += 1
+  override def incEp(): Unit = ep += 1
   
   /**
    * Creates a complete snapshot of the current Q-table.
