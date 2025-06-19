@@ -11,19 +11,19 @@ case class AgentWrapper(var builder: AgentBuilder)
 case class LineWallConfig(direction: String, from: (Int, Int), to: (Int, Int))
 
 case class LearnerConfig(
-                          var alpha: Double = 0.1,
-                          var gamma: Double = 0.9,
-                          var eps0: Double = 0.9,
-                          var epsMin: Double = 0.15,
-                          var warm: Int = 10_000,
-                          var optimistic: Double = 0.0,
-                          var learnerType: String = "qlearner"
-                        )
+  var alpha: Double = 0.1,
+  var gamma: Double = 0.9,
+  var eps0: Double = 0.9,
+  var epsMin: Double = 0.15,
+  var warm: Int = 10_000,
+  var optimistic: Double = 0.0,
+  var learnerType: String = "qlearner"
+)
 
 case class WallLLMConfig(
-                          var model: String = "",
-                          var prompt: String = ""
-                        )
+  var model: String = "",
+  var prompt: String = ""
+)
 
 enum SimulationProperty[T]:
   case Penalty extends SimulationProperty[Double]
@@ -97,23 +97,23 @@ enum WallProperty[T]:
       val (r, c) = obj.asInstanceOf[(Int, Int)]
       wrapper.builder = wrapper.builder.wall(r, c)
 
-
 enum LineProperty[T]:
   case Direction extends LineProperty[String]
   case From extends LineProperty[(Int, Int)]
   case To extends LineProperty[(Int, Int)]
 
   @targetName("to")
-  infix def >>(obj: T)(using lineBuilder: WallLineBuilder): WallLineBuilder = this match
-    case LineProperty.Direction =>
-      lineBuilder.direction = Some(obj.asInstanceOf[String])
-      lineBuilder
-    case LineProperty.From =>
-      lineBuilder.from = Some(obj.asInstanceOf[(Int, Int)])
-      lineBuilder
-    case LineProperty.To =>
-      lineBuilder.to = Some(obj.asInstanceOf[(Int, Int)])
-      lineBuilder
+  infix def >>(obj: T)(using lineBuilder: WallLineBuilder): WallLineBuilder =
+    this match
+      case LineProperty.Direction =>
+        lineBuilder.direction = Some(obj.asInstanceOf[String])
+        lineBuilder
+      case LineProperty.From =>
+        lineBuilder.from = Some(obj.asInstanceOf[(Int, Int)])
+        lineBuilder
+      case LineProperty.To =>
+        lineBuilder.to = Some(obj.asInstanceOf[(Int, Int)])
+        lineBuilder
 
 object block:
   @targetName("to")

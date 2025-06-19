@@ -4,8 +4,8 @@ import agentcrafter.MARL.visualizers.{QTableVisualizer, Visualizer}
 import agentcrafter.common.Learner
 
 /**
- * Runner: orchestrates MARL simulation execution using decomposed components.
- * Maintains the same API while delegating responsibilities to specialized managers.
+ * Runner: orchestrates MARL simulation execution using decomposed components. Maintains the same API while delegating
+ * responsibilities to specialized managers.
  */
 class Runner(spec: WorldSpec, showGui: Boolean):
 
@@ -14,13 +14,27 @@ class Runner(spec: WorldSpec, showGui: Boolean):
 
   private val episodeManager = new EpisodeManager(spec, agentsQL)
 
-
   private var visualizer: Option[Visualizer] = None
   private var qTableVisualizers: List[QTableVisualizer] = List.empty
   private var isVisualizationActive = false
 
   private var totalReward = 0.0
   private var currentEpisode = 0
+
+  def run(): Unit =
+    for ep <- 1 to spec.episodes do
+      maybeInitializeVisualization(ep)
+      episodeManager.resetEpisode()
+      currentEpisode = ep
+
+      val steps = runEpisode()
+      episodeManager.incrementEpisode()
+
+      val episodeResult = episodeManager.getCurrentState
+      totalReward += episodeResult.reward
+
+      if ep % 1000 == 0 then
+        println(s"Episode $ep finished in $steps steps")
 
   /**
    * Initializes visualization if the episode threshold is reached.
@@ -43,7 +57,6 @@ class Runner(spec: WorldSpec, showGui: Boolean):
 
       isVisualizationActive = true
 
-
   private def runEpisode(): Int =
     val result = episodeManager.runEpisode { (state, steps, anyAgentExploring) =>
       if isVisualizationActive then
@@ -53,25 +66,8 @@ class Runner(spec: WorldSpec, showGui: Boolean):
           viz.updateSimulationInfo(currentEpisode, anyAgentExploring, state.reward, currentEpsilon)
         }
 
-    
         if steps % 10 == 0 then
           qTableVisualizers.foreach(_.update())
     }
 
     result.steps
-
-
-  def run(): Unit =
-    for ep <- 1 to spec.episodes do
-      maybeInitializeVisualization(ep)
-      episodeManager.resetEpisode()
-      currentEpisode = ep
-
-      val steps = runEpisode()
-      episodeManager.incrementEpisode()
-
-      val episodeResult = episodeManager.getCurrentState
-      totalReward += episodeResult.reward
-
-      if ep % 1000 == 0 then
-        println(s"Episode $ep finished in $steps steps")

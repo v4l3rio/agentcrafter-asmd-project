@@ -22,10 +22,6 @@ class RunnerTest extends AnyFunSuite with Matchers:
                                    ): WorldSpec =
     WorldSpec(rows, cols, penalty, staticWalls, triggers, agents, episodes, stepLimit, stepDelay, showAfter)
 
-  private def createSimpleGrid(): GridWorld =
-    GridWorld(rows = 3, cols = 3, walls = Set.empty)
-
-
   private def createSimpleAgent(id: String, start: State, goal: State, reward: Double = 0.0): AgentSpec =
     val env = createSimpleGrid()
     val learner = QLearner(
@@ -36,6 +32,9 @@ class RunnerTest extends AnyFunSuite with Matchers:
       learningParameters = LearningParameters(alpha = 0.5, gamma = 0.9, eps0 = 0.1)
     )
     AgentSpec(id, start, goal, learner)
+
+  private def createSimpleGrid(): GridWorld =
+    GridWorld(rows = 3, cols = 3, walls = Set.empty)
 
 
   test("Runner should handle empty world without agents"):

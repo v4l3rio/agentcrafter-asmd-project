@@ -11,13 +11,23 @@ object LLMWallGenerator:
   /**
    * Generates walls from LLM using the specified model and prompt.
    *
-   * @param builder            The simulation builder
-   * @param model              The LLM model to use
-   * @param prompt             The custom prompt for wall generation
-   * @param simulationFilePath Optional path to the simulation file for context
-   * @return Some(asciiWalls) if successful, None otherwise
+   * @param builder
+   *   The simulation builder
+   * @param model
+   *   The LLM model to use
+   * @param prompt
+   *   The custom prompt for wall generation
+   * @param simulationFilePath
+   *   Optional path to the simulation file for context
+   * @return
+   *   Some(asciiWalls) if successful, None otherwise
    */
-  def generateWallsFromLLM(builder: SimulationBuilder, model: String, prompt: String, simulationFilePath: Option[String] = None): Option[String] =
+  def generateWallsFromLLM(
+    builder: SimulationBuilder,
+    model: String,
+    prompt: String,
+    simulationFilePath: Option[String] = None
+  ): Option[String] =
     val client = LLMHttpClient()
     val fullPrompt = buildWallPrompt(builder, prompt)
 
@@ -34,20 +44,6 @@ object LLMWallGenerator:
         None
 
   /**
-   * Loads the ASCII walls into the simulation builder.
-   *
-   * @param builder    The simulation builder
-   * @param asciiWalls The ASCII representation of walls
-   */
-  def loadWallsIntoBuilder(builder: SimulationBuilder, asciiWalls: String): Unit =
-    try
-      builder.wallsFromAscii(asciiWalls)
-      println("Successfully loaded LLM-generated walls into simulation")
-    catch
-      case ex: Exception =>
-        println(s"Error loading walls into simulation: ${ex.getMessage}")
-
-  /**
    * Builds a comprehensive prompt for wall generation including simulation context.
    */
   private def buildWallPrompt(builder: SimulationBuilder, userPrompt: String): String =
@@ -61,7 +57,6 @@ object LLMWallGenerator:
        |
        |Please generate the ASCII map now based on the above requirements and context:
     """.stripMargin
-
 
   /**
    * Extracts ASCII map from LLM response.
@@ -81,7 +76,23 @@ object LLMWallGenerator:
             val lines = response.split("\\n")
             val asciiLines = lines.filter(line =>
               line.trim.nonEmpty &&
-                line.forall(c => c == '#' || c == '.' || c == ' ')
+              line.forall(c => c == '#' || c == '.' || c == ' ')
             )
             if asciiLines.nonEmpty then Some(asciiLines.mkString("\\n"))
             else None
+
+  /**
+   * Loads the ASCII walls into the simulation builder.
+   *
+   * @param builder
+   *   The simulation builder
+   * @param asciiWalls
+   *   The ASCII representation of walls
+   */
+  def loadWallsIntoBuilder(builder: SimulationBuilder, asciiWalls: String): Unit =
+    try
+      builder.wallsFromAscii(asciiWalls)
+      println("Successfully loaded LLM-generated walls into simulation")
+    catch
+      case ex: Exception =>
+        println(s"Error loading walls into simulation: ${ex.getMessage}")

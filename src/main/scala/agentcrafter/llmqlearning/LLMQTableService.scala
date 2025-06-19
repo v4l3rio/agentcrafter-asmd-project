@@ -6,16 +6,19 @@ import agentcrafter.MARL.builders.SimulationBuilder
 import scala.collection.mutable
 import scala.util.{Failure, Success}
 
-
 object LLMQTableService:
 
   /**
    * Loads a Q-table from LLM using the specified model.
    *
-   * @param builder            The simulation builder
-   * @param model              The LLM model to use
-   * @param simulationFilePath Path to the file containing simulation DSL content
-   * @return Some(qTableJson) if successful, None otherwise
+   * @param builder
+   *   The simulation builder
+   * @param model
+   *   The LLM model to use
+   * @param simulationFilePath
+   *   Path to the file containing simulation DSL content
+   * @return
+   *   Some(qTableJson) if successful, None otherwise
    */
   def loadQTableFromLLM(builder: SimulationBuilder, model: String, simulationFilePath: String): Option[String] =
     val client = LLMHttpClient()
@@ -31,8 +34,10 @@ object LLMQTableService:
   /**
    * Loads the Q-table JSON into all agents in the simulation builder.
    *
-   * @param builder    The simulation builder containing agents
-   * @param qTableJson The Q-table JSON string to load
+   * @param builder
+   *   The simulation builder containing agents
+   * @param qTableJson
+   *   The Q-table JSON string to load
    */
   def loadQTableIntoAgents(builder: SimulationBuilder, qTableJson: String): Unit =
     try

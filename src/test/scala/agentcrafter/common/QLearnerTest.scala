@@ -5,8 +5,6 @@ import org.scalatest.matchers.should.Matchers
 
 class QLearnerTest extends AnyFunSuite with Matchers:
 
-  private def env() = GridWorld(rows = 3, cols = 3, walls = Set.empty)
-
   private def learner(lp: LearningParameters = LearningParameters()): QLearner =
     QLearner(
       goalState = State(2, 2),
@@ -15,6 +13,8 @@ class QLearnerTest extends AnyFunSuite with Matchers:
       resetFunction = () => State(0, 0),
       learningParameters = lp
     )
+
+  private def env() = GridWorld(rows = 3, cols = 3, walls = Set.empty)
 
   test("default epsilon"):
     val l = learner()

@@ -8,6 +8,8 @@ import scala.compiletime.uninitialized
 
 class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
 
+  var exploringCount = 0
+  var optimalCount = 0
   private var gridWorld: GridWorld = uninitialized
   private var agent: QLearner = uninitialized
   private var currentState: State = uninitialized
@@ -17,8 +19,6 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
   private var initialEpsilon: Double = uninitialized
   private var episodeCount: Int = 0
   private var initialQValue: Double = uninitialized
-  private var updatedQValue: Double = uninitialized
-  private var exportedQTable: Map[(State, Action), Double] = Map.empty
 
   Given("""a simple grid environment is set up""") { () =>
     gridWorld = GridWorld(rows = 5, cols = 5)
@@ -47,16 +47,12 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
       case "Stay" => Action.Stay
     }
 
-
     val (deltaR, deltaC) = action.delta
     val nextState = State(currentState.x + deltaR, currentState.y + deltaC)
 
-
     initialQValue = agent.getQValue(currentState, action)
 
-
     agent.update(currentState, action, reward.toDouble, nextState)
-
 
     currentState = nextState
   }
@@ -66,18 +62,19 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
     agent.update(State(0, 0), Action.Right, reward.toDouble, goalState)
     currentState = goalState
   }
-  Then("""the Q-value for state \({int}, {int}) and action {string} should increase""") { (row: Int, col: Int, actionName: String) =>
-    val state = State(row, col)
-    val action = actionName match {
-      case "Up" => Action.Up
-      case "Down" => Action.Down
-      case "Left" => Action.Left
-      case "Right" => Action.Right
-      case "Stay" => Action.Stay
-    }
+  Then("""the Q-value for state \({int}, {int}) and action {string} should increase""") {
+    (row: Int, col: Int, actionName: String) =>
+      val state = State(row, col)
+      val action = actionName match {
+        case "Up" => Action.Up
+        case "Down" => Action.Down
+        case "Left" => Action.Left
+        case "Right" => Action.Right
+        case "Stay" => Action.Stay
+      }
 
-    val currentQValue = agent.getQValue(state, action)
-    currentQValue should be > initialQValue
+      val currentQValue = agent.getQValue(state, action)
+      currentQValue should be > initialQValue
   }
   Then("""the Q-value should reflect the discounted future reward""") { () =>
 
@@ -107,9 +104,7 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
       case "Stay" => Action.Stay
     }
 
-
     agent.update(currentState, action, 10.0, State(0, 0))
-
 
     Action.values.foreach { a =>
       if (a != action) {
@@ -117,8 +112,8 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
       }
     }
   }
-  var exploringCount = 0
-  var optimalCount = 0
+  private var updatedQValue: Double = uninitialized
+  private var exportedQTable: Map[(State, Action), Double] = Map.empty
   When("""the agent chooses an action {int} times""") { (times: Int) =>
     actionCounts = Map.empty
     exploringCount = 0
@@ -155,8 +150,8 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
       learningParameters = LearningParameters(eps0 = epsilon, epsMin = 0.1, warm = 10)
     )
   }
-  Given("""epsilon minimum is set to {double}""") { (_: Double) => () }
-  Given("""warm-up period is {int} episodes""") { (_: Int) => () }
+  Given("""epsilon minimum is set to {double}""")((_: Double) => ())
+  Given("""warm-up period is {int} episodes""")((_: Int) => ())
   When("""{int} episodes are completed""") { (episodes: Int) =>
     episodeCount = episodes
     (1 to episodes).foreach(_ => agent.incEp())
@@ -189,22 +184,22 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
       learningParameters = LearningParameters(alpha = alpha)
     )
   }
-  Given("""Q-value for state \({int}, {int}) action {string} is initially {int}""") { (row: Int, col: Int, actionName: String, initialValue: Int) =>
-    val state = State(row, col)
-    val action = actionName match {
-      case "Up" => Action.Up
-      case "Down" => Action.Down
-      case "Left" => Action.Left
-      case "Right" => Action.Right
-      case "Stay" => Action.Stay
-    }
+  Given("""Q-value for state \({int}, {int}) action {string} is initially {int}""") {
+    (row: Int, col: Int, actionName: String, initialValue: Int) =>
+      val state = State(row, col)
+      val action = actionName match {
+        case "Up" => Action.Up
+        case "Down" => Action.Down
+        case "Left" => Action.Left
+        case "Right" => Action.Right
+        case "Stay" => Action.Stay
+      }
 
-    currentState = state
-    initialQValue = initialValue.toDouble
+      currentState = state
+      initialQValue = initialValue.toDouble
 
   }
   When("""the agent receives immediate reward {int}""") { (reward: Int) =>
-
     goalReward = reward.toDouble
   }
   When("""the maximum future Q-value is {int}""") { (maxFutureQ: Int) =>
@@ -230,7 +225,6 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
     newQValue should be(expectedValue +- 0.1)
   }
   Then("""the update should follow the Q-learning formula""") { () =>
-
     true shouldBe true
   }
 
@@ -242,11 +236,9 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
 
   }
   Then("""no Q-value update should occur for future states""") { () =>
-
     true shouldBe true
   }
   Then("""the episode should be marked as complete""") { () =>
-
     true shouldBe true
   }
 

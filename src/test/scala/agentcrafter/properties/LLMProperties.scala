@@ -14,30 +14,15 @@ import org.scalatest.matchers.should.Matchers
 object LLMProperties extends Properties("LLM") with Matchers:
 
 
+    val result1 = testMatch(stateString1)
+    val result2 = testMatch(stateString2)
+    val result3 = testMatch(stateString3)
   private val stateGen: Gen[State] = for {
     r <- Gen.choose(0, 4)
     c <- Gen.choose(0, 4)
   } yield State(r, c)
-
   private val actionGen: Gen[Action] = Gen.oneOf(Action.values)
-
   private val qValueGen: Gen[Double] = Gen.choose(-10.0, 10.0)
-
-  private val modelGen: Gen[String] = Gen.oneOf("gpt-4o", "gpt-4", "gpt-3.5-turbo")
-
-  private val llmConfigGen: Gen[LLMConfig] = for {
-    enabled <- Gen.oneOf(true, false)
-    model <- modelGen
-    wallsEnabled <- Gen.oneOf(true, false)
-    wallsModel <- modelGen
-    wallsPrompt <- Gen.alphaNumStr
-  } yield LLMConfig(enabled, model, wallsEnabled, wallsModel, wallsPrompt)
-
-  private val validJsonGen: Gen[String] = Gen.oneOf(
-    """{"(0, 0)": {"Up": 1.0, "Down": 0.5}}""",
-    """{"(1, 1)": {"Left": 2.0, "Right": 1.5}}""",
-    """```json\n{"(2, 2)": {"Stay": 0.0}}\n```"""
-  )
 
 
   property("LLM configuration maintains valid state") = forAll(llmConfigGen) { config =>
@@ -123,7 +108,7 @@ object LLMProperties extends Properties("LLM") with Matchers:
   }
 
 
-  property("LLM configuration handles edge cases") = {
+  property("LLM configuration handles edge cases") =
     val config = LLMConfig()
 
     given LLMConfig = config
@@ -134,10 +119,10 @@ object LLMProperties extends Properties("LLM") with Matchers:
 
 
     config.model.isEmpty && config.wallsPrompt.isEmpty
-  }
+  
 
 
-  property("LLM config has sensible defaults") = {
+  property("LLM config has sensible defaults") =
     val config = LLMConfig()
 
     !config.enabled &&
@@ -145,7 +130,7 @@ object LLMProperties extends Properties("LLM") with Matchers:
       !config.wallsEnabled &&
       config.wallsModel == "gpt-4o" &&
       config.wallsPrompt.isEmpty
-  }
+  
 
 
   property("State parsing handles various formats") = forAll(stateGen) { state =>
@@ -156,7 +141,7 @@ object LLMProperties extends Properties("LLM") with Matchers:
 
     val regex = """\(\s*(\d+)\s*,\s*(\d+)\s*\)""".r
 
-    def testMatch(str: String): Boolean = str match {
+    def testMatch(str: String): Boolean = str match
       case regex(r, c) =>
         try {
           r.toInt == state.x && c.toInt == state.y
@@ -165,10 +150,19 @@ object LLMProperties extends Properties("LLM") with Matchers:
         }
       case _ => false
     }
-
-    val result1 = testMatch(stateString1)
-    val result2 = testMatch(stateString2)
-    val result3 = testMatch(stateString3)
+  private val modelGen: Gen[String] = Gen.oneOf("gpt-4o", "gpt-4", "gpt-3.5-turbo")
+  private val llmConfigGen: Gen[LLMConfig] = for {
+    enabled <- Gen.oneOf(true, false)
+    model <- modelGen
+    wallsEnabled <- Gen.oneOf(true, false)
+    wallsModel <- modelGen
+    wallsPrompt <- Gen.alphaNumStr
+  } yield LLMConfig(enabled, model, wallsEnabled, wallsModel, wallsPrompt)
+  private val validJsonGen: Gen[String] = Gen.oneOf(
+    """{"(0, 0)": {"Up": 1.0, "Down": 0.5}}""",
+    """{"(1, 1)": {"Left": 2.0, "Right": 1.5}}""",
+    """```json\n{"(2, 2)": {"Stay": 0.0}}\n```"""
+  )
 
     result1 && result2 && result3
   }

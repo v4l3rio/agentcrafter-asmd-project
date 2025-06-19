@@ -3,17 +3,13 @@ package agentcrafter.llmqlearning
 import agentcrafter.MARL.DSL.{SimulationDSL, SimulationWrapper}
 import agentcrafter.MARL.builders.SimulationBuilder
 
-
-
 /**
- * Mixin that augments the base `SimulationDSL` with an `useLLM { … }` block
- * allowing users to enable LLM‑generated Q‑tables.
+ * Mixin that augments the base `SimulationDSL` with an `useLLM { … }` block allowing users to enable LLM‑generated
+ * Q‑tables.
  */
 trait LLMQLearning extends SimulationDSL:
 
-
   private var llmConfig: LLMConfig = LLMConfig()
-
 
   def useLLM(block: LLMConfig ?=> Unit)(using wrapper: SimulationWrapper): Unit =
     given config: LLMConfig = llmConfig
@@ -21,14 +17,13 @@ trait LLMQLearning extends SimulationDSL:
     block
     llmConfig = config
 
-
   override def simulation(block: SimulationWrapper ?=> Unit): Unit =
     given wrapper: SimulationWrapper = SimulationWrapper(new SimulationBuilder)
 
     block
 
     if llmConfig.enabled then
-  
+
       val simulationFilePath = findSimulationFile()
       LLMQTableService.loadQTableFromLLM(wrapper.builder, llmConfig.model, simulationFilePath) match
         case Some(qTableJson) =>
@@ -40,18 +35,16 @@ trait LLMQLearning extends SimulationDSL:
     wrapper.builder.build()
 
   /**
-   * Finds the simulation file by inspecting the stack trace to locate the file
-   * that contains the useLLM call.
+   * Finds the simulation file by inspecting the stack trace to locate the file that contains the useLLM call.
    */
   private def findSimulationFile(): String =
     val stackTrace = Thread.currentThread().getStackTrace
 
-
     val callingFrame = stackTrace.find { frame =>
       !frame.getClassName.contains("LLMQLearning") &&
-        !frame.getClassName.startsWith("java.") &&
-        !frame.getClassName.startsWith("scala.") &&
-        frame.getClassName.contains("agentcrafter")
+      !frame.getClassName.startsWith("java.") &&
+      !frame.getClassName.startsWith("scala.") &&
+      frame.getClassName.contains("agentcrafter")
     }
 
     callingFrame match

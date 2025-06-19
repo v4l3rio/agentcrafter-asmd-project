@@ -18,7 +18,6 @@ class LLMQTableLoadingSteps extends ScalaDsl with EN with Matchers:
   private def createSimpleGrid(): GridWorld =
     GridWorld(rows = 3, cols = 3, walls = Set.empty)
 
-
   Given("""a Q-Learner instance is created""") { () =>
     val env = createSimpleGrid()
     learner = QLearner(
@@ -28,7 +27,6 @@ class LLMQTableLoadingSteps extends ScalaDsl with EN with Matchers:
       resetFunction = () => State(0, 0)
     )
   }
-
 
   Given("""a valid Q-Table JSON with multiple states and actions""") { () =>
     jsonString =
@@ -41,7 +39,6 @@ class LLMQTableLoadingSteps extends ScalaDsl with EN with Matchers:
     """
   }
 
-
   Given("""a Q-Table JSON wrapped in markdown code blocks""") { () =>
     jsonString =
       """
@@ -53,7 +50,6 @@ class LLMQTableLoadingSteps extends ScalaDsl with EN with Matchers:
     """
   }
 
-
   Given("""a Q-Table JSON with LLM response prefixes like "Here is the JSON:"""") { () =>
     jsonString =
       """
@@ -64,7 +60,6 @@ class LLMQTableLoadingSteps extends ScalaDsl with EN with Matchers:
     """
   }
 
-
   Given("""an invalid JSON string with syntax errors""") { () =>
     jsonString =
       """
@@ -73,7 +68,6 @@ class LLMQTableLoadingSteps extends ScalaDsl with EN with Matchers:
     }
     """
   }
-
 
   Given("""a Q-Table JSON with invalid action names""") { () =>
     jsonString =
@@ -84,16 +78,13 @@ class LLMQTableLoadingSteps extends ScalaDsl with EN with Matchers:
     """
   }
 
-
   Given("""an empty JSON object""") { () =>
     jsonString = "{}"
   }
 
-
   When("""I load the Q-Table from JSON""") { () =>
 
     initialQValues = learner.QTableSnapshot
-
 
     loadResult = QTableLoader.loadQTableFromJson(jsonString, learner)
   }
@@ -102,10 +93,8 @@ class LLMQTableLoadingSteps extends ScalaDsl with EN with Matchers:
 
     initialQValues = learner.QTableSnapshot
 
-
     loadResult = QTableLoader.loadQTableFromJson(jsonString, learner)
   }
-
 
   Then("""the Q-Table should be loaded successfully""") { () =>
     loadResult shouldBe a[Success[?]]
@@ -115,24 +104,21 @@ class LLMQTableLoadingSteps extends ScalaDsl with EN with Matchers:
 
     loadResult shouldBe a[Success[?]]
 
-
     if jsonString.contains("\"(0, 0)\": {\"Up\": 1.5") then
       this.learner.getQValue(State(0, 0), Action.Right) shouldBe 3.0
       this.learner.getQValue(State(0, 1), Action.Up) shouldBe 2.5
       this.learner.getQValue(State(1, 0), Action.Down) shouldBe 3.5
-
-
     else if jsonString.contains("```json") && jsonString.contains("\"(0, 0)\": {\"Up\": 1.0") then
       learner.getQValue(State(0, 0), Action.Down) shouldBe 2.0
-
-
     else if jsonString.contains("Here is the JSON") then
       learner.getQValue(State(2, 2), Action.Stay) shouldBe 1.0
   }
 
   Then("""all actions should have correct Q-values""") { () =>
-
-    if jsonString.contains("\"(0, 0)\": {\"Up\": 1.0, \"Down\": 2.0, \"Left\": 3.0, \"Right\": 4.0, \"Stay\": 5.0}") then
+    if jsonString.contains(
+        "\"(0, 0)\": {\"Up\": 1.0, \"Down\": 2.0, \"Left\": 3.0, \"Right\": 4.0, \"Stay\": 5.0}"
+      )
+    then
       learner.getQValue(State(0, 0), Action.Up) shouldBe 1.0
       learner.getQValue(State(0, 0), Action.Down) shouldBe 2.0
       learner.getQValue(State(0, 0), Action.Left) shouldBe 3.0
@@ -141,22 +127,18 @@ class LLMQTableLoadingSteps extends ScalaDsl with EN with Matchers:
   }
 
   Then("""the markdown formatting should be stripped""") { () =>
-
     loadResult shouldBe a[Success[?]]
   }
 
   Then("""the Q-values should be correctly parsed""") { () =>
-
     loadResult shouldBe a[Success[?]]
   }
 
   Then("""the prefixes should be ignored""") { () =>
-
     loadResult shouldBe a[Success[?]]
   }
 
   Then("""the Q-values should be correctly extracted""") { () =>
-
     loadResult shouldBe a[Success[?]]
   }
 
@@ -169,7 +151,6 @@ class LLMQTableLoadingSteps extends ScalaDsl with EN with Matchers:
   }
 
   Then("""the Q-Learner should remain unchanged""") { () =>
-
     learner.QTableSnapshot should equal(initialQValues)
   }
 
@@ -179,7 +160,6 @@ class LLMQTableLoadingSteps extends ScalaDsl with EN with Matchers:
   }
 
   Then("""the Q-Learner should remain in a consistent state""") { () =>
-
     learner.QTableSnapshot should equal(initialQValues)
   }
 
@@ -188,6 +168,5 @@ class LLMQTableLoadingSteps extends ScalaDsl with EN with Matchers:
   }
 
   Then("""the Q-Learner should have no Q-values set""") { () =>
-
     learner.QTableSnapshot shouldBe empty
   }

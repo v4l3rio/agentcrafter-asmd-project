@@ -5,19 +5,18 @@ import agentcrafter.MARL.builders.{AgentBuilder, SimulationBuilder, TriggerBuild
 /**
  * Domain-Specific Language (DSL) for creating Multi-Agent Reinforcement Learning simulations.
  *
- * This trait provides a fluent, declarative API for defining MARL environments with agents,
- * walls, triggers, and simulation parameters. The DSL uses Scala 3's context functions
- * and given/using syntax to create a clean, readable configuration syntax.
- *
+ * This trait provides a fluent, declarative API for defining MARL environments with agents, walls, triggers, and
+ * simulation parameters. The DSL uses Scala 3's context functions and given/using syntax to create a clean, readable
+ * configuration syntax.
  */
 trait SimulationDSL:
   /**
    * Main entry point for defining a simulation.
    *
-   * Creates a simulation context and executes the provided configuration block,
-   * then starts the simulation.
+   * Creates a simulation context and executes the provided configuration block, then starts the simulation.
    *
-   * @param block Configuration block that defines the simulation setup
+   * @param block
+   *   Configuration block that defines the simulation setup
    */
   def simulation(block: SimulationWrapper ?=> Unit): Unit =
     given wrapper: SimulationWrapper = SimulationWrapper(new SimulationBuilder)
@@ -28,7 +27,8 @@ trait SimulationDSL:
   /**
    * Defines the grid dimensions for the simulation world.
    *
-   * @param size Tuple containing (rows, columns) for the grid
+   * @param size
+   *   Tuple containing (rows, columns) for the grid
    */
   def grid(size: (Int, Int))(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.grid(size._1, size._2)
@@ -36,8 +36,10 @@ trait SimulationDSL:
   /**
    * Infix operator to create grid size tuples in a readable format.
    *
-   * @return Tuple representing grid dimensions
-   * @example `10 x 10` creates a (10, 10) tuple
+   * @return
+   *   Tuple representing grid dimensions
+   * @example
+   *   `10 x 10` creates a (10, 10) tuple
    */
   extension (n: Int) infix def x(other: Int): (Int, Int) = (n, other)
 
@@ -47,7 +49,8 @@ trait SimulationDSL:
   /**
    * Defines walls using ASCII art representation.
    *
-   * @param ascii String containing ASCII representation of walls
+   * @param ascii
+   *   String containing ASCII representation of walls
    */
   def asciiWalls(ascii: String)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.wallsFromAscii(ascii.stripMargin)
@@ -55,7 +58,8 @@ trait SimulationDSL:
   /**
    * Generates walls from LLM using a configuration block.
    *
-   * @param block Configuration block for LLM wall generation (model, prompt)
+   * @param block
+   *   Configuration block for LLM wall generation (model, prompt)
    */
   def wallsFromLLM(block: WallLLMConfig ?=> Unit)(using wrapper: SimulationWrapper): Unit =
     val config = WallLLMConfig()
@@ -67,7 +71,12 @@ trait SimulationDSL:
     if config.model.nonEmpty && config.prompt.nonEmpty then
       import agentcrafter.llmqlearning.LLMWallGenerator
       val simulationFilePath = findSimulationFile()
-      LLMWallGenerator.generateWallsFromLLM(wrapper.builder, config.model, config.prompt, Some(simulationFilePath)) match
+      LLMWallGenerator.generateWallsFromLLM(
+        wrapper.builder,
+        config.model,
+        config.prompt,
+        Some(simulationFilePath)
+      ) match
         case Some(asciiWalls) =>
           println(s"LLM wall generation successful, loading walls...")
           LLMWallGenerator.loadWallsIntoBuilder(wrapper.builder, asciiWalls)
@@ -79,12 +88,12 @@ trait SimulationDSL:
   /**
    * Opens a walls configuration block.
    *
-   * @param block Configuration block for defining walls
+   * @param block
+   *   Configuration block for defining walls
    */
 
   /**
-   * Finds the simulation file by inspecting the stack trace to locate the file
-   * that contains the wallsFromLLM call.
+   * Finds the simulation file by inspecting the stack trace to locate the file that contains the wallsFromLLM call.
    */
   private def findSimulationFile(): String =
     val stackTrace = Thread.currentThread().getStackTrace
@@ -92,9 +101,9 @@ trait SimulationDSL:
     // Find the first stack frame that's not from this trait or system classes
     val callingFrame = stackTrace.find { frame =>
       !frame.getClassName.contains("SimulationDSL") &&
-        !frame.getClassName.startsWith("java.") &&
-        !frame.getClassName.startsWith("scala.") &&
-        frame.getClassName.contains("agentcrafter")
+      !frame.getClassName.startsWith("java.") &&
+      !frame.getClassName.startsWith("scala.") &&
+      frame.getClassName.contains("agentcrafter")
     }
 
     callingFrame match
@@ -110,8 +119,10 @@ trait SimulationDSL:
   /**
    * Defines a line of walls using a configuration block.
    *
-   * @param block Configuration block for the wall line (direction, from, to)
-   * @throws IllegalArgumentException if direction, from, or to are not specified
+   * @param block
+   *   Configuration block for the wall line (direction, from, to)
+   * @throws IllegalArgumentException
+   *   if direction, from, or to are not specified
    */
   def line(block: WallLineBuilder ?=> Unit)(using wrapper: SimulationWrapper): Unit =
     given lineBuilder: WallLineBuilder = WallLineBuilder()
@@ -126,7 +137,8 @@ trait SimulationDSL:
   /**
    * Defines an agent in the simulation.
    *
-   * @param block Configuration block for the agent (id, start, goal, learner, etc.)
+   * @param block
+   *   Configuration block for the agent (id, start, goal, learner, etc.)
    */
   def agent(block: AgentWrapper ?=> Unit)(using wrapper: SimulationWrapper): Unit =
     given agentWrapper: AgentWrapper = AgentWrapper(new AgentBuilder(wrapper.builder))
@@ -137,7 +149,8 @@ trait SimulationDSL:
   /**
    * Configures the Q-learning parameters for an agent.
    *
-   * @param block Configuration block for learner parameters (alpha, gamma, epsilon, etc.)
+   * @param block
+   *   Configuration block for learner parameters (alpha, gamma, epsilon, etc.)
    */
   def withLearner(using agentWrapper: AgentWrapper)(block: LearnerConfig ?=> Unit): Unit =
     val config = LearnerConfig() // Configurazione predefinita
@@ -151,7 +164,7 @@ trait SimulationDSL:
       eps0 = config.eps0,
       epsMin = config.epsMin,
       warm = config.warm,
-      optimistic = config.optimistic,
+      optimistic = config.optimistic
     )
 
   /**
@@ -170,8 +183,10 @@ trait SimulationDSL:
   /**
    * Trigger effect that removes a wall at the specified position.
    *
-   * @param r Row position of the wall to remove
-   * @param c Column position of the wall to remove
+   * @param r
+   *   Row position of the wall to remove
+   * @param c
+   *   Column position of the wall to remove
    */
   def openWall(r: Int, c: Int)(using tb: TriggerBuilder): Unit =
     tb.openWall(r, c)
@@ -185,7 +200,8 @@ trait SimulationDSL:
   /**
    * Trigger effect that gives a bonus reward to the triggering agent.
    *
-   * @param bonus The reward amount (can be positive or negative)
+   * @param bonus
+   *   The reward amount (can be positive or negative)
    */
   def give(bonus: Double)(using tb: TriggerBuilder): Unit =
     tb.give(bonus)
@@ -193,8 +209,10 @@ trait SimulationDSL:
   /**
    * Sets the number of episodes to run in the simulation.
    *
-   * @param n Number of episodes
-   * @deprecated Use `Episodes >> n` syntax instead for consistency with other DSL properties
+   * @param n
+   *   Number of episodes
+   * @deprecated
+   *   Use `Episodes >> n` syntax instead for consistency with other DSL properties
    */
   def episodes(n: Int)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.episodes(n)
@@ -202,8 +220,10 @@ trait SimulationDSL:
   /**
    * Sets the maximum number of steps per episode.
    *
-   * @param n Maximum steps per episode
-   * @deprecated Use `Steps >> n` syntax instead for consistency with other DSL properties
+   * @param n
+   *   Maximum steps per episode
+   * @deprecated
+   *   Use `Steps >> n` syntax instead for consistency with other DSL properties
    */
   def steps(n: Int)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.steps(n)
@@ -211,8 +231,10 @@ trait SimulationDSL:
   /**
    * Sets after which episode to start showing the GUI visualization.
    *
-   * @param n Episode number to start showing visualization
-   * @deprecated Use `ShowAfter >> n` syntax instead for consistency with other DSL properties
+   * @param n
+   *   Episode number to start showing visualization
+   * @deprecated
+   *   Use `ShowAfter >> n` syntax instead for consistency with other DSL properties
    */
   def showAfter(n: Int)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.showAfter(n)
@@ -220,8 +242,10 @@ trait SimulationDSL:
   /**
    * Sets the delay between simulation steps for visualization.
    *
-   * @param ms Delay in milliseconds
-   * @deprecated Use `Delay >> ms` syntax instead for consistency with other DSL properties
+   * @param ms
+   *   Delay in milliseconds
+   * @deprecated
+   *   Use `Delay >> ms` syntax instead for consistency with other DSL properties
    */
   def delay(ms: Int)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.delay(ms)
@@ -229,8 +253,10 @@ trait SimulationDSL:
   /**
    * Enables or disables the graphical user interface.
    *
-   * @param flag True to enable GUI, false to disable
-   * @deprecated Use `WithGUI >> flag` syntax instead for consistency with other DSL properties
+   * @param flag
+   *   True to enable GUI, false to disable
+   * @deprecated
+   *   Use `WithGUI >> flag` syntax instead for consistency with other DSL properties
    */
   def withGUI(flag: Boolean)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.withGUI(flag)

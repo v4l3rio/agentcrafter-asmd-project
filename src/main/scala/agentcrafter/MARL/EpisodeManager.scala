@@ -7,75 +7,44 @@ import scala.collection.mutable
 /**
  * Manages the execution of individual episodes in a Multi-Agent Reinforcement Learning (MARL) simulation.
  *
- * This class orchestrates the complex interactions between multiple learning agents in a shared
- * environment, handling state transitions, trigger activations, dynamic environment changes,
- * and coordinated Q-learning updates. It maintains the episode state and ensures proper
- * synchronization between agents while managing environmental effects and rewards.
+ * This class orchestrates the complex interactions between multiple learning agents in a shared environment, handling
+ * state transitions, trigger activations, dynamic environment changes, and coordinated Q-learning updates. It maintains
+ * the episode state and ensures proper synchronization between agents while managing environmental effects and rewards.
  *
  * Key responsibilities:
- * - Coordinating simultaneous agent actions
- * - Managing dynamic environment changes (wall removal, triggers)
- * - Applying environmental effects and bonus rewards
- * - Tracking episode termination conditions
- * - Facilitating Q-learning updates for all agents
+ *   - Coordinating simultaneous agent actions
+ *   - Managing dynamic environment changes (wall removal, triggers)
+ *   - Applying environmental effects and bonus rewards
+ *   - Tracking episode termination conditions
+ *   - Facilitating Q-learning updates for all agents
  *
- * @param spec     The complete world specification including agents, triggers, and environment parameters
- * @param agentsQL Map of agent IDs to their respective Q-learning instances
+ * @param spec
+ *   The complete world specification including agents, triggers, and environment parameters
+ * @param agentsQL
+ *   Map of agent IDs to their respective Q-learning instances
  */
 class EpisodeManager(spec: WorldSpec, agentsQL: Map[String, Learner]):
 
   private val staticWalls = spec.staticWalls.to(mutable.Set)
   private val dynamicWalls = mutable.Set.empty[State]
+  private val agentMap = spec.agents.map(a => a.id -> a).toMap
   private var episodeDone = false
   private var activeTriggers: List[Trigger] = spec.triggers
-
-  private val agentMap = spec.agents.map(a => a.id -> a).toMap
   private var agentPositions = agentMap.view.mapValues(_.start).toMap
 
   private var episodeReward = 0.0
 
   /**
-   * Creates a GridWorld instance reflecting the current environment state.
-   *
-   * This method generates a new GridWorld with the current wall configuration,
-   * accounting for both static walls (permanent obstacles) and dynamic walls
-   * that may have been removed by trigger effects during the episode.
-   *
-   * @return A GridWorld instance with the current wall configuration
-   */
-  private def currentGrid: GridWorld =
-    GridWorld(spec.rows, spec.cols, staticWalls.toSet -- dynamicWalls, spec.stepPenalty)
-
-  /**
-   * Applies a list of trigger effects and calculates the total bonus reward.
-   *
-   * This method processes various environmental effects that can be triggered
-   * by agent actions, including wall removal, bonus rewards, and episode termination.
-   * Effects are applied immediately and may modify the environment state.
-   *
-   * @param effects List of effects to apply to the environment
-   * @return The total bonus reward accumulated from all reward effects
-   */
-  private def applyEffects(effects: List[Effect]): Double =
-    var bonus = 0.0
-    effects.foreach {
-      case OpenWall(pos) => dynamicWalls += pos
-      case Reward(x) => bonus += x
-      case EndEpisode => episodeDone = true
-    }
-    bonus
-
-  /**
    * Executes a complete episode of the MARL simulation.
    *
-   * This method runs the main episode loop, coordinating agent actions,
-   * environment transitions, and Q-learning updates until the episode
-   * terminates (either by reaching a goal, hitting the step limit, or
-   * through a trigger effect).
+   * This method runs the main episode loop, coordinating agent actions, environment transitions, and Q-learning updates
+   * until the episode terminates (either by reaching a goal, hitting the step limit, or through a trigger effect).
    *
-   * @param onStep Optional callback function called after each step for visualization
-   *               or monitoring purposes. Receives (EpisodeState, stepNumber, isDone)
-   * @return EpisodeResult containing the final outcome and statistics
+   * @param onStep
+   *   Optional callback function called after each step for visualization or monitoring purposes. Receives
+   *   (EpisodeState, stepNumber, isDone)
+   * @return
+   *   EpisodeResult containing the final outcome and statistics
    */
   def runEpisode(onStep: (EpisodeState, Int, Boolean) => Unit = (_, _, _) => ()): EpisodeResult =
     var steps = 0
@@ -84,7 +53,6 @@ class EpisodeManager(spec: WorldSpec, agentsQL: Map[String, Learner]):
       val stepResult = executeStep()
       steps += 1
       episodeReward += stepResult.totalReward
-
 
       val currentState = EpisodeState(agentPositions, dynamicWalls.toSet, episodeDone, episodeReward)
       onStep(currentState, steps, stepResult.anyAgentExploring)
@@ -102,15 +70,11 @@ class EpisodeManager(spec: WorldSpec, agentsQL: Map[String, Learner]):
     val jointActions: Map[String, Action] = jointActionsWithExploration.view.mapValues(_._1).toMap
     val anyAgentExploring = jointActionsWithExploration.values.exists(_._2)
 
-    
     val (nextPositions, stepRewards) = executeActions(jointActions)
-
 
     val triggerRewards = processTriggers(nextPositions)
 
-    
     updateQLearning(jointActions, stepRewards, triggerRewards, nextPositions)
-
 
     agentPositions = nextPositions
 
@@ -128,6 +92,18 @@ class EpisodeManager(spec: WorldSpec, agentsQL: Map[String, Learner]):
     }
 
   /**
+   * Creates a GridWorld instance reflecting the current environment state.
+   *
+   * This method generates a new GridWorld with the current wall configuration, accounting for both static walls
+   * (permanent obstacles) and dynamic walls that may have been removed by trigger effects during the episode.
+   *
+   * @return
+   *   A GridWorld instance with the current wall configuration
+   */
+  private def currentGrid: GridWorld =
+    GridWorld(spec.rows, spec.cols, staticWalls.toSet -- dynamicWalls, spec.stepPenalty)
+
+  /**
    * Processes triggers and returns trigger-based rewards.
    */
   private def processTriggers(positions: Map[String, State]): Map[String, Double] =
@@ -142,12 +118,34 @@ class EpisodeManager(spec: WorldSpec, agentsQL: Map[String, Learner]):
     triggerRewards.toMap
 
   /**
+   * Applies a list of trigger effects and calculates the total bonus reward.
+   *
+   * This method processes various environmental effects that can be triggered by agent actions, including wall removal,
+   * bonus rewards, and episode termination. Effects are applied immediately and may modify the environment state.
+   *
+   * @param effects
+   *   List of effects to apply to the environment
+   * @return
+   *   The total bonus reward accumulated from all reward effects
+   */
+  private def applyEffects(effects: List[Effect]): Double =
+    var bonus = 0.0
+    effects.foreach {
+      case OpenWall(pos) => dynamicWalls += pos
+      case Reward(x) => bonus += x
+      case EndEpisode => episodeDone = true
+    }
+    bonus
+
+  /**
    * Updates Q-learning for all agents.
    */
-  private def updateQLearning(actions: Map[String, Action],
-                              stepRewards: Map[String, Double],
-                              triggerRewards: Map[String, Double],
-                              nextPositions: Map[String, State]): Unit =
+  private def updateQLearning(
+    actions: Map[String, Action],
+    stepRewards: Map[String, Double],
+    triggerRewards: Map[String, Double],
+    nextPositions: Map[String, State]
+  ): Unit =
     agentsQL.foreach { case (id, learner) =>
       val action = actions(id)
       val totalReward = stepRewards.getOrElse(id, 0.0) + triggerRewards.getOrElse(id, 0.0)
