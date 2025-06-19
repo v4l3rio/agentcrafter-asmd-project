@@ -94,7 +94,7 @@ class EpisodeManager(spec: WorldSpec, agentsQL: Map[String, Learner]):
   /**
    * Executes a single step in the episode.
    */
-  private def executeStep(): StepResult =
+  private def executeStep(): EpisodeStepResult =
     // 1. Choose actions for all agents
     val jointActionsWithExploration: Map[String, (Action, Boolean)] =
       agentsQL.map { case (id, ql) => id -> ql.choose(agentPositions(id)) }
@@ -115,7 +115,7 @@ class EpisodeManager(spec: WorldSpec, agentsQL: Map[String, Learner]):
     agentPositions = nextPositions
 
     val totalReward = (stepRewards.values.sum + triggerRewards.values.sum)
-    StepResult(agentPositions, totalReward, anyAgentExploring)
+    EpisodeStepResult(agentPositions, totalReward, anyAgentExploring)
 
   /**
    * Executes actions for all agents and returns new positions and step rewards.
@@ -182,19 +182,4 @@ class EpisodeManager(spec: WorldSpec, agentsQL: Map[String, Learner]):
   def incrementEpisode(): Unit =
     agentsQL.values.foreach(_.incEp())
 
-/**
- * Result of executing a single step.
- */
-case class StepResult(positions: Map[String, State], totalReward: Double, anyAgentExploring: Boolean)
-
-/**
- * Result of executing a complete episode.
- */
-case class EpisodeResult(steps: Int, totalReward: Double, finalPositions: Map[String, State],
-                         openedWalls: Set[State], completed: Boolean)
-
-/**
- * Current state of an episode for visualization.
- */
-case class EpisodeState(positions: Map[String, State], openedWalls: Set[State],
-                        done: Boolean, reward: Double)
+// Result types are now defined in agentcrafter.common.Results

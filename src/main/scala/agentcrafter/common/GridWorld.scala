@@ -1,17 +1,6 @@
 package agentcrafter.common
 
 /**
- * Represents the result of taking a step in the environment.
- * 
- * This case class encapsulates the outcome of an agent's action in the environment,
- * containing both the resulting state and the reward received for the transition.
- * 
- * @param state The new state after taking the action
- * @param reward The immediate reward received for the state transition
- */
-case class StepResult(state: State, reward: Double)
-
-/**
  * Factory object for creating GridWorld instances.
  * 
  * Provides convenient factory methods with sensible defaults for creating
