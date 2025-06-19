@@ -26,38 +26,6 @@ case class LLMConfig(
                       var wallsPrompt: String = ""
                     )
 
-// ── DSL property objects ──────────────────────────────────────────────
-
-/**
- * DSL object for configuring LLM enablement status.
- *
- * Provides a fluent interface for enabling or disabling LLM integration
- * in the AgentCrafter simulation configuration.
- */
-object Enabled:
-  /**
-   * Sets the LLM enabled status using DSL syntax.
-   *
-   * @param value  Whether to enable LLM integration
-   * @param config The implicit LLM configuration context
-   */
-  @targetName("to")
-  def >>(value: Boolean)(using config: LLMConfig): Unit =
-    config.enabled = value
-
-/**
- * DSL object for configuring the LLM model selection.
- *
- * Provides a fluent interface for specifying which LLM model to use
- * for Q-learning assistance and decision-making.
- */
-object Model:
-  /**
-   * Sets the LLM model using DSL syntax.
-   *
-   * @param value  The model identifier (e.g., "gpt-4o", "claude-3-sonnet")
-   * @param config The implicit LLM configuration context
-   */
-  @targetName("to")
-  def >>(value: String)(using config: LLMConfig): Unit =
-    config.model = value
+// ── DSL properties are now managed as Enum in LLMDSLProperties.scala ──
+// The DSL keywords (Enabled, Model, WallsEnabled, WallsModel, WallsPrompt)
+// are implemented as enum cases in LLMDSLProperties for type safety and consistency.
