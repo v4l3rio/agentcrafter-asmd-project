@@ -59,13 +59,13 @@ class AgentBuilder(parent: SimulationBuilder):
     gl = State(r, c); this
   }
 
-  /** Current agent id (for internal DSL usage) */
+
   private[MARL] def currentId: String = id
 
-  /** Current goal position (for internal DSL usage) */
+
   private[MARL] def currentGoal: State = gl
 
-  // Method to customize the Q-learner parameters for this specific agent
+
 
   /**
    * Configures the learning algorithm and parameters for this agent.

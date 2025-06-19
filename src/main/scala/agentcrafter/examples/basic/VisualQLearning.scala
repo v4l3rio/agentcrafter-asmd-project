@@ -22,8 +22,8 @@ import agentcrafter.common.{GridWorld, LearningParameters, QLearner, State}
  * - Current state, action, exploration mode, and Q-values
  */
 @main def TrainVisualExplain(): Unit =
-  val start = State(0, 0) // agent start position
-  val goal = State(5, 5) // agent goal position
+  val start = State(0, 0)
+  val goal = State(5, 5)
 
   val env = GridWorld(rows = 10, cols = 10, walls = Set(State(1, 1), State(1, 2), State(1, 3), State(2, 3), State(3, 3), State(4, 3), State(5, 3), State(6, 3), State(7, 3), State(8, 3)))
   val agent = QLearner(
@@ -45,8 +45,8 @@ import agentcrafter.common.{GridWorld, LearningParameters, QLearner, State}
   val testEvery = 500
 
   for ep <- 1 to episodes do
-    agent.episode() // training
+    agent.episode()
     if ep % testEvery == 0 then
-      val (_, _, path) = agent.episode() // greedy run
+      val (_, _, path) = agent.episode()
       path.foreach { case (s, a, e, q) => vis.updateSingleAgent(s, a, e, q) }
       println(f"Ep $ep%5d | ε=${agent.eps}%.3f | steps=${path.size}")

@@ -20,7 +20,7 @@ class GridQLearningIntegrationTest extends AnyFunSuite with Matchers:
       learningParameters = LearningParameters(alpha = 0.15, gamma = 0.9, eps0 = 0.5, epsMin = 0.1, warm = 100)
     )
 
-    // Test that episode method works
+
     val (done, steps, trajectory) = agent.episode()
 
     steps should be > 0

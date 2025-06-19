@@ -47,21 +47,21 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
       case "Stay" => Action.Stay
     }
 
-    // Calculate next state based on action
+
     val (deltaR, deltaC) = action.delta
     val nextState = State(currentState.x + deltaR, currentState.y + deltaC)
 
-    // Store initial Q-value for comparison
+
     initialQValue = agent.getQValue(currentState, action)
 
-    // Update Q-value
+
     agent.update(currentState, action, reward.toDouble, nextState)
 
-    // Update current state
+
     currentState = nextState
   }
   When("""the agent reaches the goal and receives reward {int}""") { (reward: Int) =>
-    val lastAction = Action.Right // o memorizzalo in una var se può variare
+    val lastAction = Action.Right
     agent.update(currentState, lastAction, reward.toDouble, goalState)
     agent.update(State(0, 0), Action.Right, reward.toDouble, goalState)
     currentState = goalState
@@ -80,8 +80,7 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
     currentQValue should be > initialQValue
   }
   Then("""the Q-value should reflect the discounted future reward""") { () =>
-    // This is verified implicitly by the Q-learning update formula
-    // The Q-value should incorporate both immediate and future rewards
+
     val currentQValue = agent.getQValue(currentState, Action.Right)
     currentQValue should be > 0.0
   }
@@ -108,10 +107,10 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
       case "Stay" => Action.Stay
     }
 
-    // Set this action to have the highest Q-value
+
     agent.update(currentState, action, 10.0, State(0, 0))
 
-    // Set other actions to have lower Q-values
+
     Action.values.foreach { a =>
       if (a != action) {
         agent.update(currentState, a, 1.0, State(0, 0))
@@ -136,12 +135,12 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
     }
   }
   Then("""approximately {int}% of actions should be exploratory""") { (pct: Int) =>
-    val totalActions = exploringCount + (100 - exploringCount) // Total is always 100 from the test
+    val totalActions = exploringCount + (100 - exploringCount)
     val exploratoryPct = exploringCount * 100.0 / totalActions
     exploratoryPct should be(pct.toDouble +- 10.0)
   }
   Then("""approximately {int}% should be the optimal action {string}""") { (pct: Int, _: String) =>
-    val totalActions = 100 // Total actions from the test
+    val totalActions = 100
     val optimalPct = optimalCount * 100.0 / totalActions
     optimalPct should be(pct.toDouble +- 10.0)
   }
@@ -202,14 +201,14 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
 
     currentState = state
     initialQValue = initialValue.toDouble
-    // The Q-value starts at 0 by default, which matches our test
+
   }
   When("""the agent receives immediate reward {int}""") { (reward: Int) =>
-    // This will be used in the Q-value update calculation
+
     goalReward = reward.toDouble
   }
   When("""the maximum future Q-value is {int}""") { (maxFutureQ: Int) =>
-    // Set up a future state with this Q-value
+
     val futureState = State(0, 1)
     agent.update(futureState, Action.Up, maxFutureQ.toDouble, State(0, 2))
   }
@@ -223,7 +222,7 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
     )
   }
   Then("""the new Q-value should be approximately {double}""") { (expectedValue: Double) =>
-    // Perform the update
+
     val nextState = State(0, 1)
     agent.update(currentState, Action.Right, goalReward, nextState)
 
@@ -231,8 +230,7 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
     newQValue should be(expectedValue +- 0.1)
   }
   Then("""the update should follow the Q-learning formula""") { () =>
-    // Q(s,a) ← (1-α)Q(s,a) + α[r + γ max Q(s',a')]
-    // This is verified by the previous assertion
+
     true shouldBe true
   }
 
@@ -241,15 +239,14 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
   }
   When("""the agent tries to choose an action""") { () =>
     val (action, wasExploring) = agent.choose(currentState)
-    // Action choice should still work in terminal states
+
   }
   Then("""no Q-value update should occur for future states""") { () =>
-    // In terminal states, there are no future states to consider
-    // This is handled by the environment, not the agent directly
+
     true shouldBe true
   }
   Then("""the episode should be marked as complete""") { () =>
-    // Episode completion is typically handled by the environment
+
     true shouldBe true
   }
 
@@ -263,20 +260,20 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
     )
   }
   When("""the agent encounters a new state-action pair""") { () =>
-    currentState = State(5, 5) // A new, unseen state
+    currentState = State(5, 5)
   }
   Then("""the initial Q-value should be {double}""") { (expectedValue: Double) =>
     val qValue = agent.getQValue(currentState, Action.Up)
     qValue should be(expectedValue +- 0.01)
   }
   Then("""this should encourage exploration of unknown areas""") { () =>
-    // Optimistic values encourage exploration by making unknown actions seem promising
+
     val qValue = agent.getQValue(currentState, Action.Up)
     qValue should be > 0.0
   }
 
   Given("""the agent has learned some Q-values""") { () =>
-    // Use alpha = 1 and gamma = 0 so that update sets the Q‑value exactly.
+
     agent = QLearner(
       goalState = State(0, 0),
       goalReward = 0.0,
@@ -302,7 +299,7 @@ class QLearningBehaviorSteps extends ScalaDsl with EN with Matchers:
   }
   When("""import the Q-Table""") { () =>
     exportedQTable.foreach { case ((s, a), v) =>
-      agent.update(s, a, v, s) // alpha = 1, gamma = 0  → exact assignment
+      agent.update(s, a, v, s)
     }
   }
   Then("""the new agent should have the same Q-values""") { () =>

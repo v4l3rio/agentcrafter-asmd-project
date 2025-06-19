@@ -35,7 +35,7 @@ object QTableFromLLMExample extends App with LLMQLearning:
       withLearner:
         Alpha >> 0.05
         Gamma >> 0.99
-        Eps0 >> 0 // with llm we can afford a lower initial exploration rate
+        Eps0 >> 0
         EpsMin >> 0
         Warm >> 500
         Optimistic >> 0.2

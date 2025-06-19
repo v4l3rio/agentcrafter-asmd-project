@@ -36,18 +36,18 @@ class Visualizer(
                   cell: Int = 60,
                   delayMs: Int = 100
                 ):
-  // Single-agent state
+
   private var singleAgentPos: Option[State] = None
   private var startPos: Option[State] = None
   private var goalPos: Option[State] = None
   private var lastQInfo = ""
 
-  // Multi-agent state
+
   private var multiAgentState: Map[String, State] = Map.empty
   private var goalCells: Set[State] = Set.empty
   private var switchCells: Set[State] = Set.empty
 
-  // Common state
+
   private var staticWalls: Set[State] = Set.empty
   private var openWalls: Set[State] = Set.empty
   private var step = 0
@@ -56,7 +56,7 @@ class Visualizer(
   private var episodeReward = 0.0
   private var epsilon = 0.0
 
-  // Visualization mode
+
   private var isSingleAgent = true
 
   private val colors = Array(
@@ -70,7 +70,7 @@ class Visualizer(
     override def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
 
-      // Draw grid and walls
+
       for r <- 0 until rows; c <- 0 until cols do
         val p = State(r, c)
         val x = c * cell
@@ -81,20 +81,20 @@ class Visualizer(
         g.setColor(Color.lightGray)
         g.drawRect(x, y, cell, cell)
 
-      // Draw special cells
+
       def fillCells(cells: Set[State], color: Color): Unit =
         cells.foreach { p =>
           g.setColor(color)
           g.fillRect(p.y * cell, p.x * cell, cell, cell)
         }
 
-      // Draw switch cells (yellow)
+
       fillCells(switchCells, Color.yellow)
 
-      // Draw goal cells (green)
+
       fillCells(goalCells, Color.green)
 
-      // Draw single-agent specific elements
+
       if isSingleAgent then
         startPos.foreach { s =>
           g.setColor(Color.cyan)
@@ -105,14 +105,14 @@ class Visualizer(
           g.fillRect(s.y * cell, s.x * cell, cell, cell)
         }
 
-        // Draw single agent
+  
         singleAgentPos.foreach { pos =>
           g.setColor(Color.blue)
           val m = cell / 6
           g.fillOval(pos.y * cell + m, pos.x * cell + m, cell - 2 * m, cell - 2 * m)
         }
       else
-        // Draw multiple agents
+  
         val m = cell / 6
         multiAgentState.zipWithIndex.foreach { case ((id, p), idx) =>
           val col = colors(idx % colors.length)
@@ -120,11 +120,11 @@ class Visualizer(
           g.fillOval(p.y * cell + m, p.x * cell + m, cell - 2 * m, cell - 2 * m)
         }
 
-      // Draw information overlay
+
       g.setColor(Color.black)
       val infoY = size.height - 80
 
-      // Display only requested fields
+
       g.drawString(s"Step: $step", 10, infoY)
       g.drawString(s"Episode: $episode", 10, infoY + 15)
       g.drawString(s"Mode: ${if explorationMode then "Exploration" else "Exploitation"}", 10, infoY + 30)

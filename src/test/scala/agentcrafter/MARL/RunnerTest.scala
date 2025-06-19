@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers
 
 class RunnerTest extends AnyFunSuite with Matchers:
 
-  // Helper method to create a simple WorldSpec for testing
+
   private def createSimpleWorldSpec(
                                      rows: Int = 5,
                                      cols: Int = 5,

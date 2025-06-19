@@ -24,7 +24,7 @@ import agentcrafter.common.State
  * - Educational demonstrations of reinforcement learning
  */
 object ConsoleVisualizer:
-  // finite alphabet a‒z, A‒Z; any step ≥52 is rendered as '*'
+  
   private val glyphs: IndexedSeq[Char] =
     ('a' to 'z') ++ ('A' to 'Z')
 
@@ -55,7 +55,7 @@ object ConsoleVisualizer:
    * @return Vector of strings, one per grid row
    */
   private def asciiLines(start: State, goal: State, walls: Set[State], path: List[State], rows: Int, cols: Int): Vector[String] =
-    // Map first visit only (ignore revisits)
+
     val firstVisit: Map[State, Int] =
       path.drop(1).zipWithIndex.foldLeft(Map.empty[State, Int]) {
         case (m, (s, i)) => if m.contains(s) then m else m.updated(s, i)

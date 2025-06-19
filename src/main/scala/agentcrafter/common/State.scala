@@ -18,9 +18,9 @@ package agentcrafter.common
  * @param y The column coordinate (horizontal position)
  * @example
  * {{{
- * val startState = State(0, 0)     // Top-left corner
- * val goalState = State(9, 8)      // Row 9, Column 8
- * val wallState = State(5, 3)      // Wall at row 5, column 3
+ * val startState = State(0, 0)
+ * val goalState = State(9, 8)
+ * val wallState = State(5, 3)
  * }}}
  */
 case class State(x: Int, y: Int)

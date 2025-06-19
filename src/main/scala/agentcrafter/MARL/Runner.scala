@@ -14,7 +14,7 @@ class Runner(spec: WorldSpec, showGui: Boolean):
 
   private val episodeManager = new EpisodeManager(spec, agentsQL)
 
-  // Direct visualization components
+
   private var visualizer: Option[Visualizer] = None
   private var qTableVisualizers: List[QTableVisualizer] = List.empty
   private var isVisualizationActive = false
@@ -43,7 +43,7 @@ class Runner(spec: WorldSpec, showGui: Boolean):
 
       isVisualizationActive = true
 
-  /* ---------- single episode ---------------------------------------- */
+
   private def runEpisode(): Int =
     val result = episodeManager.runEpisode { (state, steps, anyAgentExploring) =>
       if isVisualizationActive then
@@ -53,14 +53,14 @@ class Runner(spec: WorldSpec, showGui: Boolean):
           viz.updateSimulationInfo(currentEpisode, anyAgentExploring, state.reward, currentEpsilon)
         }
 
-        // Update Q-table visualizers periodically
+    
         if steps % 10 == 0 then
           qTableVisualizers.foreach(_.update())
     }
 
     result.steps
 
-  /* ---------- training cycle ---------------------------------------- */
+
   def run(): Unit =
     for ep <- 1 to spec.episodes do
       maybeInitializeVisualization(ep)

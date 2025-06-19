@@ -157,7 +157,7 @@ private class EpisodeRunner(
         val isGoal = stepResult.state == goalState
         val reward = if isGoal then goalReward else stepResult.reward
         
-        // Update Q-table
+    
         qTable.update(state, action, reward, stepResult.state, learningParams)
         
         val qValues = Action.values.map(qTable.getValue(state, _))

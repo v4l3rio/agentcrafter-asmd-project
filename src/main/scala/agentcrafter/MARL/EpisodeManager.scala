@@ -85,7 +85,7 @@ class EpisodeManager(spec: WorldSpec, agentsQL: Map[String, Learner]):
       steps += 1
       episodeReward += stepResult.totalReward
 
-      // Call visualization callback
+
       val currentState = EpisodeState(agentPositions, dynamicWalls.toSet, episodeDone, episodeReward)
       onStep(currentState, steps, stepResult.anyAgentExploring)
 
@@ -95,23 +95,23 @@ class EpisodeManager(spec: WorldSpec, agentsQL: Map[String, Learner]):
    * Executes a single step in the episode.
    */
   private def executeStep(): EpisodeStepResult =
-    // 1. Choose actions for all agents
+
     val jointActionsWithExploration: Map[String, (Action, Boolean)] =
       agentsQL.map { case (id, ql) => id -> ql.choose(agentPositions(id)) }
 
     val jointActions: Map[String, Action] = jointActionsWithExploration.view.mapValues(_._1).toMap
     val anyAgentExploring = jointActionsWithExploration.values.exists(_._2)
 
-    // 2. Execute actions and get new positions
+    
     val (nextPositions, stepRewards) = executeActions(jointActions)
 
-    // 3. Process triggers
+
     val triggerRewards = processTriggers(nextPositions)
 
-    // 4. Update Q-learning for all agents
+    
     updateQLearning(jointActions, stepRewards, triggerRewards, nextPositions)
 
-    // 5. Update state
+
     agentPositions = nextPositions
 
     val totalReward = (stepRewards.values.sum + triggerRewards.values.sum)
@@ -181,5 +181,3 @@ class EpisodeManager(spec: WorldSpec, agentsQL: Map[String, Learner]):
    */
   def incrementEpisode(): Unit =
     agentsQL.values.foreach(_.incEp())
-
-// Result types are now defined in agentcrafter.common.Results

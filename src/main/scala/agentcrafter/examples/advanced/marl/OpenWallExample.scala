@@ -21,18 +21,18 @@ object OpenWallExample extends App with SimulationDSL:
       8 x 12
 
     walls:
-      // Create a vertical wall dividing the grid
+
       line:
         Direction >> "vertical"
         From >> (1, 6)
         To >> (6, 6)
-      // Add some obstacles
+
       block >> (2, 2)
       block >> (3, 2)
       block >> (5, 9)
       block >> (6, 9)
 
-    // Agent that needs to open the wall
+
     agent:
       Name >> "Opener"
       Start >> (1, 1)
@@ -43,13 +43,13 @@ object OpenWallExample extends App with SimulationDSL:
         EpsMin >> 0.1
         Warm >> 1_500
         Optimistic >> 0.5
-      Goal >> (6, 2) // Switch location
+      Goal >> (6, 2)
       onGoal:
-        Give >> 25.0 // Reward for reaching the goal
+        Give >> 25.0
         OpenWall >> (4, 6)
-        EndEpisode >> false // End episode when Runner reaches the goal
+        EndEpisode >> false
 
-    // Agent that needs to reach the other side
+
     agent:
       Name >> "Runner"
       Start >> (1, 2)
@@ -60,10 +60,10 @@ object OpenWallExample extends App with SimulationDSL:
         EpsMin >> 0.1
         Warm >> 1_500
         Optimistic >> 0.5
-      Goal >> (6, 10) // Goal on the other side
+      Goal >> (6, 10)
       onGoal:
-        Give >> 55.0 // Reward for reaching the goal
-        EndEpisode >> true // End episode when Opener reaches the switch
+        Give >> 55.0
+        EndEpisode >> true
     Penalty >> -3.0
     Episodes >> 12_000
     Steps >> 300

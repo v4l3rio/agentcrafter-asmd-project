@@ -25,7 +25,3 @@ case class LLMConfig(
                       var wallsModel: String = "gpt-4o",
                       var wallsPrompt: String = ""
                     )
-
-// ── DSL properties are now managed as Enum in LLMDSLProperties.scala ──
-// The DSL keywords (Enabled, Model, WallsEnabled, WallsModel, WallsPrompt)
-// are implemented as enum cases in LLMDSLProperties for type safety and consistency.

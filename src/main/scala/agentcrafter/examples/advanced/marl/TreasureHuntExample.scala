@@ -36,7 +36,7 @@ object TreasureHuntExample extends App with SimulationDSL:
         |#......#
         |########"""
 
-    // WallOpener1: Activates switch 1 to open first door
+
     agent:
       Name >> "WallOpener1"
       Start >> (1, 1)
@@ -47,13 +47,13 @@ object TreasureHuntExample extends App with SimulationDSL:
         EpsMin >> 0.05
         Warm >> 3_000
         Optimistic >> 1.0
-      Goal >> (4, 1) // Switch 1 location
+      Goal >> (4, 1)
       onGoal:
-        Give >> 70.0 // Reward for activating switch 1
-        OpenWall >> (7, 5) // Open door 1
-        EndEpisode >> false // Continue until treasure is found
+        Give >> 70.0
+        OpenWall >> (7, 5)
+        EndEpisode >> false
 
-    // WallOpener2: Activates switch 2 to open second door
+
     agent:
       Name >> "WallOpener2"
       Start >> (1, 6)
@@ -64,13 +64,13 @@ object TreasureHuntExample extends App with SimulationDSL:
         EpsMin >> 0.05
         Warm >> 3_000
         Optimistic >> 1.0
-      Goal >> (3, 5) // Switch 2 location
+      Goal >> (3, 5)
       onGoal:
-        Give >> 70.0 // Reward for activating switch 2
-        OpenWall >> (5, 3) // Open door 2
-        EndEpisode >> false // Continue until treasure is found
+        Give >> 70.0
+        OpenWall >> (5, 3)
+        EndEpisode >> false
 
-    // Hunter: Claims the final treasure inside the chamber
+
     agent:
       Name >> "Hunter"
       Start >> (8, 1)
@@ -81,10 +81,10 @@ object TreasureHuntExample extends App with SimulationDSL:
         EpsMin >> 0.05
         Warm >> 3_000
         Optimistic >> 0.5
-      Goal >> (4, 3) // Treasure location inside the chamber
+      Goal >> (4, 3)
       onGoal:
-        Give >> 100.0 // Big reward for reaching treasure
-        EndEpisode >> true // End episode when treasure is claimed
+        Give >> 100.0
+        EndEpisode >> true
     Penalty >> -3.0
     Episodes >> 20_000
     Steps >> 600

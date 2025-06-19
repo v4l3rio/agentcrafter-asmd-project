@@ -9,7 +9,7 @@ import scala.util.{Failure, Success}
 
 class QTableLoaderTest extends AnyFunSuite with Matchers:
 
-  // make dummy GridWorld to satisfy QLearner's requirements
+  
   private def createSimpleGrid(): GridWorld =
     GridWorld(rows = 3, cols = 3, walls = Set.empty)
 
@@ -36,7 +36,7 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     val result = QTableLoader.loadQTableFromJson(validJson, learner)
     result shouldBe a[Success[?]]
 
-    // Verify that Q-values were loaded correctly
+
     learner.getQValue(State(0, 0), Action.Right) shouldBe 3.0
     learner.getQValue(State(0, 1), Action.Up) shouldBe 2.5
     learner.getQValue(State(1, 0), Action.Down) shouldBe 3.5

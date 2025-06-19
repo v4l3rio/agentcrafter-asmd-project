@@ -16,7 +16,7 @@ object LabyrinthExample extends App with SimulationDSL:
   simulation:
     grid:
       12 x 12
-    // Create a labyrinth using ASCII art
+
     asciiWalls:
       """############
         |#..........#
@@ -33,7 +33,7 @@ object LabyrinthExample extends App with SimulationDSL:
 
     agent:
       Name >> "Explorer"
-      Start >> (1, 1) // Top-left corner inside the maze
+      Start >> (1, 1)
       withLearner:
         Alpha >> 0.1
         Gamma >> 0.95

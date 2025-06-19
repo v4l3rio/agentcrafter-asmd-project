@@ -97,7 +97,7 @@ object QTableLoader:
     mapField.setAccessible(true)
     val internal = mapField.get(qTable).asInstanceOf[mutable.Map[(State, Action), Double]]
 
-    internal ++= table // bulk update
+    internal ++= table
   }.recoverWith { case NonFatal(e) =>
     Failure(new RuntimeException("Failed to inject Q‑values via reflection: " + e.getMessage, e))
   }

@@ -87,14 +87,14 @@ class QLearner private(
                         updateFunction: UpdateFunction,
                         resetFunction: ResetFunction
                       ) extends Learner:
-  /** Random number generator for stochastic action selection */
+
   private given rng: Random = Random()
 
   /**
    * Internal Q-table implementation that stores and manages Q-values.
    */
   private class QTable:
-    /** The underlying table storing Q-values with optimistic initialization */
+
     private val table: mutable.Map[(State, Action), Double] = mutable.Map().withDefaultValue(learningParameters.optimistic)
 
     /**
@@ -144,19 +144,19 @@ class QLearner private(
    * Represents the type of action selection made by the agent.
    */
   enum Choice:
-    /** Action was chosen through exploration (random selection) */
+
     case Exploring(action: Action)
-    /** Action was chosen through exploitation (greedy selection) */
+
     case Exploiting(state: State)
 
 
-  /** Array of all possible actions */
+
   private val A = Action.values
 
-  /** The Q-table storing learned values */
+
   private val Q: QTable = new QTable()
 
-  /** Current episode number */
+
   private var ep = 0
 
   /**
@@ -191,7 +191,7 @@ class QLearner private(
 
         val StepResult(nextState, nextStateReward) = updateFunction(state, action)
         val isGoal = nextState == goalState
-        val reward = if isGoal then goalReward else nextStateReward // Step penalty
+        val reward = if isGoal then goalReward else nextStateReward
 
         Q.update(state, action, reward, nextState)
 
@@ -210,7 +210,7 @@ class QLearner private(
   def getQValue(state: State, action: Action): Double =
     Q.tableSnapshot().getOrElse((state, action), learningParameters.optimistic)
 
-  // MARL compatibility methods
+
   def choose(state: State): (Action, Boolean) =
     chooseInternal(state) match
       case Choice.Exploring(action) => (action, true)

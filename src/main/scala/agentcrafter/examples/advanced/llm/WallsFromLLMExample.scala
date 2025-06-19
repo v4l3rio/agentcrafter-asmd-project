@@ -20,7 +20,7 @@ object WallsFromLLMExample extends App with LLMQLearning:
     grid:
       12 x 15
 
-    // Generate walls using LLM with cooperative elements
+
     wallsFromLLM:
       Model >> "gpt-4o"
       Prompt >>
@@ -34,41 +34,41 @@ object WallsFromLLMExample extends App with LLMQLearning:
         - Include some rooms connected by narrow corridors
         """
 
-    // Agent 1: SwitchOperator - must reach the switch to open the wall
+
     agent:
       Name >> "SwitchOperator"
       Start >> (1, 1)
       withLearner:
         Alpha >> 0.12
         Gamma >> 0.95
-        Eps0 >> 0.8 // High exploration to find the switch
+        Eps0 >> 0.8
         EpsMin >> 0.05
         Warm >> 2_000
         Optimistic >> 0.4
-      Goal >> (3, 3) // Switch location
+      Goal >> (3, 3)
       onGoal:
-        Give >> 75.0 // Reward for activating the switch
-        OpenWall >> (6, 7) // Open the critical wall
-        EndEpisode >> false // Continue until Runner reaches goal
+        Give >> 75.0
+        OpenWall >> (6, 7)
+        EndEpisode >> false
 
-    // Agent 2: Runner - needs to pass through the opened wall to reach the goal
+
     agent:
       Name >> "Runner"
       Start >> (10, 1)
       withLearner:
         Alpha >> 0.1
         Gamma >> 0.95
-        Eps0 >> 0.6 // Lower exploration, focus on reaching goal
+        Eps0 >> 0.6
         EpsMin >> 0.05
         Warm >> 2_000
         Optimistic >> 0.3
-      Goal >> (10, 13) // Final destination (only reachable after wall opens)
+      Goal >> (10, 13)
       onGoal:
-        Give >> 150.0 // Higher reward for completing the mission
-        EndEpisode >> true // End episode when Runner reaches goal
+        Give >> 150.0
+        EndEpisode >> true
 
     Episodes >> 5_000
-    Steps >> 800 // More steps needed for complex LLM-generated maze
+    Steps >> 800
     ShowAfter >> 4_500
     Delay >> 80
     WithGUI >> true

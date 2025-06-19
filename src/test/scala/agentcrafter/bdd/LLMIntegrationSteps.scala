@@ -14,10 +14,10 @@ import scala.util.{Failure, Success, Try}
 
 class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
 
-  // Test simulation class that extends LLMQLearning
+
   private class TestSimulation extends SimulationDSL with LLMQLearning
 
-  // Variables to track state
+
   private var simulation: TestSimulation = uninitialized
   private var llmConfig: LLMConfig = uninitialized
   private var simulationWrapper: SimulationWrapper = uninitialized
@@ -28,7 +28,7 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   private var agentCount: Int = 0
   private var loggedWarnings: mutable.Buffer[String] = mutable.Buffer.empty
 
-  // Mock LLM API client for testing
+
   private class MockLLMApiClient extends LLMHttpClient("mock-url", "mock-key"):
     override def callLLM(
                           prompt: String = "",
@@ -49,7 +49,7 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   private def createSimpleGrid(): GridWorld =
     GridWorld(rows = 3, cols = 3, walls = Set.empty)
 
-  // Background
+
   Given("""the LLM integration system is available""") { () =>
     simulation = new TestSimulation()
     simulationWrapper = SimulationWrapper(new SimulationBuilder)
@@ -60,7 +60,7 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
     loggedWarnings.clear()
   }
 
-  // Scenario: Enabling LLM for simulation
+
   Given("""I create a simulation with LLM enabled""") { () =>
     given config: LLMConfig = llmConfig
 
@@ -74,12 +74,12 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   }
 
   Given("""I add an agent to the simulation""") { () =>
-    // Add a test agent to the simulation
+
     agentCount += 1
   }
 
   When("""I run the simulation""") { () =>
-    // Simulate running the simulation with LLM integration
+
     if llmConfig.enabled then
       apiCallsMade = true
   }
@@ -89,11 +89,11 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   }
 
   Then("""the agent should start with LLM-provided knowledge""") { () =>
-    // Verify that the agent has non-default Q-values
+
     llmConfig.enabled shouldBe true
   }
 
-  // Scenario: LLM configuration with different models
+
   Given("""I enable LLM with model "gpt-3.5-turbo"""") { () =>
     given config: LLMConfig = llmConfig
 
@@ -102,7 +102,7 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   }
 
   When("""I configure the simulation""") { () =>
-    // Configuration is done in the Given steps
+
   }
 
   Then("""the LLM configuration should use the specified model""") { () =>
@@ -114,7 +114,7 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
     llmConfig.model should not be empty
   }
 
-  // Scenario: Simulation without LLM
+
   Given("""I create a simulation without enabling LLM""") { () =>
     given config: LLMConfig = llmConfig
 
@@ -122,7 +122,7 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   }
 
   Then("""the agent should start with default Q-values""") { () =>
-    // Verify that the agent has default Q-values
+
     llmConfig.enabled shouldBe false
   }
 
@@ -130,7 +130,7 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
     apiCallsMade shouldBe false
   }
 
-  // Scenario: LLM API failure handling
+
   Given("""I enable LLM for the simulation""") { () =>
     given config: LLMConfig = llmConfig
 
@@ -142,7 +142,7 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   }
 
   When("""I attempt to run the simulation""") { () =>
-    // Simulate running the simulation with a failing LLM API
+
     if llmConfig.enabled then
       try {
         val mockClient = new MockLLMApiClient()
@@ -156,21 +156,21 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   }
 
   Then("""the simulation should handle the failure gracefully""") { () =>
-    // Verify that no exceptions were thrown
+
     apiCallsMade shouldBe true
   }
 
   Then("""the agent should fall back to default initialization""") { () =>
-    // Verify that the agent falls back to default initialization
+
     mockApiError shouldBe defined
   }
 
   Then("""an appropriate warning should be logged""") { () =>
-    // Verify that a warning was logged
+
     loggedWarnings should not be empty
   }
 
-  // Scenario: LLM returns invalid Q-Table format
+
   Given("""the LLM returns malformed JSON""") { () =>
     mockApiResponse = Some("""This is not valid JSON""")
   }
@@ -193,29 +193,29 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   }
 
   Then("""the agent should use default Q-values""") { () =>
-    // Verify that the agent uses default Q-values
+
     qTableLoadResult shouldBe a[Failure[?]]
   }
 
   Then("""the error should be properly reported""") { () =>
-    // Verify that the error is properly reported
+
     qTableLoadResult.failed.get.getMessage should include("Failed to load Q-Table from JSON")
   }
 
-  // Scenario: Multiple agents with LLM
+
   Given("""I add multiple agents with different configurations""") { () =>
-    // Add multiple test agents to the simulation
+
     agentCount = 3
   }
 
   Then("""each agent should receive appropriate LLM-generated Q-Tables""") { () =>
-    // Verify that each agent receives a Q-Table
+
     agentCount should be > 1
     llmConfig.enabled shouldBe true
   }
 
   Then("""the Q-Tables should be tailored to each agent's environment""") { () =>
-    // Verify that the Q-Tables are tailored to each agent's environment
+
     agentCount should be > 1
     llmConfig.enabled shouldBe true
   }

@@ -63,13 +63,11 @@ class GridWorld private (val rows: Int, val cols: Int, val walls: Set[State], st
     val (dr, dc) = a.delta
     val intendedNext = State(s.x + dr, s.y + dc)
     
-    // Check if the intended move is valid (within bounds and not a wall)
+
     val isValidMove = intendedNext.x >= 0 && intendedNext.x < rows &&
                       intendedNext.y >= 0 && intendedNext.y < cols &&
                       !walls.contains(intendedNext)
     
     val next = if isValidMove then intendedNext else s
-    // if you want to extend the implementation to make different
-    // states give different rewards you can do it here,
-    // for now each step gives a penalty
+
     StepResult(next, stepPenalty)

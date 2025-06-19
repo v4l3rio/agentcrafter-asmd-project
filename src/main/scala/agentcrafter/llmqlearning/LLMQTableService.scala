@@ -6,7 +6,7 @@ import agentcrafter.MARL.builders.SimulationBuilder
 import scala.collection.mutable
 import scala.util.{Failure, Success}
 
-/** Service responsible for LLM Q-table generation and loading into agents. */
+
 object LLMQTableService:
 
   /**

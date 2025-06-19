@@ -20,9 +20,9 @@ class SimulationBuilder:
   private val triggers = mutable.Buffer.empty[Trigger]
   private var nEpisodes = 10_000
   private var stepLimit = 400
-  private var stepDelay = 70 // ms between steps in GUI mode
+  private var stepDelay = 70
   private var showAfter = 0
-  private var stepPenalty = -3.0 // default step penalty for agents
+  private var stepPenalty = -3.0
 
   private var gui = false
 
@@ -133,7 +133,7 @@ class SimulationBuilder:
    */
   def getWalls: Set[State] = walls.toSet
 
-  /** Internal helper to create a trigger builder. */
+
   private[MARL] def newTrigger(who: String, r: Int, c: Int): TriggerBuilder =
     new TriggerBuilder(who, r, c, this)
 

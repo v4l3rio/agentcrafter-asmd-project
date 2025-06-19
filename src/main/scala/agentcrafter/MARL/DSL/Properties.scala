@@ -83,7 +83,7 @@ enum WallProperty[T]:
     case WallProperty.Line =>
       val lineConfig = obj.asInstanceOf[LineWallConfig]
       lineConfig.direction match
-        case "horizontal" => // Support both spellings
+        case "horizontal" =>
           val minCol = math.min(lineConfig.from._2, lineConfig.to._2)
           val maxCol = math.max(lineConfig.from._2, lineConfig.to._2)
           for col <- minCol to maxCol do

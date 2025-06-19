@@ -14,7 +14,7 @@ package agentcrafter.common
  * @example
  * {{{
  * val action = Action.Up
- * val (deltaRow, deltaCol) = action.delta  // (-1, 0)
+ * val (deltaRow, deltaCol) = action.delta
  * }}}
  */
 enum Action(val delta: (Int, Int))derives CanEqual:
