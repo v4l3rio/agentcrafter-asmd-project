@@ -23,7 +23,7 @@ The project is built around a modular architecture with the following key compon
 1. **Common Framework** (`agentcrafter.common`): Shared abstractions including:
    - `Environment` trait for defining RL environments
    - `GridWorld` implementation for grid-based environments
-   - `QLearner` and `MDPLearner` for different learning algorithms
+   - `QLearner` for Q-learning algorithm implementation
    - `State`, `Action`, and `StepResult` core data types
 
 2. **Multi-Agent Reinforcement Learning (MARL)** (`agentcrafter.marl`):
