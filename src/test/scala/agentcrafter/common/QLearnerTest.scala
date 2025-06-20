@@ -3,6 +3,13 @@ package agentcrafter.common
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
+/**
+ * Unit tests for QLearner functionality.
+ *
+ * This test suite verifies the core behavior of the QLearner implementation,
+ * including parameter handling, Q-value updates, action selection, and
+ * learning convergence properties.
+ */
 class QLearnerTest extends AnyFunSuite with Matchers:
 
   private def learner(lp: LearningParameters = LearningParameters()): QLearner =

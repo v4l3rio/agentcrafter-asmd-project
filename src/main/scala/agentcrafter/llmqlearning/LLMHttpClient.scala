@@ -11,11 +11,6 @@ import scala.concurrent.duration.Duration
 import scala.io.Source
 import scala.util.{Failure, Try, Using}
 
-val dotenv: Dotenv =
-  Dotenv.configure()
-    .ignoreIfMissing()
-    .load()
-
 /**
  * Client for interacting with Large Language Model APIs.
  *
@@ -30,7 +25,7 @@ val dotenv: Dotenv =
  */
 class LLMHttpClient(
   baseUrl: String = "https://api.openai.com",
-  apiKey: String = dotenv.get("OPENAI_API_KEY", "API")
+  apiKey: String = Dotenv.configure().ignoreIfMissing().load().get("OPENAI_API_KEY", "API")
 ):
   /**
    * Trigger an LLM generation.

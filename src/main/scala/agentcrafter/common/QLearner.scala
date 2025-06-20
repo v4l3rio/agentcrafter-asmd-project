@@ -54,11 +54,43 @@ case class LearningParameters(
   def calculateEpsilon(ep: Int): Double =
     if ep < warm then eps0 else math.max(epsMin, eps0 - (eps0 - epsMin) * (ep - warm) / warm)
 
+/**
+ * Type alias for representing an agent's trajectory during an episode.
+ * Contains state, action, exploration flag, and Q-values for each step.
+ */
 private type Trajectory = List[(State, Action, Boolean, Array[Double])]
+
+/**
+ * Type alias for reward values in the learning system.
+ */
 type Reward = Double
+
+/**
+ * Type alias for agent identifiers.
+ */
 type ID = String
+
+/**
+ * Type alias for episode outcomes containing success status, step count, and trajectory.
+ * 
+ * @return A tuple of (success: Boolean, steps: Int, trajectory: Trajectory)
+ */
 type EpisodeOutcome = (Boolean, Int, Trajectory)
+
+/**
+ * Type alias for environment update functions that handle state transitions.
+ * 
+ * @param state The current state
+ * @param action The action to take
+ * @return StepResult containing the next state and reward
+ */
 type UpdateFunction = (State, Action) => StepResult
+
+/**
+ * Type alias for environment reset functions that return the initial state.
+ * 
+ * @return The initial state for a new episode
+ */
 type ResetFunction = () => State
 
 extension [T](actions: Array[T]) private def draw(using rng: Random) = actions(rng.nextInt(actions.length))
