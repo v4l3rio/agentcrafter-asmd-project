@@ -105,14 +105,13 @@ enum LineProperty[T]:
   infix def >>(obj: T)(using lineBuilder: WallLineBuilder): WallLineBuilder =
     this match
       case LineProperty.Direction =>
-        lineBuilder.direction = Some(obj.asInstanceOf[String])
-        lineBuilder
+        lineBuilder.withDirection(obj.asInstanceOf[String])
       case LineProperty.From =>
-        lineBuilder.from = Some(obj.asInstanceOf[(Int, Int)])
-        lineBuilder
+        val (x, y) = obj.asInstanceOf[(Int, Int)]
+        lineBuilder.withFrom(x, y)
       case LineProperty.To =>
-        lineBuilder.to = Some(obj.asInstanceOf[(Int, Int)])
-        lineBuilder
+        val (x, y) = obj.asInstanceOf[(Int, Int)]
+        lineBuilder.withTo(x, y)
 
 object block:
   @targetName("to")

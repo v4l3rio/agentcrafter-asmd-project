@@ -73,6 +73,14 @@ class SimulationBuilder:
     new TriggerBuilder(who, x, y, this)
 
   /**
+   * Creates a new wall line builder for configuring a line of walls.
+   *
+   * @return
+   *   A new WallLineBuilder instance for configuring the wall line
+   */
+  def newWallLine(): WallLineBuilder = new WallLineBuilder(this)
+
+  /**
    * Sets the penalty applied for each step taken by agents.
    *
    * @param penalty

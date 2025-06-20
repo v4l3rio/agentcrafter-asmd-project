@@ -125,14 +125,10 @@ trait Simulationdsl:
    *   if direction, from, or to are not specified
    */
   def line(block: WallLineBuilder ?=> Unit)(using wrapper: SimulationWrapper): Unit =
-    given lineBuilder: WallLineBuilder = WallLineBuilder()
+    given lineBuilder: WallLineBuilder = wrapper.builder.newWallLine()
 
     block
-    // Create wall from the configured line builder
-    (lineBuilder.direction, lineBuilder.from, lineBuilder.to) match
-      case (Some(dir), Some(fromPos), Some(toPos)) =>
-        WallProperty.Line >> LineWallConfig(dir, fromPos, toPos)
-      case _ => throw new IllegalArgumentException("Line must have direction, from, and to specified")
+    wrapper.builder = lineBuilder.build()
 
   /**
    * Defines an agent in the simulation.
