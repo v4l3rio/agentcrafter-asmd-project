@@ -43,7 +43,7 @@ object GridWorld:
  *   - Customizable start and goal positions
  *   - Wall obstacles that block movement
  *   - Reward structure with step penalties and goal rewards
- *   - Boundary clamping (agents cannot move outside the grid)
+ *   - Toroidal wrapping (agents moving out of bounds appear on the opposite side)
  *
  * The coordinate system uses (row, column) indexing starting from (0, 0) at the top-left.
  *
@@ -74,12 +74,12 @@ class GridWorld private (override val rows: Int, override val cols: Int, val wal
    */
   override def step(s: State, a: Action): StepResult =
     val (dr, dc) = a.delta
-    val intendedNext = State(s.x + dr, s.y + dc)
-
-    val isValidMove = intendedNext.x >= 0 && intendedNext.x < rows &&
-      intendedNext.y >= 0 && intendedNext.y < cols &&
-      !walls.contains(intendedNext)
-
+    val intendedNextRaw = State(s.x + dr, s.y + dc)
+    // Toroidal wrapping
+    val wrappedX = (intendedNextRaw.x + rows) % rows
+    val wrappedY = (intendedNextRaw.y + cols) % cols
+    val intendedNext = State(wrappedX, wrappedY)
+  
+    val isValidMove = !walls.contains(intendedNext)
     val next = if isValidMove then intendedNext else s
-
     StepResult(next, stepPenalty)
