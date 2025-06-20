@@ -1,6 +1,6 @@
-package agentcrafter.MARL.scenarios
+package agentcrafter.marl.scenarios
 
-import agentcrafter.MARL.DSL.*
+import agentcrafter.marl.dsl.*
 
 /**
  * Wall Scenario: Two agents cooperate to solve a task.
@@ -8,7 +8,7 @@ import agentcrafter.MARL.DSL.*
  * - Agent "Runner" must reach a goal on the other side of the wall
  * - The simulation ends when both agents reach their respective goals
  */
-object OpenWallExample extends App with SimulationDSL:
+object OpenWallExample extends App with Simulationdsl:
 
   import AgentProperty.*
   import LearnerProperty.*

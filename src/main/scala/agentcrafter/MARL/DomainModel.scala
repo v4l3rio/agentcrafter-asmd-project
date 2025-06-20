@@ -1,11 +1,11 @@
-package agentcrafter.MARL
+package agentcrafter.marl
 
 import agentcrafter.common.{Learner, State}
 
 /**
- * Domain model for Multi-Agent Reinforcement Learning (MARL) simulations.
+ * Domain model for Multi-Agent Reinforcement Learning (marl) simulations.
  *
- * This file defines the core data structures used to represent MARL environments, including effects, triggers, agent
+ * This file defines the core data structures used to represent marl environments, including effects, triggers, agent
  * specifications, and world configurations.
  */
 
@@ -52,7 +52,7 @@ case class Reward(delta: Double) extends Effect
 case class Trigger(who: String, at: State, effects: List[Effect])
 
 /**
- * Specification for a single agent in the MARL environment.
+ * Specification for a single agent in the marl environment.
  *
  * @param id
  *   Unique identifier for the agent
@@ -66,7 +66,7 @@ case class Trigger(who: String, at: State, effects: List[Effect])
 case class AgentSpec(id: String, start: State, goal: State, learner: Learner)
 
 /**
- * Complete specification for a MARL world/environment.
+ * Complete specification for a marl world/environment.
  *
  * This contains all the information needed to run a multi-agent simulation, including world dimensions, obstacles,
  * agents, and simulation parameters.

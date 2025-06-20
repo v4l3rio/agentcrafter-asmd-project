@@ -8,7 +8,7 @@ import scala.annotation.targetName
  * This class encapsulates all configuration parameters needed for LLM-enhanced Q-learning, including model selection,
  * feature toggles, and specialized configurations for different LLM-powered features like dynamic wall generation.
  *
- * The class is designed to work with the AgentCrafter DSL, providing a fluent interface for configuring LLM behavior in
+ * The class is designed to work with the AgentCrafter dsl, providing a fluent interface for configuring LLM behavior in
  * reinforcement learning experiments.
  *
  * @param enabled

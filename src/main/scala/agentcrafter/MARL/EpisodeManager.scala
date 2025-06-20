@@ -1,11 +1,11 @@
-package agentcrafter.MARL
+package agentcrafter.marl
 
 import agentcrafter.common.*
 
 import scala.collection.mutable
 
 /**
- * Manages the execution of individual episodes in a Multi-Agent Reinforcement Learning (MARL) simulation.
+ * Manages the execution of individual episodes in a Multi-Agent Reinforcement Learning (marl) simulation.
  *
  * This class orchestrates the complex interactions between multiple learning agents in a shared environment, handling
  * state transitions, trigger activations, dynamic environment changes, and coordinated Q-learning updates. It maintains
@@ -35,7 +35,7 @@ class EpisodeManager(spec: WorldSpec, agentsQL: Map[String, Learner]):
   private var episodeReward = 0.0
 
   /**
-   * Executes a complete episode of the MARL simulation.
+   * Executes a complete episode of the marl simulation.
    *
    * This method runs the main episode loop, coordinating agent actions, environment transitions, and Q-learning updates
    * until the episode terminates (either by reaching a goal, hitting the step limit, or through a trigger effect).

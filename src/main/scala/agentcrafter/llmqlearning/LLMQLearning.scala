@@ -1,13 +1,13 @@
 package agentcrafter.llmqlearning
 
-import agentcrafter.MARL.DSL.{SimulationDSL, SimulationWrapper}
-import agentcrafter.MARL.builders.SimulationBuilder
+import agentcrafter.marl.dsl.{Simulationdsl, SimulationWrapper}
+import agentcrafter.marl.builders.SimulationBuilder
 
 /**
- * Mixin that augments the base `SimulationDSL` with an `useLLM { … }` block allowing users to enable LLM‑generated
+ * Mixin that augments the base `Simulationdsl` with an `useLLM { … }` block allowing users to enable LLM‑generated
  * Q‑tables.
  */
-trait LLMQLearning extends SimulationDSL:
+trait LLMQLearning extends Simulationdsl:
 
   private var llmConfig: LLMConfig = LLMConfig()
 

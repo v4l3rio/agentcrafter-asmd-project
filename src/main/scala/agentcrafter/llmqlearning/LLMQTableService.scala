@@ -1,7 +1,7 @@
 package agentcrafter.llmqlearning
 
-import agentcrafter.MARL.AgentSpec
-import agentcrafter.MARL.builders.SimulationBuilder
+import agentcrafter.marl.AgentSpec
+import agentcrafter.marl.builders.SimulationBuilder
 
 import scala.collection.mutable
 import scala.util.{Failure, Success}
@@ -16,7 +16,7 @@ object LLMQTableService:
    * @param model
    *   The LLM model to use
    * @param simulationFilePath
-   *   Path to the file containing simulation DSL content
+   *   Path to the file containing simulation dsl content
    * @return
    *   Some(qTableJson) if successful, None otherwise
    */

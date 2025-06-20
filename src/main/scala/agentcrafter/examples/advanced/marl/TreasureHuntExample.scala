@@ -1,6 +1,6 @@
-package agentcrafter.MARL.scenarios
+package agentcrafter.marl.scenarios
 
-import agentcrafter.MARL.DSL.*
+import agentcrafter.marl.dsl.*
 
 /**
  * Treasure Hunt Scenario: A creative multi-agent cooperation scenario.
@@ -13,7 +13,7 @@ import agentcrafter.MARL.DSL.*
  * The agents must coordinate: both switches must be activated to open
  * the walls before the hunter can reach the treasure inside.
  */
-object TreasureHuntExample extends App with SimulationDSL:
+object TreasureHuntExample extends App with Simulationdsl:
 
   import AgentProperty.*
   import LearnerProperty.*

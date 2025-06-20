@@ -1,6 +1,6 @@
-package agentcrafter.MARL.DSL
+package agentcrafter.marl.dsl
 
-import agentcrafter.MARL.builders.{AgentBuilder, SimulationBuilder, TriggerBuilder, WallLineBuilder}
+import agentcrafter.marl.builders.{AgentBuilder, SimulationBuilder, TriggerBuilder, WallLineBuilder}
 
 import scala.annotation.targetName
 

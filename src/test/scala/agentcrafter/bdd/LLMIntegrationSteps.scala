@@ -1,7 +1,7 @@
 package agentcrafter.steps
 
-import agentcrafter.MARL.DSL.{SimulationDSL, SimulationWrapper}
-import agentcrafter.MARL.builders.SimulationBuilder
+import agentcrafter.marl.DSL.{SimulationDSL, SimulationWrapper}
+import agentcrafter.marl.builders.SimulationBuilder
 import agentcrafter.common.{GridWorld, QLearner, State}
 import agentcrafter.llmqlearning.LLMDSLProperties.*
 import agentcrafter.llmqlearning.{LLMConfig, LLMHttpClient, LLMQLearning, QTableLoader}

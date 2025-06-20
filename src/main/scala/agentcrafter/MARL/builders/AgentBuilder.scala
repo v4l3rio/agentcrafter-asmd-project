@@ -1,6 +1,6 @@
-package agentcrafter.MARL.builders
+package agentcrafter.marl.builders
 
-import agentcrafter.MARL.{AgentSpec, Trigger}
+import agentcrafter.marl.{AgentSpec, Trigger}
 import agentcrafter.common.*
 
 import scala.compiletime.uninitialized
@@ -124,6 +124,6 @@ class AgentBuilder(parent: SimulationBuilder):
     parent.addAgent(id, spec)
     parent
 
-  private[MARL] def currentId: String = id
+  private[marl] def currentId: String = id
 
-  private[MARL] def currentGoal: State = gl
+  private[marl] def currentGoal: State = gl

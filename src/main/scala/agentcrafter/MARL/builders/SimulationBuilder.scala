@@ -1,12 +1,33 @@
-package agentcrafter.MARL.builders
+package agentcrafter.marl.builders
 
-import agentcrafter.MARL.{AgentSpec, Runner, Trigger, WorldSpec}
+import agentcrafter.marl.builders.{AgentBuilder, TriggerBuilder}
+import agentcrafter.marl.{AgentSpec, Trigger, WorldSpec}
 import agentcrafter.common.State
+import agentcrafter.marl.Runner
 
 import scala.collection.mutable
 
 /**
- * Builder for creating Multi-Agent Reinforcement Learning (MARL) simulations.
+ * Constants for SimulationBuilder default values
+ */
+object SimulationBuilderConstants:
+  /** Default number of rows */
+  val DEFAULT_ROWS: Int = 5
+  /** Default number of columns */
+  val DEFAULT_COLS: Int = 5
+  /** Default step limit */
+  val DEFAULT_STEP_LIMIT: Int = 400
+  /** Default step delay in milliseconds */
+  val DEFAULT_STEP_DELAY: Int = 70
+  /** Default show after episodes */
+  val DEFAULT_SHOW_AFTER: Int = 0
+  /** Default step penalty */
+  val DEFAULT_STEP_PENALTY: Double = -3.0
+  /** Default number of episodes */
+  val DEFAULT_EPISODES: Int = 10_000
+
+/**
+ * Builder for creating Multi-Agent Reinforcement Learning (marl) simulations.
  *
  * This class provides a fluent API for configuring simulations with multiple agents, environmental obstacles (walls),
  * triggers, and various simulation parameters. The builder pattern allows for flexible and readable simulation setup.
@@ -15,13 +36,13 @@ class SimulationBuilder:
   private val walls = mutable.Set.empty[State]
   private val agents = mutable.Map.empty[String, AgentSpec]
   private val triggers = mutable.Buffer.empty[Trigger]
-  private var rows = 5
-  private var cols = 5
-  private var nEpisodes = 10_000
-  private var stepLimit = 400
-  private var stepDelay = 70
-  private var showAfter = 0
-  private var stepPenalty = -3.0
+  private var rows = SimulationBuilderConstants.DEFAULT_ROWS
+  private var cols = SimulationBuilderConstants.DEFAULT_COLS
+  private var nEpisodes = SimulationBuilderConstants.DEFAULT_EPISODES
+  private var stepLimit = SimulationBuilderConstants.DEFAULT_STEP_LIMIT
+  private var stepDelay = SimulationBuilderConstants.DEFAULT_STEP_DELAY
+  private var showAfter = SimulationBuilderConstants.DEFAULT_SHOW_AFTER
+  private var stepPenalty = SimulationBuilderConstants.DEFAULT_STEP_PENALTY
 
   private var gui = false
 
@@ -50,7 +71,7 @@ class SimulationBuilder:
   def grid(rows: Int, cols: Int): SimulationBuilder =
     this.rows = rows; this.cols = cols; this
 
-  private[MARL] def newTrigger(who: String, x: Int, y: Int): TriggerBuilder =
+  private[marl] def newTrigger(who: String, x: Int, y: Int): TriggerBuilder =
     new TriggerBuilder(who, x, y, this)
 
   /**

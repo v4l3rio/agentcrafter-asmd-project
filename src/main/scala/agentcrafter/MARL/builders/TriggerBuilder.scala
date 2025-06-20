@@ -1,6 +1,7 @@
-package agentcrafter.MARL.builders
+package agentcrafter.marl.builders
 
-import agentcrafter.MARL.*
+import agentcrafter.marl.OpenWall
+import agentcrafter.marl.*
 import agentcrafter.common.State
 
 import scala.collection.mutable
@@ -65,6 +66,6 @@ class TriggerBuilder(who: String, x: Int, y: Int, parent: SimulationBuilder):
    * @return
    *   The parent SimulationBuilder for continued configuration
    */
-  private[MARL] def build(): SimulationBuilder =
+  private[marl] def build(): SimulationBuilder =
     parent.addTrigger(Trigger(who, State(x, y), eff.toList))
     parent

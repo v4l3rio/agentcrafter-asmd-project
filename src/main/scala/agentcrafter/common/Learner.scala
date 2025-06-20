@@ -53,7 +53,7 @@ trait Learner:
    * @return
    *   An EpisodeOutcome containing success status, step count, and trajectory
    */
-  def episode(maxSteps: Int = 200): EpisodeOutcome
+  def episode(maxSteps: Int = QLearnerConstants.DEFAULT_MAX_STEPS): EpisodeOutcome
 
   /**
    * Gets the current exploration rate (epsilon) for epsilon-greedy policies.

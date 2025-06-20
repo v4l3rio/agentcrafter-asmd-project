@@ -44,7 +44,7 @@ class LLMHttpClient(
    * @param endpoint
    *   API path (default: "/v1/chat/completions")
    * @param simulationFilePath
-   *   Optional path to the file containing simulation DSL content
+   *   Optional path to the file containing simulation dsl content
    */
   def callLLM(
     prompt: String = "",
@@ -70,7 +70,7 @@ class LLMHttpClient(
    * @param endpoint
    *   The API endpoint
    * @param simContent
-   *   The simulation DSL content to include
+   *   The simulation dsl content to include
    * @return
    *   Try containing the LLM response or an error
    */
@@ -84,7 +84,7 @@ class LLMHttpClient(
     val enhancedPrompt =
       s"""$prompt
          |
-         |Simulation DSL content:
+         |Simulation dsl content:
          |$simContent""".stripMargin
 
     val body: String =
@@ -169,7 +169,7 @@ class LLMHttpClient(
    * Reads simulation content from the specified file path.
    *
    * @param simulationFilePath
-   *   Optional path to the file containing simulation DSL content
+   *   Optional path to the file containing simulation dsl content
    * @return
    *   Try containing the simulation content or an error message
    */
@@ -201,7 +201,7 @@ class LLMHttpClient(
    * Filters out wallsFromLLM blocks from simulation content to prevent prompt duplication.
    *
    * @param content
-   *   The simulation DSL content
+   *   The simulation dsl content
    * @return
    *   Content with wallsFromLLM blocks removed
    */

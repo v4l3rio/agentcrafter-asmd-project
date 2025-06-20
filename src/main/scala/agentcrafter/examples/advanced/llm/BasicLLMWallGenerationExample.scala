@@ -1,6 +1,6 @@
 package agentcrafter.examples.advanced.llm
 
-import agentcrafter.MARL.DSL.*
+import agentcrafter.marl.dsl.*
 import agentcrafter.llmqlearning.LLMQLearning
 
 /**

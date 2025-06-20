@@ -1,15 +1,15 @@
-package agentcrafter.MARL.DSL
+package agentcrafter.marl.dsl
 
-import agentcrafter.MARL.builders.{AgentBuilder, SimulationBuilder, TriggerBuilder, WallLineBuilder}
+import agentcrafter.marl.builders.{AgentBuilder, SimulationBuilder, TriggerBuilder, WallLineBuilder}
 
 /**
- * Domain-Specific Language (DSL) for creating Multi-Agent Reinforcement Learning simulations.
+ * Domain-Specific Language (dsl) for creating Multi-Agent Reinforcement Learning simulations.
  *
- * This trait provides a fluent, declarative API for defining MARL environments with agents, walls, triggers, and
- * simulation parameters. The DSL uses Scala 3's context functions and given/using syntax to create a clean, readable
+ * This trait provides a fluent, declarative API for defining marl environments with agents, walls, triggers, and
+ * simulation parameters. The dsl uses Scala 3's context functions and given/using syntax to create a clean, readable
  * configuration syntax.
  */
-trait SimulationDSL:
+trait Simulationdsl:
   /**
    * Main entry point for defining a simulation.
    *
@@ -100,7 +100,7 @@ trait SimulationDSL:
 
     // Find the first stack frame that's not from this trait or system classes
     val callingFrame = stackTrace.find { frame =>
-      !frame.getClassName.contains("SimulationDSL") &&
+      !frame.getClassName.contains("Simulationdsl") &&
       !frame.getClassName.startsWith("java.") &&
       !frame.getClassName.startsWith("scala.") &&
       frame.getClassName.contains("agentcrafter")
@@ -218,7 +218,7 @@ trait SimulationDSL:
    * @param n
    *   Number of episodes
    * @deprecated
-   *   Use `Episodes >> n` syntax instead for consistency with other DSL properties
+   *   Use `Episodes >> n` syntax instead for consistency with other dsl properties
    */
   def episodes(n: Int)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.episodes(n)
@@ -229,7 +229,7 @@ trait SimulationDSL:
    * @param n
    *   Maximum steps per episode
    * @deprecated
-   *   Use `Steps >> n` syntax instead for consistency with other DSL properties
+   *   Use `Steps >> n` syntax instead for consistency with other dsl properties
    */
   def steps(n: Int)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.steps(n)
@@ -240,7 +240,7 @@ trait SimulationDSL:
    * @param n
    *   Episode number to start showing visualization
    * @deprecated
-   *   Use `ShowAfter >> n` syntax instead for consistency with other DSL properties
+   *   Use `ShowAfter >> n` syntax instead for consistency with other dsl properties
    */
   def showAfter(n: Int)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.showAfter(n)
@@ -251,7 +251,7 @@ trait SimulationDSL:
    * @param ms
    *   Delay in milliseconds
    * @deprecated
-   *   Use `Delay >> ms` syntax instead for consistency with other DSL properties
+   *   Use `Delay >> ms` syntax instead for consistency with other dsl properties
    */
   def delay(ms: Int)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.delay(ms)
@@ -262,7 +262,7 @@ trait SimulationDSL:
    * @param flag
    *   True to enable GUI, false to disable
    * @deprecated
-   *   Use `WithGUI >> flag` syntax instead for consistency with other DSL properties
+   *   Use `WithGUI >> flag` syntax instead for consistency with other dsl properties
    */
   def withGUI(flag: Boolean)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.withGUI(flag)

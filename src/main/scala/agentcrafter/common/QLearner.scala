@@ -7,6 +7,19 @@ import scala.collection.mutable
 import scala.util.Random
 
 /**
+ * Constants for Q-Learning algorithm
+ */
+object QLearnerConstants:
+  /** Default maximum number of steps per episode */
+  val DEFAULT_MAX_STEPS: Int = 200
+  /** Initial episode counter value */
+  val INITIAL_EPISODE_COUNT: Int = 0
+  /** Step increment value */
+  val STEP_INCREMENT: Int = 1
+  /** Alpha coefficient for Q-value update (1 - alpha) */
+  val ALPHA_COMPLEMENT_FACTOR: Double = 1.0
+
+/**
  * Configuration parameters for Q-learning algorithms.
  *
  * @param alpha
@@ -106,10 +119,10 @@ class QLearner private (
 
   private val A = Action.values
   private val Q: QTable = new QTable()
-  private var ep = 0
+  private var ep = QLearnerConstants.INITIAL_EPISODE_COUNT
 
-  override def episode(maxSteps: Int = 200): EpisodeOutcome =
-    ep += 1
+  override def episode(maxSteps: Int = QLearnerConstants.DEFAULT_MAX_STEPS): EpisodeOutcome =
+    ep += QLearnerConstants.STEP_INCREMENT
 
     @tailrec
     def loop(state: State, steps: Int, acc: List[(State, Action, Boolean, Array[Reward])]): EpisodeOutcome =
@@ -128,8 +141,8 @@ class QLearner private (
 
         val newAcc = (state, action, isExploring, Q.qValues(state)) :: acc
 
-        if isGoal then (true, steps + 1, newAcc.reverse)
-        else loop(nextState, steps + 1, newAcc)
+        if isGoal then (true, steps + QLearnerConstants.STEP_INCREMENT, newAcc.reverse)
+        else loop(nextState, steps + QLearnerConstants.STEP_INCREMENT, newAcc)
 
     val initialState = resetFunction()
     loop(initialState, 0, Nil)
@@ -183,7 +196,7 @@ class QLearner private (
     Q.update(state, action, reward, nextState)
 
   override def incEp(): Unit =
-    ep += 1
+    ep += QLearnerConstants.STEP_INCREMENT
 
   /**
    * Represents the type of action selection made by the agent.
@@ -235,7 +248,7 @@ class QLearner private (
      */
     def update(state: State, action: Action, reward: Reward, newState: State): Unit =
       val bestNext = A.map(a2 => table(newState, a2)).max
-      val newValue = (1 - learningParameters.alpha) *
+      val newValue = (QLearnerConstants.ALPHA_COMPLEMENT_FACTOR - learningParameters.alpha) *
         table(state, action) + learningParameters.alpha *
         (reward + learningParameters.gamma * bestNext)
       table(state -> action) = newValue

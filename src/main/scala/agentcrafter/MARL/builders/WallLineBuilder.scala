@@ -1,4 +1,4 @@
-package agentcrafter.MARL.builders
+package agentcrafter.marl.builders
 
 case class WallLineBuilder(
   var direction: Option[String] = None,

@@ -1,10 +1,26 @@
-package agentcrafter.MARL
+package agentcrafter.marl
 
-import agentcrafter.MARL.visualizers.{QTableVisualizer, Visualizer}
+import agentcrafter.marl.visualizers.{QTableVisualizer, Visualizer}
+import agentcrafter.marl.{EpisodeManager, WorldSpec}
 import agentcrafter.common.Learner
 
 /**
- * Runner: orchestrates MARL simulation execution using decomposed components. Maintains the same API while delegating
+ * Constants for Runner class
+ */
+object RunnerConstants:
+  /** Episode reporting frequency */
+  val EPISODE_REPORT_FREQUENCY: Int = 1000
+  /** Q-table update frequency during visualization */
+  val QTABLE_UPDATE_FREQUENCY: Int = 10
+  /** Default cell size for visualization */
+  val DEFAULT_VISUALIZATION_CELL_SIZE: Int = 48
+  /** Initial reward value */
+  val INITIAL_REWARD: Double = 0.0
+  /** Initial episode counter */
+  val INITIAL_EPISODE_COUNT: Int = 0
+
+/**
+ * Runner: orchestrates marl simulation execution using decomposed components. Maintains the same API while delegating
  * responsibilities to specialized managers.
  */
 class Runner(spec: WorldSpec, showGui: Boolean):
@@ -18,8 +34,8 @@ class Runner(spec: WorldSpec, showGui: Boolean):
   private var qTableVisualizers: List[QTableVisualizer] = List.empty
   private var isVisualizationActive = false
 
-  private var totalReward = 0.0
-  private var currentEpisode = 0
+  private var totalReward = RunnerConstants.INITIAL_REWARD
+  private var currentEpisode = RunnerConstants.INITIAL_EPISODE_COUNT
 
   def run(): Unit =
     for ep <- 1 to spec.episodes do
@@ -33,7 +49,7 @@ class Runner(spec: WorldSpec, showGui: Boolean):
       val episodeResult = episodeManager.getCurrentState
       totalReward += episodeResult.reward
 
-      if ep % 1000 == 0 then
+      if ep % RunnerConstants.EPISODE_REPORT_FREQUENCY == 0 then
         println(s"Episode $ep finished in $steps steps")
 
   /**
@@ -42,10 +58,10 @@ class Runner(spec: WorldSpec, showGui: Boolean):
   private def maybeInitializeVisualization(episode: Int): Unit =
     if !isVisualizationActive && episode >= spec.showAfter && showGui then
       visualizer = Some(new Visualizer(
-        "MARL Simulation",
+        "marl Simulation",
         spec.rows,
         spec.cols,
-        cell = 48,
+        cell = RunnerConstants.DEFAULT_VISUALIZATION_CELL_SIZE,
         delayMs = spec.stepDelay
       ))
 
@@ -66,7 +82,7 @@ class Runner(spec: WorldSpec, showGui: Boolean):
           viz.updateSimulationInfo(currentEpisode, anyAgentExploring, state.reward, currentEpsilon)
         }
 
-        if steps % 10 == 0 then
+        if steps % RunnerConstants.QTABLE_UPDATE_FREQUENCY == 0 then
           qTableVisualizers.foreach(_.update())
     }
 

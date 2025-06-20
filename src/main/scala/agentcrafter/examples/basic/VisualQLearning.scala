@@ -1,6 +1,6 @@
 package agentcrafter.examples.basic
 
-import agentcrafter.MARL.visualizers.Visualizer
+import agentcrafter.marl.visualizers.Visualizer
 import agentcrafter.common.{GridWorld, LearningParameters, QLearner, State}
 
 /**

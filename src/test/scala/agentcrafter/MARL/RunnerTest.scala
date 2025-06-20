@@ -1,6 +1,6 @@
-package agentcrafter.MARL
+package agentcrafter.marl
 
-import agentcrafter.MARL.{AgentSpec, EndEpisode, OpenWall, Reward, Runner, Trigger, WorldSpec}
+import agentcrafter.marl.{AgentSpec, EndEpisode, OpenWall, Reward, Runner, Trigger, WorldSpec}
 import agentcrafter.common.{GridWorld, LearningParameters, QLearner, State}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers

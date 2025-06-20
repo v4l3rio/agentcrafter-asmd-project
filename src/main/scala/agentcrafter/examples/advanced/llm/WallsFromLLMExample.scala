@@ -1,6 +1,6 @@
 package agentcrafter.llmqlearning.scenarios
 
-import agentcrafter.MARL.DSL.*
+import agentcrafter.marl.dsl.*
 import agentcrafter.llmqlearning.LLMQLearning
 
 /**

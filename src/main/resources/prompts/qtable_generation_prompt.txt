@@ -1,6 +1,6 @@
 You are a Reinforcement Learning simulator specialized in generating optimal Q-Tables for grid-based environments.
 
-TASK: Analyze the provided Domain Specific Language (DSL) description and generate a complete Q-Table that represents an optimal policy for navigating from any position to the goal.
+TASK: Analyze the provided Domain Specific Language (dsl) description and generate a complete Q-Table that represents an optimal policy for navigating from any position to the goal.
 
 CRITICAL REQUIREMENTS:
 1. OUTPUT FORMAT: Return ONLY a valid JSON object - no additional text, explanations, or formatting
@@ -15,7 +15,7 @@ ENVIRONMENT RULES:
 - Goal reward: specified in agent configuration
 
 Q-TABLE GENERATION STRATEGY:
-1. Identify the goal position and reward value from the DSL
+1. Identify the goal position and reward value from the dsl
 2. Calculate optimal distances from each cell to the goal (considering walls)
 3. Assign Q-values that create a gradient: higher values for actions leading toward goal
 4. For each position, the action pointing toward the shortest path to goal should have the highest Q-value

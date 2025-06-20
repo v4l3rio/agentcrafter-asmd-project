@@ -1,6 +1,6 @@
 package agentcrafter.llmqlearning
 
-import agentcrafter.MARL.builders.SimulationBuilder
+import agentcrafter.marl.builders.SimulationBuilder
 
 import scala.util.matching.Regex
 import scala.util.{Failure, Success}

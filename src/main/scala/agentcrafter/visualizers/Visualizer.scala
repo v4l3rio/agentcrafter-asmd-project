@@ -1,10 +1,47 @@
-package agentcrafter.MARL.visualizers
+package agentcrafter.marl.visualizers
 
-import agentcrafter.MARL.{OpenWall, WorldSpec}
+import agentcrafter.marl.{OpenWall, WorldSpec}
 import agentcrafter.common.{Action, State}
 
+import scala.swing.*
+import scala.swing.event.*
 import java.awt.{Color, Graphics2D}
-import scala.swing.{MainFrame, Panel}
+import javax.swing.Timer
+
+/**
+ * Constants for Visualizer UI components
+ */
+object VisualizerConstants:
+  /** Default cell size in pixels */
+  val DEFAULT_CELL_SIZE: Int = 60
+  /** Default delay between updates in milliseconds */
+  val DEFAULT_DELAY_MS: Int = 100
+  /** Additional height for info panel */
+  val INFO_PANEL_HEIGHT: Int = 100
+  /** Agent circle margin factor (cell size divided by this) */
+  val AGENT_CIRCLE_MARGIN_FACTOR: Int = 6
+  /** Agent circle margin multiplier */
+  val AGENT_CIRCLE_MARGIN_MULTIPLIER: Int = 2
+  /** Info text Y offset from bottom */
+  val INFO_Y_OFFSET: Int = 80
+  /** Info text X position */
+  val INFO_X_POSITION: Int = 10
+  /** Line spacing for info text */
+  val INFO_LINE_SPACING: Int = 15
+  /** RGB values for orange color */
+  val ORANGE_RED: Int = 255
+  val ORANGE_GREEN: Int = 140
+  val ORANGE_BLUE: Int = 0
+  /** RGB values for dark green color */
+  val DARK_GREEN_RED: Int = 0
+  val DARK_GREEN_GREEN: Int = 128
+  val DARK_GREEN_BLUE: Int = 0
+  /** RGB values for purple color */
+  val PURPLE_RED: Int = 128
+  val PURPLE_GREEN: Int = 0
+  val PURPLE_BLUE: Int = 128
+  /** Update frequency divider for performance */
+  val UPDATE_FREQUENCY_DIVIDER: Int = 10
 
 /**
  * Unified visualization component for both single-agent Q-Learning and multi-agent simulations.
@@ -38,8 +75,8 @@ class Visualizer(
   windowTitle: String = "Unified Agent Visualizer",
   rows: Int,
   cols: Int,
-  cell: Int = 60,
-  delayMs: Int = 100
+  cell: Int = VisualizerConstants.DEFAULT_CELL_SIZE,
+  delayMs: Int = VisualizerConstants.DEFAULT_DELAY_MS
 ):
 
   val frame: MainFrame =
@@ -51,15 +88,15 @@ class Visualizer(
   private val colors = Array(
     Color.blue,
     Color.magenta,
-    new Color(255, 140, 0),
+    new Color(VisualizerConstants.ORANGE_RED, VisualizerConstants.ORANGE_GREEN, VisualizerConstants.ORANGE_BLUE),
     Color.cyan,
     Color.pink,
-    new Color(0, 128, 0),
+    new Color(VisualizerConstants.DARK_GREEN_RED, VisualizerConstants.DARK_GREEN_GREEN, VisualizerConstants.DARK_GREEN_BLUE),
     Color.red,
-    new Color(128, 0, 128)
+    new Color(VisualizerConstants.PURPLE_RED, VisualizerConstants.PURPLE_GREEN, VisualizerConstants.PURPLE_BLUE)
   )
   private val panel = new Panel:
-    preferredSize = new java.awt.Dimension(cols * cell, rows * cell + 100)
+    preferredSize = new java.awt.Dimension(cols * cell, rows * cell + VisualizerConstants.INFO_PANEL_HEIGHT)
 
     override def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
@@ -96,26 +133,26 @@ class Visualizer(
 
         singleAgentPos.foreach { pos =>
           g.setColor(Color.blue)
-          val m = cell / 6
-          g.fillOval(pos.y * cell + m, pos.x * cell + m, cell - 2 * m, cell - 2 * m)
+          val m = cell / VisualizerConstants.AGENT_CIRCLE_MARGIN_FACTOR
+          g.fillOval(pos.y * cell + m, pos.x * cell + m, cell - VisualizerConstants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m, cell - VisualizerConstants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m)
         }
       else
 
-        val m = cell / 6
+        val m = cell / VisualizerConstants.AGENT_CIRCLE_MARGIN_FACTOR
         multiAgentState.zipWithIndex.foreach { case ((id, p), idx) =>
           val col = colors(idx % colors.length)
           g.setColor(col)
-          g.fillOval(p.y * cell + m, p.x * cell + m, cell - 2 * m, cell - 2 * m)
+          g.fillOval(p.y * cell + m, p.x * cell + m, cell - VisualizerConstants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m, cell - VisualizerConstants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m)
         }
 
       g.setColor(Color.black)
-      val infoY = size.height - 80
+      val infoY = size.height - VisualizerConstants.INFO_Y_OFFSET
 
-      g.drawString(s"Step: $step", 10, infoY)
-      g.drawString(s"Episode: $episode", 10, infoY + 15)
-      g.drawString(s"Mode: ${if explorationMode then "Exploration" else "Exploitation"}", 10, infoY + 30)
-      g.drawString(s"Episode Reward: ${"%.2f".format(episodeReward)}", 10, infoY + 45)
-      g.drawString(s"Epsilon: ${"%.3f".format(epsilon)}", 10, infoY + 60)
+      g.drawString(s"Step: $step", VisualizerConstants.INFO_X_POSITION, infoY)
+      g.drawString(s"Episode: $episode", VisualizerConstants.INFO_X_POSITION, infoY + VisualizerConstants.INFO_LINE_SPACING)
+      g.drawString(s"Mode: ${if explorationMode then "Exploration" else "Exploitation"}", VisualizerConstants.INFO_X_POSITION, infoY + VisualizerConstants.INFO_LINE_SPACING * 2)
+      g.drawString(s"Episode Reward: ${"%.2f".format(episodeReward)}", VisualizerConstants.INFO_X_POSITION, infoY + VisualizerConstants.INFO_LINE_SPACING * 3)
+      g.drawString(s"Epsilon: ${"%.3f".format(epsilon)}", VisualizerConstants.INFO_X_POSITION, infoY + VisualizerConstants.INFO_LINE_SPACING * 4)
   private var singleAgentPos: Option[State] = None
   private var startPos: Option[State] = None
   private var goalPos: Option[State] = None

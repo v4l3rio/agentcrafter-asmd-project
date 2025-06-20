@@ -1,7 +1,7 @@
 package agentcrafter.examples.advanced.llm
 
-import agentcrafter.MARL.DSL.*
-import agentcrafter.llmqlearning.LLMDSLProperties.{Enabled, Model}
+import agentcrafter.marl.dsl.*
+import agentcrafter.llmqlearning.LLMdslProperties.{Enabled, Model}
 import agentcrafter.llmqlearning.LLMQLearning
 
 object QTableFromLLMExample extends App with LLMQLearning:
@@ -9,7 +9,7 @@ object QTableFromLLMExample extends App with LLMQLearning:
   import AgentProperty.*
   import LearnerProperty.*
   import TriggerProperty.*
-  import agentcrafter.MARL.DSL.SimulationProperty.*
+  import agentcrafter.marl.dsl.SimulationProperty.*
 
   simulation:
     useLLM:
