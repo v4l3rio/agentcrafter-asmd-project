@@ -51,11 +51,11 @@ enum AgentProperty[T]:
   infix def >>(obj: T)(using agentWrapper: AgentWrapper): AgentBuilder = this match
     case AgentProperty.Name => agentWrapper.builder.name(obj.asInstanceOf[String])
     case AgentProperty.Start =>
-      val (r, c) = obj.asInstanceOf[(Int, Int)]
-      agentWrapper.builder.start(r, c)
+      val (x, y) = obj.asInstanceOf[(Int, Int)]
+      agentWrapper.builder.start(x, y)
     case AgentProperty.Goal =>
-      val (r, c) = obj.asInstanceOf[(Int, Int)]
-      agentWrapper.builder.goal(r, c)
+      val (x, y) = obj.asInstanceOf[(Int, Int)]
+      agentWrapper.builder.goal(x, y)
 
 enum TriggerProperty[T]:
   case OpenWall extends TriggerProperty[(Int, Int)]
@@ -65,8 +65,8 @@ enum TriggerProperty[T]:
   @targetName("to")
   infix def >>(obj: T)(using tb: TriggerBuilder): Unit = this match
     case TriggerProperty.OpenWall =>
-      val (r, c) = obj.asInstanceOf[(Int, Int)]
-      tb.openWall(r, c)
+      val (x, y) = obj.asInstanceOf[(Int, Int)]
+      tb.openWall(x, y)
     case TriggerProperty.Give =>
       val bonus = obj.asInstanceOf[Double]
       tb.give(bonus)
@@ -94,8 +94,8 @@ enum WallProperty[T]:
           for row <- minRow to maxRow do
             wrapper.builder = wrapper.builder.wall(row, lineConfig.from._2)
     case WallProperty.Block =>
-      val (r, c) = obj.asInstanceOf[(Int, Int)]
-      wrapper.builder = wrapper.builder.wall(r, c)
+      val (x, y) = obj.asInstanceOf[(Int, Int)]
+      wrapper.builder = wrapper.builder.wall(x, y)
 
 enum LineProperty[T]:
   case Direction extends LineProperty[String]

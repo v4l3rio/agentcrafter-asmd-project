@@ -86,7 +86,7 @@ object QTableLoader:
 
   private given stateKeyFormat: Format[State] = new Format[State]:
     def reads(j: JsValue): JsResult[State] = j.validate[String].flatMap {
-      case stateRegex(r, c) => JsSuccess(State(r.toInt, c.toInt))
+      case stateRegex(x, y) => JsSuccess(State(x.toInt, y.toInt))
       case other => JsError(s"invalid state key '$other'")
     }
 

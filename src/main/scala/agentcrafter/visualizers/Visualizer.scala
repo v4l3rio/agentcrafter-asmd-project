@@ -64,20 +64,20 @@ class Visualizer(
     override def paintComponent(g: Graphics2D): Unit =
       super.paintComponent(g)
 
-      for r <- 0 until rows; c <- 0 until cols do
-        val p = State(r, c)
-        val x = c * cell
-        val y = r * cell
+      for x <- 0 until cols; y <- 0 until rows do
+        val p = State(x, y)
+        val screenX = x * cell
+        val screenY = y * cell
         val isWall = staticWalls.contains(p) && !openWalls.contains(p)
         g.setColor(if isWall then Color.darkGray else Color.white)
-        g.fillRect(x, y, cell, cell)
+        g.fillRect(screenX, screenY, cell, cell)
         g.setColor(Color.lightGray)
-        g.drawRect(x, y, cell, cell)
+        g.drawRect(screenX, screenY, cell, cell)
 
       def fillCells(cells: Set[State], color: Color): Unit =
         cells.foreach { p =>
           g.setColor(color)
-          g.fillRect(p.y * cell, p.x * cell, cell, cell)
+          g.fillRect(p.x * cell, p.y * cell, cell, cell)
         }
 
       fillCells(switchCells, Color.yellow)

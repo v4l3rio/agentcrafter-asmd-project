@@ -188,8 +188,14 @@ trait SimulationDSL:
    * @param c
    *   Column position of the wall to remove
    */
-  def openWall(r: Int, c: Int)(using tb: TriggerBuilder): Unit =
-    tb.openWall(r, c)
+  /**
+   * @param x
+   *   Row coordinate
+   * @param y
+   *   Column coordinate
+   */
+  def openWall(x: Int, y: Int)(using tb: TriggerBuilder): Unit =
+    tb.openWall(x, y)
 
   /**
    * Trigger effect that immediately ends the current episode.

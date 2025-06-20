@@ -20,21 +20,21 @@ import scala.collection.mutable
  * @param parent
  *   The parent SimulationBuilder
  */
-class TriggerBuilder(who: String, r: Int, c: Int, parent: SimulationBuilder):
+class TriggerBuilder(who: String, x: Int, y: Int, parent: SimulationBuilder):
   private val eff = mutable.Buffer.empty[Effect]
 
   /**
    * Adds an effect to open a wall when this trigger is activated.
    *
-   * @param r
+   * @param x
    *   Row coordinate of the wall to open
-   * @param c
+   * @param y
    *   Column coordinate of the wall to open
    * @return
    *   This builder instance for method chaining
    */
-  def openWall(r: Int, c: Int): TriggerBuilder =
-    eff += OpenWall(State(r, c))
+  def openWall(x: Int, y: Int): TriggerBuilder =
+    eff += OpenWall(State(x, y))
     this
 
   /**
@@ -66,5 +66,5 @@ class TriggerBuilder(who: String, r: Int, c: Int, parent: SimulationBuilder):
    *   The parent SimulationBuilder for continued configuration
    */
   private[MARL] def build(): SimulationBuilder =
-    parent.addTrigger(Trigger(who, State(r, c), eff.toList))
+    parent.addTrigger(Trigger(who, State(x, y), eff.toList))
     parent

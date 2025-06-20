@@ -14,9 +14,9 @@ import org.scalatest.matchers.should.Matchers
 object LLMProperties extends Properties("LLM") with Matchers:
 
   private val stateGen: Gen[State] = for {
-    r <- Gen.choose(0, 4)
-    c <- Gen.choose(0, 4)
-  } yield State(r, c)
+    x <- Gen.choose(0, 4)
+    y <- Gen.choose(0, 4)
+  } yield State(x, y)
   private val actionGen: Gen[Action] = Gen.oneOf(Action.values)
   private val qValueGen: Gen[Double] = Gen.choose(-10.0, 10.0)
 
@@ -137,9 +137,9 @@ object LLMProperties extends Properties("LLM") with Matchers:
     val regex = """\(\s*(\d+)\s*,\s*(\d+)\s*\)""".r
 
     def testMatch(str: String): Boolean = str match
-      case regex(r, c) =>
+      case regex(x, y) =>
         try {
-          r.toInt == state.x && c.toInt == state.y
+          x.toInt == state.x && y.toInt == state.y
         } catch {
           case _: NumberFormatException => false
         }

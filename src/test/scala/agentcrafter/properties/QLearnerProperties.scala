@@ -12,9 +12,9 @@ import org.scalatest.matchers.should.Matchers
 object QLearnerProperties extends Properties("QLearner") with Matchers:
 
   private val stateGen: Gen[State] = for {
-    r <- Gen.choose(0, 4)
-    c <- Gen.choose(0, 4)
-  } yield State(r, c)
+    x <- Gen.choose(0, 4)
+    y <- Gen.choose(0, 4)
+  } yield State(x, y)
 
   private val actionGen: Gen[Action] = Gen.oneOf(Action.values)
 

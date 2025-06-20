@@ -42,28 +42,28 @@ class AgentBuilder(parent: SimulationBuilder):
   /**
    * Sets the starting position for this agent.
    *
-   * @param r
+   * @param x
    *   Row coordinate of the starting position
-   * @param c
+   * @param y
    *   Column coordinate of the starting position
    * @return
    *   This builder instance for method chaining
    */
-  def start(r: Int, c: Int): AgentBuilder =
-    st = State(r, c); this
+  def start(x: Int, y: Int): AgentBuilder =
+    st = State(x, y); this
 
   /**
    * Sets the goal position for this agent.
    *
-   * @param r
+   * @param x
    *   Row coordinate of the goal position
-   * @param c
+   * @param y
    *   Column coordinate of the goal position
    * @return
    *   This builder instance for method chaining
    */
-  def goal(r: Int, c: Int): AgentBuilder =
-    gl = State(r, c); this
+  def goal(x: Int, y: Int): AgentBuilder =
+    gl = State(x, y); this
 
   /**
    * Configures the learning algorithm and parameters for this agent.

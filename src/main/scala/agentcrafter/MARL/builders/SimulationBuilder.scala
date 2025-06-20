@@ -40,15 +40,18 @@ class SimulationBuilder:
   /**
    * Sets the grid dimensions for the simulation environment.
    *
-   * @param r
+   * @param rows
    *   Number of rows in the grid
-   * @param c
+   * @param cols
    *   Number of columns in the grid
    * @return
    *   This builder instance for method chaining
    */
-  def grid(r: Int, c: Int): SimulationBuilder =
-    rows = r; cols = c; this
+  def grid(rows: Int, cols: Int): SimulationBuilder =
+    this.rows = rows; this.cols = cols; this
+
+  private[MARL] def newTrigger(who: String, x: Int, y: Int): TriggerBuilder =
+    new TriggerBuilder(who, x, y, this)
 
   /**
    * Sets the penalty applied for each step taken by agents.
@@ -72,8 +75,8 @@ class SimulationBuilder:
    * @return
    *   This builder instance for method chaining
    */
-  def wall(r: Int, c: Int): SimulationBuilder =
-    walls += State(r, c); this
+  def wall(x: Int, y: Int): SimulationBuilder =
+    walls += State(x, y); this
 
   /**
    * Adds walls based on ASCII art representation.
@@ -85,9 +88,9 @@ class SimulationBuilder:
    */
   def wallsFromAscii(s: String): SimulationBuilder =
     val lines = s.stripMargin.split("\n").map(_.trim)
-    lines.zipWithIndex.foreach { case (line, r) =>
-      line.zipWithIndex.foreach { case (ch, c) =>
-        if ch == '#' then walls += State(r, c)
+    lines.zipWithIndex.foreach { case (line, x) =>
+      line.zipWithIndex.foreach { case (ch, y) =>
+        if ch == '#' then walls += State(x, y)
       }
     };
     this

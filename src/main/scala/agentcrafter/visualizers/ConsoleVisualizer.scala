@@ -117,9 +117,9 @@ object ConsoleVisualizer:
         case (m, (s, i)) => if m.contains(s) then m else m.updated(s, i)
       }
 
-    (0 until rows).toVector.map { r =>
-      (0 until cols).map { c =>
-        val s = State(r, c)
+    (0 until rows).toVector.map { x =>
+      (0 until cols).map { y =>
+        val s = State(x, y)
         if walls.contains(s) then "##"
         else if s == start then "S "
         else if s == goal then "G "
