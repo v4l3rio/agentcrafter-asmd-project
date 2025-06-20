@@ -1,9 +1,7 @@
 package agentcrafter.marl.builders
 
-import agentcrafter.marl.builders.{AgentBuilder, TriggerBuilder}
-import agentcrafter.marl.{AgentSpec, Trigger, WorldSpec}
+import agentcrafter.marl.{AgentSpec, Runner, Trigger, WorldSpec}
 import agentcrafter.common.State
-import agentcrafter.marl.Runner
 
 import scala.collection.mutable
 
@@ -27,7 +25,7 @@ object SimulationBuilderConstants:
   val DEFAULT_EPISODES: Int = 10_000
 
 /**
- * Builder for creating Multi-Agent Reinforcement Learning (marl) simulations.
+ * Builder for creating Multi-Agent Reinforcement Learning (MARL) simulations.
  *
  * This class provides a fluent API for configuring simulations with multiple agents, environmental obstacles (walls),
  * triggers, and various simulation parameters. The builder pattern allows for flexible and readable simulation setup.
@@ -169,6 +167,14 @@ class SimulationBuilder:
    *   An immutable set of wall positions
    */
   def getWalls: Set[State] = walls.toSet
+
+  /**
+   * Gets the map of agents in the simulation.
+   *
+   * @return
+   *   An immutable map of agent IDs to their specifications
+   */
+  def getAgents: Map[String, AgentSpec] = agents.toMap
 
   /**
    * Sets the maximum number of steps per episode.

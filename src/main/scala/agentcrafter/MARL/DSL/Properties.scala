@@ -17,7 +17,6 @@ case class LearnerConfig(
   var epsMin: Double = 0.15,
   var warm: Int = 10_000,
   var optimistic: Double = 0.0,
-  var learnerType: String = "qlearner"
 )
 
 case class WallLLMConfig(
@@ -127,7 +126,6 @@ enum LearnerProperty[T]:
   case EpsMin extends LearnerProperty[Double]
   case Warm extends LearnerProperty[Int]
   case Optimistic extends LearnerProperty[Double]
-  case LearnerType extends LearnerProperty[String]
 
   @targetName("to")
   infix def >>(obj: T)(using config: LearnerConfig): Unit = this match
@@ -137,7 +135,6 @@ enum LearnerProperty[T]:
     case LearnerProperty.EpsMin => config.epsMin = obj.asInstanceOf[Double]
     case LearnerProperty.Warm => config.warm = obj.asInstanceOf[Int]
     case LearnerProperty.Optimistic => config.optimistic = obj.asInstanceOf[Double]
-    case LearnerProperty.LearnerType => config.learnerType = obj.asInstanceOf[String]
 
 enum WallLLMProperty[T]:
   case Model extends WallLLMProperty[String]

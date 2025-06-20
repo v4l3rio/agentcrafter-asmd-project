@@ -3,7 +3,6 @@ package agentcrafter.llmqlearning
 import agentcrafter.marl.AgentSpec
 import agentcrafter.marl.builders.SimulationBuilder
 
-import scala.collection.mutable
 import scala.util.{Failure, Success}
 
 object LLMQTableService:
@@ -40,16 +39,10 @@ object LLMQTableService:
    *   The Q-table JSON string to load
    */
   def loadQTableIntoAgents(builder: SimulationBuilder, qTableJson: String): Unit =
-    try
-      val agentsField = builder.getClass.getDeclaredField("agents")
-      agentsField.setAccessible(true)
-      val agents = agentsField.get(builder).asInstanceOf[mutable.Map[String, AgentSpec]]
+    val agents = builder.getAgents
 
-      agents.values.foreach { agentSpec =>
-        QTableLoader.loadQTableFromJson(qTableJson, learner = agentSpec.learner) match
-          case Success(_) => println(s"Loaded LLM Q‑table for agent: ${agentSpec.id}")
-          case Failure(ex) => println(s"Failed to load Q‑table for agent ${agentSpec.id}: ${ex.getMessage}")
-      }
-    catch
-      case ex: Exception =>
-        println(s"Error accessing agents for Q‑table loading: ${ex.getMessage}")
+    agents.values.foreach { agentSpec =>
+      QTableLoader.loadQTableFromJson(qTableJson, learner = agentSpec.learner) match
+        case Success(_) => println(s"Loaded LLM Q‑table for agent: ${agentSpec.id}")
+        case Failure(ex) => println(s"Failed to load Q‑table for agent ${agentSpec.id}: ${ex.getMessage}")
+    }
