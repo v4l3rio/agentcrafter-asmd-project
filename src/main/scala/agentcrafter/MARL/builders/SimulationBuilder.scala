@@ -212,6 +212,3 @@ class SimulationBuilder:
       showAfter
     )
     new Runner(spec, gui).run()
-
-  private[MARL] def newTrigger(who: String, r: Int, c: Int): TriggerBuilder =
-    new TriggerBuilder(who, r, c, this)
