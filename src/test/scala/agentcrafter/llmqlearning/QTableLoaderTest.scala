@@ -1,6 +1,6 @@
 package agentcrafter.llmqlearning
 
-import agentcrafter.common.{Action, GridWorld, QLearner, State}
+import agentcrafter.common.{Action, GridWorld, LearningConfig, QLearner, State}
 import agentcrafter.llmqlearning.QTableLoader
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
@@ -16,7 +16,8 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
       goalState = State(2, 2),
       goalReward = 0.0,
       updateFunction = env.step,
-      resetFunction = () => State(0, 0)
+      resetFunction = () => State(0, 0),
+      learningConfig = LearningConfig()
     )
 
   private def createSimpleGrid(): GridWorld =

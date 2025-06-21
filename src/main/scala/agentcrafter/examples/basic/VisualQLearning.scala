@@ -1,7 +1,7 @@
 package agentcrafter.examples.basic
 
 import agentcrafter.marl.visualizers.Visualizer
-import agentcrafter.common.{GridWorld, LearningParameters, QLearner, State}
+import agentcrafter.common.{GridWorld, LearningConfig, QLearner, State}
 
 /**
  * Main training program with real-time visualization.
@@ -31,7 +31,7 @@ import agentcrafter.common.{GridWorld, LearningParameters, QLearner, State}
     goalReward = 50,
     updateFunction = env.step,
     resetFunction = () => start,
-    learningParameters = LearningParameters(
+    learningConfig = LearningConfig(
       eps0 = 0.95,
       epsMin = 0.1,
       warm = 1_000,

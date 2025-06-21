@@ -17,7 +17,7 @@ class GridQLearningIntegrationTest extends AnyFunSuite with Matchers:
       goalReward = 50.0,
       updateFunction = env.step,
       resetFunction = () => start,
-      learningParameters = LearningParameters(alpha = 0.15, gamma = 0.9, eps0 = 0.5, epsMin = 0.1, warm = 100)
+      learningConfig = LearningConfig(alpha = 0.15, gamma = 0.9, eps0 = 0.5, epsMin = 0.1, warm = 100)
     )
 
 

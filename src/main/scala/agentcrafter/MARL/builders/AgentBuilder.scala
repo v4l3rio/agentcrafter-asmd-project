@@ -21,7 +21,7 @@ class AgentBuilder(parent: SimulationBuilder):
   private var st: State = State(0, 0)
   private var gl: State = State(0, 0)
   private var learner: Learner = QLearner(
-    learningParameters = LearningParameters(),
+    learningConfig = LearningConfig(),
     goalState = gl,
     goalReward = 0.0,
     updateFunction = (s, _) => StepResult(s, 0.0),
@@ -98,7 +98,7 @@ class AgentBuilder(parent: SimulationBuilder):
       walls = parent.getWalls
     )
     learner = QLearner(
-      learningParameters = LearningParameters(alpha, gamma, eps0, epsMin, warm, optimistic),
+      learningConfig = LearningConfig(alpha, gamma, eps0, epsMin, warm, optimistic),
       goalState = gl,
       goalReward = 0.0,
       updateFunction = gridWorld.step,

@@ -48,9 +48,9 @@ object QTableLoader:
     noTicks.replaceAll("(?i)^json\\s*", "").replaceAll("(?i)^here.*?:\\s*", "").trim
 
   private def inject(learner: QLearner, table: Map[(State, Action), Double]) = Try {
-    val qField = learner.getClass.getDeclaredField("Q")
-    qField.setAccessible(true)
-    val qTable = qField.get(learner)
+    val qTableField = learner.getClass.getDeclaredField("qTable")
+    qTableField.setAccessible(true)
+    val qTable = qTableField.get(learner)
 
     val mapField = qTable.getClass.getDeclaredField("table")
     mapField.setAccessible(true)

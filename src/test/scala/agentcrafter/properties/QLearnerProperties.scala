@@ -35,7 +35,7 @@ object QLearnerProperties extends Properties("QLearner") with Matchers:
 
   private val rewardGen: Gen[Double] = Gen.choose(TEST_REWARD_MIN, TEST_REWARD_MAX)
 
-  private val learningParamsGen: Gen[LearningParameters] = for {
+  private val learningParamsGen: Gen[LearningConfig] = for {
     alpha <- Gen.choose(TEST_ALPHA_MIN, TEST_ALPHA_MAX)
     gamma <- Gen.choose(TEST_GAMMA_MIN, TEST_GAMMA_MAX)
     eps0 <- Gen.choose(0.1, TEST_EPSILON_MAX)
@@ -44,17 +44,17 @@ object QLearnerProperties extends Properties("QLearner") with Matchers:
     optimistic <- Gen.choose(TEST_OPTIMISTIC_MIN, TEST_OPTIMISTIC_MAX)
   } yield {
     val actualEpsMin = math.min(epsMin, eps0)
-    LearningParameters(alpha, gamma, eps0, actualEpsMin, warm, optimistic)
+    LearningConfig(alpha, gamma, eps0, actualEpsMin, warm, optimistic)
   }
 
-  private def createLearner(params: LearningParameters = LearningParameters()): QLearner =
+  private def createLearner(params: LearningConfig = LearningConfig()): QLearner =
     val env = GridWorld(rows = TEST_GRID_SIZE, cols = TEST_GRID_SIZE, walls = Set.empty)
     QLearner(
       goalState = State(TEST_GRID_SIZE - 1, TEST_GRID_SIZE - 1),
       goalReward = TEST_REWARD_MAX,
       updateFunction = env.step,
       resetFunction = () => State(0, 0),
-      learningParameters = params
+      learningConfig = params
     )
 
   property("Q-values start with optimistic initialization") = forAll(learningParamsGen, stateGen, actionGen) {
@@ -149,7 +149,7 @@ object QLearnerProperties extends Properties("QLearner") with Matchers:
     (alpha, gamma) =>
 
       val actualGamma = math.max(gamma, 0.1)
-      val params = LearningParameters(alpha = alpha, gamma = actualGamma, eps0 = 0.0, epsMin = 0.0)
+      val params = LearningConfig(alpha = alpha, gamma = actualGamma, eps0 = 0.0, epsMin = 0.0)
       val learner = createLearner(params)
 
       val state = State(3, 4)

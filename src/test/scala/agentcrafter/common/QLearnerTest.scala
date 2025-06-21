@@ -30,7 +30,7 @@ class QLearnerTest extends AnyFunSuite with Matchers:
   private val TEST_EPSILON_DECAY_WARM: Int = 2
   private val TEST_EPSILON_DECAY_STEPS: Int = 20
 
-  private def learner(lp: LearningParameters = LearningParameters()): QLearner =
+  private def learner(lp: LearningConfig = LearningConfig()): QLearner =
     val env = GridWorld(
       rows = TEST_GRID_ROWS,
       cols = TEST_GRID_COLS,
@@ -41,7 +41,7 @@ class QLearnerTest extends AnyFunSuite with Matchers:
       goalReward = TEST_GOAL_REWARD,
       updateFunction = env.step,
       resetFunction = () => TEST_RESET_STATE,
-      learningParameters = lp
+      learningConfig = lp
     )
 
   private def env() = GridWorld(rows = TEST_GRID_ROWS, cols = TEST_GRID_COLS, walls = Set.empty)
@@ -51,19 +51,19 @@ class QLearnerTest extends AnyFunSuite with Matchers:
     l.eps shouldBe TEST_DEFAULT_EPSILON
 
   test("custom parameters are honoured"):
-    val params = LearningParameters(alpha = 0.2, gamma = 0.8, eps0 = 0.5, epsMin = 0.1, warm = 5, optimistic = 0.0)
+    val params = LearningConfig(alpha = 0.2, gamma = 0.8, eps0 = 0.5, epsMin = 0.1, warm = 5, optimistic = 0.0)
     val l = learner(params)
     l.eps shouldBe 0.5
 
   test("Q-value update"):
-    val l = learner(LearningParameters(alpha = TEST_ALPHA, gamma = TEST_GAMMA, optimistic = TEST_OPTIMISTIC))
+    val l = learner(LearningConfig(alpha = TEST_ALPHA, gamma = TEST_GAMMA, optimistic = TEST_OPTIMISTIC))
     val s1 = State(0, 0)
     val s2 = State(0, 1)
     l.update(s1, Action.Right, TEST_REWARD, s2)
     l.getQValue(s1, Action.Right) shouldBe TEST_EXPECTED_Q_VALUE
 
   test("epsilon decays after warm up"):
-    val l = learner(LearningParameters(eps0 = TEST_EPSILON_DECAY_EPS0, epsMin = TEST_EPSILON_DECAY_EPS_MIN, warm = TEST_EPSILON_DECAY_WARM))
+    val l = learner(LearningConfig(eps0 = TEST_EPSILON_DECAY_EPS0, epsMin = TEST_EPSILON_DECAY_EPS_MIN, warm = TEST_EPSILON_DECAY_WARM))
     l.eps shouldBe TEST_EPSILON_DECAY_EPS0
     l.incEp();
     l.incEp();

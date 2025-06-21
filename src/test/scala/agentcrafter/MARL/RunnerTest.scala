@@ -1,7 +1,7 @@
 package agentcrafter.marl
 
 import agentcrafter.marl.{AgentSpec, EndEpisode, OpenWall, Reward, Runner, Trigger, WorldSpec}
-import agentcrafter.common.{GridWorld, LearningParameters, QLearner, State}
+import agentcrafter.common.{GridWorld, LearningConfig, QLearner, State}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
@@ -29,7 +29,7 @@ class RunnerTest extends AnyFunSuite with Matchers:
       goalReward = reward,
       updateFunction = env.step,
       resetFunction = () => start,
-      learningParameters = LearningParameters(alpha = 0.5, gamma = 0.9, eps0 = 0.1)
+      learningConfig = LearningConfig(alpha = 0.5, gamma = 0.9, eps0 = 0.1)
     )
     AgentSpec(id, start, goal, learner)
 
