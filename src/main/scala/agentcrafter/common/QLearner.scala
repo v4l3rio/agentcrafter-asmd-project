@@ -1,53 +1,54 @@
 package agentcrafter.common
 
 import agentcrafter.common.Constants
+import agentcrafter.common.ActionChoice
 import scala.annotation.tailrec
 import scala.util.Random
 
 /**
- * Type alias per rappresentare la traiettoria di un agente durante un episodio.
- * Contiene stato, azione, flag di esplorazione e valori Q per ogni passo.
+ * Type alias to represent an agent's trajectory during an episode.
+ * Contains state, action, exploration flag and Q-values for each step.
  */
 type Trajectory = List[(State, Action, Boolean, Array[Double])]
 
 /**
- * Type alias per i valori di ricompensa nel sistema di apprendimento.
+ * Type alias for reward values in the learning system.
  */
 type Reward = Double
 
 /**
- * Type alias per gli identificatori degli agenti.
+ * Type alias for agent identifiers.
  */
 type ID = String
 
 /**
- * Type alias per i risultati degli episodi contenenti stato di successo, numero di passi e traiettoria.
+ * Type alias for episode results containing success state, number of steps and trajectory.
  */
 type EpisodeOutcome = (Boolean, Int, Trajectory)
 
 /**
- * Type alias per le funzioni di aggiornamento dell'ambiente che gestiscono le transizioni di stato.
+ * Type alias for environment update functions that handle state transitions.
  */
 type UpdateFunction = (State, Action) => StepResult
 
 /**
- * Type alias per le funzioni di reset dell'ambiente che restituiscono lo stato iniziale.
+ * Type alias for environment reset functions that return the initial state.
  */
 type ResetFunction = () => State
 
 /**
- * Factory object per creare istanze di QLearner.
+ * Factory object for creating QLearner instances.
  */
 object QLearner:
   /**
-   * Crea una nuova istanza di QLearner con i parametri specificati.
+   * Creates a new QLearner instance with the specified parameters.
    *
-   * @param goalState Lo stato obiettivo che l'agente deve raggiungere
-   * @param goalReward La ricompensa data quando si raggiunge lo stato obiettivo
-   * @param updateFunction Funzione che gestisce le transizioni di stato nell'ambiente
-   * @param resetFunction Funzione che resetta l'ambiente allo stato iniziale
-   * @param learningConfig Parametri di configurazione per l'algoritmo Q-learning
-   * @return Una nuova istanza di QLearner
+   * @param goalState The goal state that the agent must reach
+   * @param goalReward The reward given when the goal state is reached
+   * @param updateFunction Function that handles state transitions in the environment
+   * @param resetFunction Function that resets the environment to the initial state
+   * @param learningConfig Configuration parameters for the Q-learning algorithm
+   * @return A new QLearner instance
    */
   def apply(
     goalState: State,
@@ -59,17 +60,17 @@ object QLearner:
     new QLearner(goalState, goalReward, updateFunction, resetFunction, learningConfig)
 
 /**
- * Implementazione dell'algoritmo Q-Learning per il reinforcement learning.
+ * Implementation of the Q-Learning algorithm for reinforcement learning.
  *
- * Questa classe implementa l'algoritmo Q-learning con esplorazione epsilon-greedy.
- * È stata ristrutturata per essere più lineare e comprensibile, separando le
- * responsabilità in classi dedicate.
+ * This class implements the Q-learning algorithm with epsilon-greedy exploration.
+ * It manages learning through episodes, updating Q-values based on
+ * received rewards and observed state transitions.
  *
- * @param goalState Lo stato obiettivo che termina gli episodi con successo
- * @param goalReward La ricompensa data quando si raggiunge lo stato obiettivo
- * @param updateFunction Funzione che gestisce le transizioni di stato dell'ambiente
- * @param resetFunction Funzione che resetta l'ambiente alle condizioni iniziali
- * @param config Parametri di configurazione per l'algoritmo di apprendimento
+ * @param goalState The goal state that terminates episodes successfully
+ * @param goalReward The reward given when the goal state is reached
+ * @param updateFunction Function that handles environment state transitions
+ * @param resetFunction Function that resets the environment to initial conditions
+ * @param config Configuration parameters for the learning algorithm
  */
 class QLearner private (
   goalState: State,
@@ -79,17 +80,17 @@ class QLearner private (
   config: LearningConfig
 ) extends Learner:
 
-  // Componenti principali del Q-learner
+  // Main Q-learner components
   private val qTable = new QTable(config)
   private val explorationStrategy = new ExplorationStrategy(config)
   
   private given rng: Random = Random()
 
   /**
-   * Esegue un episodio completo di apprendimento.
-   * 
-   * @param maxSteps Numero massimo di passi per episodio
-   * @return Risultato dell'episodio (successo, numero di passi, traiettoria)
+   * Executes a complete learning episode.
+   *
+   * @param maxSteps Maximum number of steps per episode
+   * @return Episode result (success, number of steps, trajectory)
    */
   override def episode(maxSteps: Int = Constants.DEFAULT_MAX_STEPS_PER_EPISODE): EpisodeOutcome =
     explorationStrategy.incrementEpisode()
@@ -98,7 +99,17 @@ class QLearner private (
     runEpisodeLoop(initialState, maxSteps)
 
   /**
-   * Loop principale dell'episodio - gestisce la logica di esecuzione passo dopo passo.
+   * Main episode loop - handles step-by-step execution logic.
+   *
+   * This recursive method implements the main episode loop,
+   * handling action selection, environment execution,
+   * Q-value updates and trajectory recording.
+   *
+   * @param currentState The current state of the agent
+   * @param steps The number of steps executed so far
+   * @param maxSteps The maximum number of steps allowed
+   * @param trajectory The trajectory accumulated so far
+   * @return The final result of the episode
    */
   @tailrec
   private def runEpisodeLoop(
@@ -108,98 +119,103 @@ class QLearner private (
     trajectory: List[(State, Action, Boolean, Array[Double])] = Nil
   ): EpisodeOutcome =
     
-    // Verifica condizioni di terminazione
+    // Check termination conditions
     if state == goalState then
       (true, currentStep, trajectory.reverse)
     else if currentStep >= maxSteps then
       (false, currentStep, trajectory.reverse)
     else
-      // Scelta dell'azione usando la strategia di esplorazione
-      val (action, isExploring) = explorationStrategy.chooseAction(state, qTable)
+      // Action selection using exploration strategy
+      val actionChoice = explorationStrategy.chooseAction(state, qTable)
+      val (action, isExploring) = actionChoice match
+        case ActionChoice.Exploration(a) => (a, true)
+        case ActionChoice.Exploitation(a) => (a, false)
       
-      // Esecuzione dell'azione nell'ambiente
+      // Action execution in the environment
       val StepResult(nextState, environmentReward) = updateFunction(state, action)
       
-      // Calcolo della ricompensa finale
+      // Final reward calculation
       val finalReward = if nextState == goalState then goalReward else environmentReward
       
-      // Aggiornamento della Q-table
+      // Q-table update
       qTable.updateValue(state, action, finalReward, nextState)
       
-      // Registrazione del passo nella traiettoria
+      // Step recording in trajectory
       val stepRecord = (state, action, isExploring, qTable.getStateValues(state))
       val newTrajectory = stepRecord :: trajectory
       
-      // Continua con il prossimo passo
+      // Continue with the next step
       runEpisodeLoop(nextState, maxSteps, currentStep + 1, newTrajectory)
 
   /**
-   * Ottiene uno snapshot immutabile della Q-table corrente.
+   * Gets an immutable snapshot of the current Q-table.
    * 
-   * @return Mappa contenente tutti i valori Q correnti
+   * @return Map containing all current Q-values
    */
   def QTableSnapshot: Map[(State, Action), Double] =
     qTable.createSnapshot()
 
   /**
-   * Ottiene il valore Q per una specifica coppia stato-azione.
+   * Gets the Q-value for a specific state-action pair.
    * 
-   * @param state Lo stato
-   * @param action L'azione
-   * @return Il valore Q corrente
+   * @param state The state
+   * @param action The action
+   * @return The current Q-value
    */
   def getQValue(state: State, action: Action): Double =
     qTable.getValue(state, action)
 
   /**
-   * Sceglie un'azione per lo stato dato utilizzando la strategia epsilon-greedy.
+   * Chooses an action for the given state using the epsilon-greedy strategy.
    * 
-   * @param state Lo stato corrente
-   * @return Tupla contenente (azione, è_esplorazione)
+   * @param state The current state
+   * @return Tuple containing (action, is_exploration)
    */
   override def choose(state: State): (Action, Boolean) =
-    explorationStrategy.chooseAction(state, qTable)
+    explorationStrategy.chooseAction(state, qTable) match
+      case ActionChoice.Exploration(action) => (action, true)
+      case ActionChoice.Exploitation(action) => (action, false)
 
   /**
-   * Ottiene il tasso di esplorazione corrente (epsilon).
+   * Gets the current exploration rate (epsilon).
    * 
-   * @return Il valore epsilon per l'episodio corrente
+   * @return The epsilon value for the current episode
    */
   override def eps: Double =
     explorationStrategy.getCurrentEpsilon
 
   /**
-   * Aggiorna il valore Q per una coppia stato-azione.
+   * Updates the Q-value for a state-action pair.
    * 
-   * @param state Lo stato corrente
-   * @param action L'azione presa
-   * @param reward La ricompensa ricevuta
-   * @param nextState Lo stato successivo
+   * @param state The current state
+   * @param action The action taken
+   * @param reward The reward received
+   * @param nextState The next state
    */
   override def update(state: State, action: Action, reward: Reward, nextState: State): Unit =
     qTable.updateValue(state, action, reward, nextState)
 
   /**
-   * Aggiorna il valore Q utilizzando la logica di ricompensa dell'obiettivo.
+   * Updates the Q-value using goal reward logic.
    * 
-   * Questo rispecchia il passo di aggiornamento eseguito all'interno di [[episode]].
-   * La ricompensa dell'ambiente fornita viene combinata con la ricompensa dell'obiettivo
-   * se lo stato successivo corrisponde allo stato obiettivo configurato.
+   * This mirrors the update step performed within [[episode]].
+   * The provided environment reward is combined with the goal reward
+   * if the next state matches the configured goal state.
    */
   override def updateWithGoal(state: State, action: Action, envReward: Reward, nextState: State): Unit =
     val finalReward = if nextState == goalState then goalReward else envReward
     qTable.updateValue(state, action, finalReward, nextState)
 
   /**
-   * Incrementa il contatore degli episodi.
+   * Increments the episode counter.
    */
   override def incEp(): Unit =
     explorationStrategy.incrementEpisode()
 
   /**
-   * Ottiene informazioni di debug sulla configurazione corrente.
+   * Gets debug information about the current configuration.
    * 
-   * @return Stringa contenente informazioni sulla configurazione
+   * @return String containing configuration information
    */
   def getDebugInfo: String =
     s"""QLearner Debug Info:
@@ -210,7 +226,7 @@ class QLearner private (
        |  Goal Reward: $goalReward""".stripMargin
 
   /**
-   * Resetta completamente il learner allo stato iniziale.
+   * Completely resets the learner to the initial state.
    */
   def reset(): Unit =
     qTable.reset()

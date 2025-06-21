@@ -3,19 +3,19 @@ package agentcrafter.common
 import scala.util.Random
 
 /**
- * Rappresenta il tipo di scelta fatta dall'agente durante la selezione dell'azione.
+ * Represents the type of choice made by the agent during action selection.
  */
 enum ActionChoice:
   case Exploration(action: Action)
   case Exploitation(action: Action)
 
 /**
- * Strategia di esplorazione epsilon-greedy per l'algoritmo Q-learning.
+ * Epsilon-greedy exploration strategy for the Q-learning algorithm.
  * 
- * Questa classe gestisce la logica di scelta tra esplorazione (azioni casuali)
- * e sfruttamento (azioni basate sui valori Q appresi).
+ * This class manages the logic of choosing between exploration (random actions)
+ * and exploitation (actions based on learned Q-values).
  *
- * @param config Configurazione dei parametri di apprendimento
+ * @param config Configuration of learning parameters
  */
 class ExplorationStrategy(config: LearningConfig):
   
@@ -23,73 +23,59 @@ class ExplorationStrategy(config: LearningConfig):
   private given rng: Random = Random()
 
   /**
-   * Sceglie un'azione utilizzando la strategia epsilon-greedy.
+   * Chooses an action using the epsilon-greedy strategy.
    *
-   * @param state Lo stato corrente
-   * @param qTable La Q-table per ottenere i valori delle azioni
-   * @return Una tupla contenente (azione_scelta, è_esplorazione)
+   * @param state The current state
+   * @param qTable The Q-table to get action values
+   * @return The type of choice made (exploration or exploitation)
    */
-  def chooseAction(state: State, qTable: QTable): (Action, Boolean) =
+  def chooseAction(state: State, qTable: QTable): ActionChoice =
     val epsilon = config.calculateEpsilon(currentEpisode)
     
     if rng.nextDouble() < epsilon then
-      // Esplorazione: scelta casuale
-      val randomAction = Action.values(rng.nextInt(Action.values.length))
-      (randomAction, true)
-    else
-      // Sfruttamento: scelta greedy basata sui valori Q
-      val bestAction = qTable.getBestAction(state)
-      (bestAction, false)
-
-  /**
-   * Versione più dettagliata che restituisce il tipo di scelta effettuata.
-   *
-   * @param state Lo stato corrente
-   * @param qTable La Q-table per ottenere i valori delle azioni
-   * @return Il tipo di scelta effettuata (esplorazione o sfruttamento)
-   */
-  def chooseActionDetailed(state: State, qTable: QTable): ActionChoice =
-    val epsilon = config.calculateEpsilon(currentEpisode)
-    
-    if rng.nextDouble() < epsilon then
+      // Exploration: random choice
       val randomAction = Action.values(rng.nextInt(Action.values.length))
       ActionChoice.Exploration(randomAction)
     else
+      // Exploitation: greedy choice based on Q-values
       val bestAction = qTable.getBestAction(state)
       ActionChoice.Exploitation(bestAction)
 
+
+
   /**
-   * Ottiene il valore epsilon corrente.
+   * Gets the current epsilon value.
    *
-   * @return Il valore epsilon per l'episodio corrente
+   * @return The epsilon value for the current episode
    */
   def getCurrentEpsilon: Double =
     config.calculateEpsilon(currentEpisode)
 
   /**
-   * Incrementa il contatore degli episodi.
-   * Dovrebbe essere chiamato all'inizio di ogni nuovo episodio.
+   * Increments the episode counter.
+   * Should be called at the beginning of each new episode.
    */
   def incrementEpisode(): Unit =
     currentEpisode += Constants.SINGLE_STEP_INCREMENT
 
   /**
-   * Ottiene il numero dell'episodio corrente.
+   * Gets the current episode number.
    *
-   * @return Il numero dell'episodio corrente
+   * @return The current episode number
    */
   def getCurrentEpisode: Int = currentEpisode
 
   /**
-   * Resetta il contatore degli episodi.
+   * Resets the episode counter.
    */
   def resetEpisodeCounter(): Unit =
     currentEpisode = Constants.INITIAL_EPISODE_COUNT
 
   /**
-   * Imposta manualmente il numero dell'episodio corrente.
+   * Manually sets the current episode number.
+   * Useful for testing or restoring a specific state.
    *
-   * @param episode Il nuovo numero di episodio
+   * @param episode The new episode number
    */
   def setCurrentEpisode(episode: Int): Unit =
     currentEpisode = episode

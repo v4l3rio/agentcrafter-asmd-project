@@ -131,11 +131,11 @@ trait Simulationdsl:
    *   Configuration block for learner parameters (alpha, gamma, epsilon, etc.)
    */
   def withLearner(using agentWrapper: AgentWrapper)(block: LearnerConfig ?=> Unit): Unit =
-    val config = LearnerConfig() // Configurazione predefinita
+    val config = LearnerConfig() // Default configuration
 
     given LearnerConfig = config
 
-    block // Applica le modifiche definite nel blocco
+    block // Apply the changes defined in the block
     agentWrapper.builder = agentWrapper.builder.withLearner(
       alpha = config.alpha,
       gamma = config.gamma,

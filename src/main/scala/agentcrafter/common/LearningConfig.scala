@@ -3,17 +3,17 @@ package agentcrafter.common
 import agentcrafter.common.Constants
 
 /**
- * Configurazione dei parametri per l'algoritmo Q-learning.
+ * Configuration of parameters for the Q-learning algorithm.
  * 
- * Questa classe contiene tutti i parametri necessari per configurare
- * l'algoritmo di apprendimento Q-learning con strategia epsilon-greedy.
+ * This class contains all the necessary parameters to configure
+ * the Q-learning algorithm with epsilon-greedy strategy.
  *
- * @param alpha Tasso di apprendimento (0.0 a 1.0) - controlla quanto le nuove informazioni sovrascrivono quelle vecchie
- * @param gamma Fattore di sconto (0.0 a 1.0) - determina l'importanza delle ricompense future
- * @param eps0 Tasso di esplorazione iniziale per la politica epsilon-greedy
- * @param epsMin Tasso di esplorazione minimo dopo il periodo di warm-up
- * @param warm Numero di episodi per il periodo di warm-up prima che inizi il decadimento di epsilon
- * @param optimistic Valore ottimistico iniziale per le coppie stato-azione non visitate
+ * @param alpha Learning rate (0.0 to 1.0) - controls how much new information overwrites old information
+ * @param gamma Discount factor (0.0 to 1.0) - determines the importance of future rewards
+ * @param eps0 Initial exploration rate for the epsilon-greedy policy
+ * @param epsMin Minimum exploration rate after the warm-up period
+ * @param warm Number of episodes for the warm-up period before epsilon decay begins
+ * @param optimistic Initial optimistic value for unvisited state-action pairs
  */
 case class LearningConfig(
     alpha: Double = Constants.DEFAULT_LEARNING_RATE,
@@ -24,10 +24,10 @@ case class LearningConfig(
     optimistic: Double = Constants.DEFAULT_OPTIMISTIC_INITIALIZATION
 ):
   /**
-   * Calcola il valore epsilon corrente basato sul numero di episodio.
+   * Calculates the current epsilon value based on the episode number.
    *
-   * @param episodeNumber Numero dell'episodio corrente
-   * @return Il valore epsilon per l'episodio corrente
+   * @param episodeNumber Current episode number
+   * @return The epsilon value for the current episode
    */
   def calculateEpsilon(episodeNumber: Int): Double =
     if episodeNumber < warm then 
@@ -36,9 +36,9 @@ case class LearningConfig(
       math.max(epsMin, eps0 - (eps0 - epsMin) * (episodeNumber - warm) / warm)
 
   /**
-   * Verifica se i parametri sono validi.
+   * Verifies if the parameters are valid.
    * 
-   * @return true se tutti i parametri sono nei range corretti
+   * @return true if all parameters are in the correct ranges
    */
   def isValid: Boolean =
     alpha >= 0.0 && alpha <= 1.0 &&

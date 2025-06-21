@@ -4,37 +4,37 @@ import scala.collection.mutable
 import scala.util.Random
 
 /**
- * Implementazione della Q-table per l'algoritmo Q-learning.
+ * Implementation of the Q-table for the Q-learning algorithm.
  * 
- * Questa classe gestisce la memorizzazione e l'aggiornamento dei valori Q
- * per le coppie stato-azione. Utilizza una mappa mutabile per efficienza
- * durante l'apprendimento.
+ * This class manages the storage and updating of Q-values
+ * for state-action pairs. It uses a mutable map for efficiency
+ * during learning.
  *
- * @param config Configurazione dei parametri di apprendimento
+ * @param config Configuration of learning parameters
  */
 class QTable(config: LearningConfig):
   
-  // Mappa che memorizza i valori Q per ogni coppia (stato, azione)
+  // Map that stores Q-values for each (state, action) pair
   private val table: mutable.Map[(State, Action), Double] =
     mutable.Map().withDefaultValue(config.optimistic)
 
   /**
-   * Ottiene il valore Q per una specifica coppia stato-azione.
+   * Gets the Q-value for a specific state-action pair.
    *
-   * @param state Lo stato
-   * @param action L'azione
-   * @return Il valore Q corrente
+   * @param state The state
+   * @param action The action
+   * @return The current Q-value
    */
   def getValue(state: State, action: Action): Double =
     table.getOrElse((state, action), config.optimistic)
 
   /**
-   * Aggiorna un valore Q utilizzando la regola di aggiornamento Q-learning.
+   * Updates a Q-value using the Q-learning update rule.
    *
-   * @param state Lo stato corrente
-   * @param action L'azione presa
-   * @param reward La ricompensa immediata ricevuta
-   * @param nextState Lo stato risultante dopo aver preso l'azione
+   * @param state The current state
+   * @param action The action taken
+   * @param reward The immediate reward received
+   * @param nextState The resulting state after taking the action
    */
   def updateValue(state: State, action: Action, reward: Reward, nextState: State): Unit =
     val currentValue = getValue(state, action)
@@ -46,57 +46,57 @@ class QTable(config: LearningConfig):
     table((state, action)) = newValue
 
   /**
-   * Ottiene tutti i valori Q per tutte le azioni da uno stato specifico.
+   * Gets all Q-values for all actions from a specific state.
    *
-   * @param state Lo stato da interrogare
-   * @return Array dei valori Q per tutte le azioni possibili
+   * @param state The state to query
+   * @return Array of Q-values for all possible actions
    */
   def getStateValues(state: State): Array[Double] =
     Action.values.map(action => getValue(state, action))
 
   /**
-   * Seleziona l'azione con il valore Q più alto per uno stato dato (politica greedy).
-   * In caso di pareggio, sceglie casualmente tra le azioni migliori.
+   * Selects the action with the highest Q-value for a given state (greedy policy).
+   * In case of a tie, randomly chooses among the best actions.
    *
-   * @param state Lo stato per cui selezionare l'azione
-   * @param rng Generatore di numeri casuali per il tie-breaking
-   * @return L'azione con il valore Q più alto
+   * @param state The state for which to select the action
+   * @param rng Random number generator
+   * @return The action with the highest Q-value
    */
   def getBestAction(state: State)(using rng: Random): Action =
     val actionValues = Action.values.map(action => action -> getValue(state, action))
     val maxValue = actionValues.map(_._2).max
     val bestActions = actionValues.filter(_._2 == maxValue).map(_._1)
     
-    // Scelta casuale in caso di pareggio
+    // Random choice in case of tie
     bestActions(rng.nextInt(bestActions.length))
 
   /**
-   * Crea uno snapshot immutabile della Q-table corrente.
+   * Creates an immutable snapshot of the current Q-table.
    *
-   * @return Una mappa immutabile contenente tutti i valori Q correnti
+   * @return An immutable map containing all current Q-values
    */
   def createSnapshot(): Map[(State, Action), Double] =
     table.toMap
 
   /**
-   * Ottiene il numero di coppie stato-azione visitate.
+   * Gets the number of visited state-action pairs.
    *
-   * @return Il numero di entry nella Q-table
+   * @return The number of state-action pairs in the table
    */
   def size: Int = table.size
 
   /**
-   * Verifica se una coppia stato-azione è stata visitata.
+   * Checks if a state-action pair has been visited.
    *
-   * @param state Lo stato
-   * @param action L'azione
-   * @return true se la coppia è stata visitata
+   * @param state The state
+   * @param action The action
+   * @return true if the pair has been visited
    */
   def hasBeenVisited(state: State, action: Action): Boolean =
     table.contains((state, action))
 
   /**
-   * Resetta la Q-table rimuovendo tutti i valori appresi.
+   * Resets the Q-table by removing all learned values.
    */
   def reset(): Unit =
     table.clear()
