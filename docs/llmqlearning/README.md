@@ -56,6 +56,22 @@ enum LLMProperty {
   case WallsPrompt
 }
 
+### LLMdslProperties Enum
+
+- `Enabled`: Boolean flag to enable/disable LLM integration
+- `Model`: String specifying the LLM model (e.g., "gpt-4o")
+- `WallsEnabled`: Boolean flag for LLM wall generation
+- `WallsModel`: String specifying the model for wall generation
+- `WallsPrompt`: String containing the prompt template
+
+All properties use the `>>` operator for assignment:
+
+```scala
+useLLM:
+  Enabled >> true
+  Model >> "gpt-4o"
+```
+
 // Configuration through DSL
 simulation("LLMEnhancedScenario") {
   llm {
@@ -68,6 +84,19 @@ simulation("LLMEnhancedScenario") {
     qTableFromLLM = true
   }
 }
+
+```scala
+simulation:
+  useLLM:
+    Enabled >> true
+    Model >> "gpt-4o"
+  
+  grid: 10 x 10
+  agent:
+    Name >> "Explorer"
+    Start >> (1, 1)
+    Goal >> (8, 8)
+```
 ```
 
 #### LLM Services
@@ -196,6 +225,24 @@ class LLMResponseProcessor {
     // Ensure completeness
   }
 }
+```
+
+```scala
+object AdvancedLLMExample extends App with LLMQLearning:
+  simulation:
+    useLLM:
+      Enabled >> true
+      Model >> "gpt-4o"
+    
+    grid: 12 x 12
+    agent:
+      Name >> "AIAgent"
+      Start >> (1, 1)
+      Goal >> (10, 10)
+      withLearner:
+        Alpha >> 0.05
+        Gamma >> 0.99
+        Eps0 >> 0.0  // No exploration - trust the LLM
 ```
 
 ## Example Scenarios

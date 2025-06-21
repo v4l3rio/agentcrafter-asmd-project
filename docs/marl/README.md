@@ -80,11 +80,13 @@ simulation(
 
 The DSL uses a sophisticated property system with the following enums:
 
-- **SimulationProperty**: `Name`, `Width`, `Height`, `Episodes`, `MaxSteps`
-- **AgentProperty**: `Position`, `LearningRate`, `DiscountFactor`, `ExplorationRate`, `ExplorationDecay`
-- **WallProperty**: `From`, `To`
-- **TriggerProperty**: `Position`, `RequiredAgents`, `Reward`, `Penalty`
-- **LearnerProperty**: `LearningRate`, `DiscountFactor`, `ExplorationRate`, `ExplorationDecay`
+- **SimulationProperty**: `Penalty`, `Episodes`, `Steps`, `ShowAfter`, `Delay`, `WithGUI`
+- **AgentProperty**: `Name`, `Start`, `Goal`
+- **LearnerProperty**: `Alpha`, `Gamma`, `Eps0`, `EpsMin`, `Warm`, `Optimistic`
+- **TriggerProperty**: `Give`, `OpenWall`, `EndEpisode`
+- **WallProperty**: `Line`, `Block`
+- **LineProperty**: `Direction`, `From`, `To`
+- **WallLLMProperty**: `Model`, `Prompt`
 
 ### Configuration Classes
 

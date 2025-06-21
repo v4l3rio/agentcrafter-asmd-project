@@ -16,29 +16,41 @@ The project is built around a sophisticated **Multi-Agent Reinforcement Learning
 - **Flexible Environment**: Grid-based environments with walls, triggers, and dynamic interactions
 - **Advanced Learning**: Q-Learning with configurable parameters and optimization strategies
 
+### Advanced Learning
+- **Multi-Agent Coordination**: Sophisticated agent interaction patterns
+- **Dynamic Environment**: Real-time environment modifications
+- **Trigger Systems**: Event-driven behaviors and rewards
+- **Performance Analytics**: Comprehensive learning metrics
+- **Real-time Visualization**: GUI and console-based monitoring
+
 ### LLM Integration Extensions
-- **LLM Q-Table Generation**: AI-powered Q-Table initialization using GPT models
-- **LLM Wall Generation**: Automatic maze and environment generation from natural language descriptions
-- **Intelligent Bootstrapping**: Pre-computed optimal policies to accelerate learning
+
+#### Q-Table Generation
+- **AI-Powered Bootstrapping**: Use LLMs like GPT-4o to generate initial Q-tables
+- **Strategic Initialization**: Leverage AI understanding for better starting policies
+- **Seamless Integration**: Drop-in replacement for traditional initialization
+
+#### Wall Generation
+- **Natural Language Design**: Describe environments in plain English
+- **Creative Layouts**: AI-generated mazes and obstacle patterns
+- **Dynamic Content**: Procedural environment generation
+
+#### Visualization System
+- **Unified Interface**: Single component for both single and multi-agent scenarios
+- **Real-time Monitoring**: Live agent movement and state updates
+- **Debug Capabilities**: Q-value inspection and trajectory analysis
+- **Console Support**: ASCII-based visualization for headless environments
 
 
 
 ## Documentation Sections
 
-### 1. [Multi-Agent Reinforcement Learning (MARL)](marl/)
-The core framework implementing sophisticated multi-agent systems with coordination mechanisms, triggers, and complex environment interactions. This is the foundation of the entire project.
-
-### 2. [LLM Q-Learning Extensions](llmqlearning/)
-Innovative extensions that integrate Large Language Models for intelligent Q-Table generation and environment bootstrapping. This demonstrates how AI can enhance traditional reinforcement learning.
-
-### 3. [LLM Wall Generation](wallsfromllm/)
-A unique feature that allows automatic generation of maze layouts and wall configurations using LLMs directly within the simulation DSL, enabling endless variety in environment design.
-
-### 4. [Grid Q-Learning](gridqlearning/)
-The foundational implementation showcasing basic Q-Learning concepts. This serves as a reference for understanding the evolution to more advanced approaches.
-
-### 5. [Visual Q-Learning](visualqlearning/)
-Enhanced implementation with visualization capabilities and improved learning mechanisms, bridging basic and advanced approaches.
+- **[MARL Framework](marl/)** - Multi-Agent Reinforcement Learning core
+- **[Grid Q-Learning](gridqlearning/)** - Foundation grid-based learning
+- **[LLM Q-Learning](llmqlearning/)** - AI-powered Q-Table generation
+- **[Visual Q-Learning](visualqlearning/)** - Enhanced visualization and monitoring
+- **[Visualizers](visualizers/)** - Comprehensive visualization system
+- **[LLM Wall Generation](wallsfromllm/)** - AI-powered environment design
 
 ## Key Features
 

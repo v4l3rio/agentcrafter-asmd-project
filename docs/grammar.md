@@ -118,7 +118,6 @@ string ::= "\"" [^\"]* "\"" ;
   - **name_property**: Agent identifier
   - **start_property**: Initial position coordinates
   - **goal_property**: Target position coordinates
-  - **reward_property**: Reward value for reaching the goal
   - **learner_block**: Learning algorithm configuration
 
 #### Learner Configuration
@@ -132,12 +131,27 @@ string ::= "\"" [^\"]* "\"" ;
   - **Warm**: Warm-up episodes
   - **Optimistic**: Optimistic initialization value
 
+#### Trigger Configuration
+- **trigger_block**: Configures goal-reaching triggers
+- **trigger_config**: Contains trigger-specific properties
+- **trigger_property**: Individual trigger parameters:
+  - **Give**: Bonus reward amount
+  - **OpenWall**: Wall position to remove
+  - **EndEpisode**: Whether to end the episode
+
+#### Wall Configuration
+- **wall_block**: Defines walls in the simulation
+- **ascii_wall_block**: ASCII representation of walls
+- **llm_wall_block**: LLM-generated walls
+
 #### Simulation Control
-- **episodes_block**: Number of training episodes
-- **steps_block**: Maximum steps per episode
-- **delay_block**: Delay between steps (milliseconds)
-- **show_after_block**: Episodes after which to show visualization
-- **gui_block**: Enable/disable graphical user interface
+- **simulation_property**: Global simulation parameters:
+  - **Penalty**: Movement penalty
+  - **Episodes**: Number of training episodes
+  - **Steps**: Maximum steps per episode
+  - **ShowAfter**: Episodes after which to show visualization
+  - **Delay**: Delay between steps (milliseconds)
+  - **WithGUI**: Enable/disable graphical user interface
 
 ### Data Types
 
@@ -157,7 +171,6 @@ simulation:
     Name >> "Agent1"
     Start >> (0, 0)
     Goal >> (9, 9)
-    Reward >> 100
     withLearner:
       Alpha >> 0.1
       Gamma >> 0.9

@@ -40,6 +40,19 @@ enum WallLLMProperty {
 }
 ```
 
+### WallLLMProperty Enum
+
+- `Model`: Specifies the LLM model to use for generation
+- `Prompt`: Contains the natural language description of the desired environment
+
+Both properties use the `>>` operator for assignment:
+
+```scala
+wallsFromLLM:
+  Model >> "gpt-4o"
+  Prompt >> "Create a maze..."
+```
+
 #### WallLLMConfig Case Class
 Type-safe configuration for wall generation:
 
@@ -86,8 +99,8 @@ simulation(
   
   // LLM-generated walls
   wallsFromLLM {
-    model = "gpt-4o"
-    prompt = "Create a challenging maze with multiple paths to the goal, including some dead ends and a central chamber"
+    Model >> "gpt-4o"
+    Prompt >> "Create a challenging maze with multiple paths to the goal, including some dead ends and a central chamber"
   }
   
   // Goal definition
@@ -108,8 +121,8 @@ wallsFromLLM("Create a spiral maze pattern")
 
 // Detailed configuration
 wallsFromLLM {
-  model = "gpt-4o"
-  prompt = "Generate a symmetrical maze with four quadrants, each with different complexity levels"
+  Model >> "gpt-4o"
+  Prompt >> "Generate a symmetrical maze with four quadrants, each with different complexity levels"
 }
 
 // Mixed with manual walls

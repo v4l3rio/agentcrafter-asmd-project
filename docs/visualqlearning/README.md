@@ -31,113 +31,52 @@ Visual Q-Learning builds upon the solid foundation of Grid Q-Learning by adding 
 
 ## Implementation Architecture
 
-### Core Visualization Engine
+### Integration with Visualizers
+Visual Q-Learning leverages the comprehensive visualization system provided by the `visualizers` package:
 
 ```scala
-class VisualQLearningEngine extends GridQLearningEngine {
-  private val renderer: EnvironmentRenderer = new EnvironmentRenderer()
-  private val dashboard: PerformanceDashboard = new PerformanceDashboard()
-  private val interactionHandler: UserInteractionHandler = new UserInteractionHandler()
-  
-  def renderEnvironment(state: EnvironmentState): VisualFrame = {
-    val baseFrame = renderer.createBaseFrame(state)
-    val agentLayer = renderer.renderAgents(state.agents)
-    val qValueLayer = renderer.renderQValues(state.qTables)
-    val pathLayer = renderer.renderAgentPaths(state.agentHistories)
-    
-    baseFrame.addLayers(agentLayer, qValueLayer, pathLayer)
-  }
-  
-  def updateDashboard(metrics: LearningMetrics): Unit = {
-    dashboard.updatePerformanceCharts(metrics)
-    dashboard.updateStatistics(metrics)
-    dashboard.refreshDisplay()
-  }
-  
-  def handleUserInteraction(interaction: UserInteraction): InteractionResult = {
-    interaction match {
-      case EnvironmentModification(position, modification) => 
-        modifyEnvironment(position, modification)
-      case ParameterAdjustment(parameter, value) => 
-        adjustParameter(parameter, value)
-      case SimulationControl(action) => 
-        controlSimulation(action)
-    }
-  }
-}
+// Uses the unified Visualizer component
+class Visualizer(
+  windowTitle: String,
+  rows: Int, 
+  cols: Int,
+  cell: Int = 60,
+  delayMs: Int = 100
+)
 ```
+
+### Enhanced Learning Features
+- **Real-time Rendering**: Live updates during learning process
+- **Interactive Controls**: User interaction with running simulations
+- **Advanced Analytics**: Comprehensive learning metrics and statistics
+- **Multi-layer Visualization**: Support for complex multi-agent scenarios
 
 ### Visualization Components
 
-#### Environment Renderer
+#### Visualization Components
+The Visual Q-Learning system utilizes both GUI and console visualization:
 
+#### GUI Visualization
 ```scala
-class EnvironmentRenderer {
-  def renderGrid(environment: GridEnvironment): GridVisualization = {
-    val grid = createGridCanvas(environment.width, environment.height)
-    
-    // Render walls
-    environment.walls.foreach { wall =>
-      grid.drawWall(wall.position, wall.style)
-    }
-    
-    // Render triggers
-    environment.triggers.foreach { trigger =>
-      grid.drawTrigger(trigger.position, trigger.reward, trigger.color)
-    }
-    
-    grid
-  }
-  
-  def renderAgents(agents: Map[String, Agent]): AgentVisualization = {
-    val agentLayer = createAgentLayer()
-    
-    agents.foreach { case (name, agent) =>
-      agentLayer.drawAgent(
-        position = agent.position,
-        name = name,
-        color = agent.color,
-        direction = agent.lastAction,
-        confidence = agent.actionConfidence
-      )
-    }
-    
-    agentLayer
-  }
-  
-  def renderQValues(qTables: Map[String, QTable]): QValueVisualization = {
-    val qValueLayer = createQValueLayer()
-    
-    qTables.foreach { case (agentName, qTable) =>
-      qTable.getAllStates().foreach { state =>
-        val maxQValue = qTable.getMaxQValue(state)
-        val actionValues = qTable.getActionValues(state)
-        
-        qValueLayer.drawQValueHeatmap(state, maxQValue)
-        qValueLayer.drawActionArrows(state, actionValues)
-      }
-    }
-    
-    qValueLayer
-  }
-  
-  def renderAgentPaths(histories: Map[String, AgentHistory]): PathVisualization = {
-    val pathLayer = createPathLayer()
-    
-    histories.foreach { case (agentName, history) =>
-      val path = history.getPositionHistory()
-      pathLayer.drawPath(
-        path = path,
-        color = getAgentColor(agentName),
-        opacity = 0.6,
-        style = "gradient"
-      )
-    }
-    
-    pathLayer
-  }
-}
+// Enable GUI with DSL
+simulation:
+  WithGUI >> true
+  Delay >> 100
+  ShowAfter >> 1000
 ```
+
+#### Console Visualization
+```scala
+// ASCII-based debugging
+ConsoleVisualizer.printGrid(gridWorld, agentPosition)
+ConsoleVisualizer.visualizeTrajectory(path, gridWorld)
+```
+
+#### Advanced Features
+- **Q-value Display**: Real-time Q-table inspection
+- **Trajectory Tracking**: Agent path visualization
+- **Performance Metrics**: Episode and reward statistics
+- **Dynamic Updates**: Real-time environment changes
 
 #### Performance Dashboard
 
