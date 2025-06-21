@@ -1,5 +1,7 @@
 package agentcrafter.marl.dsl
 
+import agentcrafter.common.*
+import agentcrafter.marl.*
 import agentcrafter.marl.builders.{AgentBuilder, SimulationBuilder, TriggerBuilder, WallLineBuilder}
 
 import scala.annotation.targetName
@@ -58,12 +60,12 @@ case class LineWallConfig(direction: String, from: (Int, Int), to: (Int, Int))
  *   Initial optimistic value for unvisited state-action pairs
  */
 case class LearnerConfig(
-  var alpha: Double = 0.1,
-  var gamma: Double = 0.9,
-  var eps0: Double = 0.9,
-  var epsMin: Double = 0.15,
-  var warm: Int = 10_000,
-  var optimistic: Double = 0.0,
+    var alpha: Double = Constants.DEFAULT_LEARNING_RATE,
+    var gamma: Double = Constants.DEFAULT_DISCOUNT_FACTOR,
+    var eps0: Double = Constants.DEFAULT_INITIAL_EXPLORATION_RATE,
+    var epsMin: Double = Constants.DEFAULT_MINIMUM_EXPLORATION_RATE,
+    var warm: Int = Constants.DEFAULT_WARMUP_EPISODES,
+    var optimistic: Double = Constants.DEFAULT_OPTIMISTIC_INITIALIZATION
 )
 
 /**

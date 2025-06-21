@@ -11,32 +11,47 @@ import org.scalatest.matchers.should.Matchers
  */
 object QLearnerProperties extends Properties("QLearner") with Matchers:
 
+  // Test constants
+  private val TEST_GRID_SIZE: Int = 5
+  private val TEST_REWARD_MIN: Double = -100.0
+  private val TEST_REWARD_MAX: Double = 100.0
+  private val TEST_ALPHA_MIN: Double = 0.01
+  private val TEST_ALPHA_MAX: Double = 1.0
+  private val TEST_GAMMA_MIN: Double = 0.0
+  private val TEST_GAMMA_MAX: Double = 1.0
+  private val TEST_EPSILON_MIN: Double = 0.0
+  private val TEST_EPSILON_MAX: Double = 1.0
+  private val TEST_WARM_MIN: Int = 1
+  private val TEST_WARM_MAX: Int = 1000
+  private val TEST_OPTIMISTIC_MIN: Double = -1.0
+  private val TEST_OPTIMISTIC_MAX: Double = 1.0
+
   private val stateGen: Gen[State] = for {
-    x <- Gen.choose(0, 4)
-    y <- Gen.choose(0, 4)
+    x <- Gen.choose(0, TEST_GRID_SIZE - 1)
+    y <- Gen.choose(0, TEST_GRID_SIZE - 1)
   } yield State(x, y)
 
   private val actionGen: Gen[Action] = Gen.oneOf(Action.values)
 
-  private val rewardGen: Gen[Double] = Gen.choose(-100.0, 100.0)
+  private val rewardGen: Gen[Double] = Gen.choose(TEST_REWARD_MIN, TEST_REWARD_MAX)
 
   private val learningParamsGen: Gen[LearningParameters] = for {
-    alpha <- Gen.choose(0.01, 1.0)
-    gamma <- Gen.choose(0.0, 1.0)
-    eps0 <- Gen.choose(0.1, 1.0)
-    epsMin <- Gen.choose(0.0, 0.5)
-    warm <- Gen.choose(1, 1000)
-    optimistic <- Gen.choose(-1.0, 1.0)
+    alpha <- Gen.choose(TEST_ALPHA_MIN, TEST_ALPHA_MAX)
+    gamma <- Gen.choose(TEST_GAMMA_MIN, TEST_GAMMA_MAX)
+    eps0 <- Gen.choose(0.1, TEST_EPSILON_MAX)
+    epsMin <- Gen.choose(TEST_EPSILON_MIN, 0.5)
+    warm <- Gen.choose(TEST_WARM_MIN, TEST_WARM_MAX)
+    optimistic <- Gen.choose(TEST_OPTIMISTIC_MIN, TEST_OPTIMISTIC_MAX)
   } yield {
     val actualEpsMin = math.min(epsMin, eps0)
     LearningParameters(alpha, gamma, eps0, actualEpsMin, warm, optimistic)
   }
 
   private def createLearner(params: LearningParameters = LearningParameters()): QLearner =
-    val env = GridWorld(rows = 5, cols = 5, walls = Set.empty)
+    val env = GridWorld(rows = TEST_GRID_SIZE, cols = TEST_GRID_SIZE, walls = Set.empty)
     QLearner(
-      goalState = State(4, 4),
-      goalReward = 100.0,
+      goalState = State(TEST_GRID_SIZE - 1, TEST_GRID_SIZE - 1),
+      goalReward = TEST_REWARD_MAX,
       updateFunction = env.step,
       resetFunction = () => State(0, 0),
       learningParameters = params

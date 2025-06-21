@@ -1,7 +1,8 @@
 package agentcrafter.marl.builders
 
-import agentcrafter.marl.{AgentSpec, Trigger}
 import agentcrafter.common.*
+import agentcrafter.marl.*
+import agentcrafter.marl.dsl.*
 
 import scala.compiletime.uninitialized
 
@@ -84,19 +85,19 @@ class AgentBuilder(parent: SimulationBuilder):
    *   This builder instance for method chaining
    */
   def withLearner(
-    alpha: Double = 0.1,
-    gamma: Double = 0.99,
-    eps0: Double = 0.9,
-    epsMin: Double = 0.15,
-    warm: Int = 10_000,
-    optimistic: Double = 0.5
+      alpha: Double = Constants.DEFAULT_LEARNING_RATE,
+      gamma: Double = Constants.DEFAULT_DISCOUNT_FACTOR,
+      eps0: Double = Constants.DEFAULT_INITIAL_EXPLORATION_RATE,
+      epsMin: Double = Constants.DEFAULT_MINIMUM_EXPLORATION_RATE,
+      warm: Int = Constants.DEFAULT_WARMUP_EPISODES,
+      optimistic: Double = Constants.DEFAULT_OPTIMISTIC_INITIALIZATION
   ): AgentBuilder =
     val gridWorld = GridWorld(
       rows = parent.getRows,
       cols = parent.getCols,
       walls = parent.getWalls
     )
-    QLearner(
+    learner = QLearner(
       learningParameters = LearningParameters(alpha, gamma, eps0, epsMin, warm, optimistic),
       goalState = gl,
       goalReward = 0.0,

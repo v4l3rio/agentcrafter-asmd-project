@@ -1,23 +1,13 @@
 package agentcrafter.common
 
 import agentcrafter.common.QLearner.*
+import agentcrafter.common.Constants
 
 import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.util.Random
 
-/**
- * Constants for Q-Learning algorithm
- */
-object QLearnerConstants:
-  /** Default maximum number of steps per episode */
-  val DEFAULT_MAX_STEPS: Int = 200
-  /** Initial episode counter value */
-  val INITIAL_EPISODE_COUNT: Int = 0
-  /** Step increment value */
-  val STEP_INCREMENT: Int = 1
-  /** Alpha coefficient for Q-value update (1 - alpha) */
-  val ALPHA_COMPLEMENT_FACTOR: Double = 1.0
+
 
 /**
  * Configuration parameters for Q-learning algorithms.
@@ -36,12 +26,12 @@ object QLearnerConstants:
  *   Initial optimistic value for unvisited state-action pairs
  */
 case class LearningParameters(
-  alpha: Double = 0.1,
-  gamma: Double = 0.99,
-  eps0: Double = 0.9,
-  epsMin: Double = 0.15,
-  warm: Int = 10_000,
-  optimistic: Double = 0.5
+    alpha: Double = Constants.DEFAULT_LEARNING_RATE,
+    gamma: Double = Constants.DEFAULT_DISCOUNT_FACTOR,
+    eps0: Double = Constants.DEFAULT_INITIAL_EXPLORATION_RATE,
+    epsMin: Double = Constants.DEFAULT_MINIMUM_EXPLORATION_RATE,
+    warm: Int = Constants.DEFAULT_WARMUP_EPISODES,
+    optimistic: Double = Constants.DEFAULT_OPTIMISTIC_INITIALIZATION
 ):
   /**
    * Calculates the current epsilon value based on the episode number.
@@ -151,10 +141,10 @@ class QLearner private (
 
   private val A = Action.values
   private val Q: QTable = new QTable()
-  private var ep = QLearnerConstants.INITIAL_EPISODE_COUNT
+  private var ep = Constants.INITIAL_EPISODE_COUNT
 
-  override def episode(maxSteps: Int = QLearnerConstants.DEFAULT_MAX_STEPS): EpisodeOutcome =
-    ep += QLearnerConstants.STEP_INCREMENT
+  override def episode(maxSteps: Int = Constants.DEFAULT_MAX_STEPS_PER_EPISODE): EpisodeOutcome =
+    ep += Constants.SINGLE_STEP_INCREMENT
 
     @tailrec
     def loop(state: State, steps: Int, acc: List[(State, Action, Boolean, Array[Reward])]): EpisodeOutcome =
@@ -173,8 +163,8 @@ class QLearner private (
 
         val newAcc = (state, action, isExploring, Q.qValues(state)) :: acc
 
-        if isGoal then (true, steps + QLearnerConstants.STEP_INCREMENT, newAcc.reverse)
-        else loop(nextState, steps + QLearnerConstants.STEP_INCREMENT, newAcc)
+        if isGoal then (true, steps + Constants.SINGLE_STEP_INCREMENT, newAcc.reverse)
+        else loop(nextState, steps + Constants.SINGLE_STEP_INCREMENT, newAcc)
 
     val initialState = resetFunction()
     loop(initialState, 0, Nil)
@@ -228,7 +218,7 @@ class QLearner private (
     Q.update(state, action, reward, nextState)
 
   override def incEp(): Unit =
-    ep += QLearnerConstants.STEP_INCREMENT
+    ep += Constants.SINGLE_STEP_INCREMENT
 
   /**
    * Represents the type of action selection made by the agent.
@@ -280,7 +270,7 @@ class QLearner private (
      */
     def update(state: State, action: Action, reward: Reward, newState: State): Unit =
       val bestNext = A.map(a2 => table(newState, a2)).max
-      val newValue = (QLearnerConstants.ALPHA_COMPLEMENT_FACTOR - learningParameters.alpha) *
+      val newValue = (Constants.Q_LEARNING_ALPHA_COMPLEMENT - learningParameters.alpha) *
         table(state, action) + learningParameters.alpha *
         (reward + learningParameters.gamma * bestNext)
       table(state -> action) = newValue

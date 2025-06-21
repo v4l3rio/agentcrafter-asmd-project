@@ -1,0 +1,71 @@
+package agentcrafter.common
+
+/** Constants for the AgentCrafter RL framework */
+object Constants:
+
+  // Grid World Environment
+  val DEFAULT_GRID_ROWS: Int = 10
+  val DEFAULT_GRID_COLS: Int = 10
+  val DEFAULT_STEP_PENALTY: Double = -3.0
+  
+  val DEFAULT_GRID_WALLS: Set[State] = Set(
+    State(1, 2),
+    State(2, 2)
+  )
+  
+
+
+  // Q-Learning Algorithm
+  val DEFAULT_LEARNING_RATE: Double = 0.1
+  val DEFAULT_DISCOUNT_FACTOR: Double = 0.95
+  val DEFAULT_INITIAL_EXPLORATION_RATE: Double = 0.8
+  val DEFAULT_MINIMUM_EXPLORATION_RATE: Double = 0.1
+  val DEFAULT_WARMUP_EPISODES: Int = 1000
+  val DEFAULT_OPTIMISTIC_INITIALIZATION: Double = 0.5
+  val DEFAULT_MAX_STEPS_PER_EPISODE: Int = 200
+  val DEFAULT_GOAL_REWARD: Double = 100.0
+  val Q_LEARNING_ALPHA_COMPLEMENT: Double = 1.0
+  val SINGLE_STEP_INCREMENT: Int = 1
+  val INITIAL_EPISODE_COUNT: Int = 0
+
+  // Simulation and Training
+  val DEFAULT_TRAINING_EPISODES: Int = 5000
+  val DEFAULT_SIMULATION_STEP_LIMIT: Int = 400
+  val DEFAULT_STEP_DELAY_MS: Int = 100
+  val DEFAULT_SHOW_AFTER_EPISODES: Int = 0
+  val EPISODE_REPORT_FREQUENCY: Int = 1000
+  val QTABLE_UPDATE_FREQUENCY: Int = 10
+
+  val INITIAL_REWARD_VALUE: Double = 0.0
+
+  // Visualization
+  val DEFAULT_VISUALIZATION_CELL_SIZE: Int = 60
+  val INFO_PANEL_HEIGHT: Int = 100
+  val AGENT_CIRCLE_MARGIN_DIVISOR: Int = 6
+  val AGENT_CIRCLE_MARGIN_MULTIPLIER: Int = 2
+  val INFO_TEXT_Y_OFFSET: Int = 80
+  val INFO_TEXT_X_POSITION: Int = 10
+  val INFO_TEXT_LINE_SPACING: Int = 15
+
+
+  // Q-Table Visualizer
+  val QTABLE_WINDOW_WIDTH: Int = 620
+  val QTABLE_WINDOW_HEIGHT: Int = 450
+  val WINDOW_POSITION_OFFSET: Int = 50
+  val WINDOW_POSITION_X_RANGE: Int = 300
+  val WINDOW_POSITION_Y_RANGE: Int = 200
+  val QTABLE_FONT_SIZE: Int = 12
+  val QTABLE_SCROLL_PANE_WIDTH: Int = 600
+  val QTABLE_SCROLL_PANE_HEIGHT: Int = 400
+  
+  // Q-table has 6 columns: state + 5 actions
+  val QTABLE_TOTAL_COLUMNS: Int = 6
+  val QTABLE_STATE_COLUMN_INDEX: Int = 0
+  val QTABLE_ACTION_UP_INDEX: Int = 1
+  val QTABLE_ACTION_DOWN_INDEX: Int = 2
+  val QTABLE_ACTION_LEFT_INDEX: Int = 3
+  val QTABLE_ACTION_RIGHT_INDEX: Int = 4
+  val QTABLE_ACTION_STAY_INDEX: Int = 5
+  
+  val DEFAULT_UNVISITED_Q_VALUE: Double = 0.0
+  val QTABLE_INITIAL_ROW_COUNT: Int = 0

@@ -1,9 +1,9 @@
 package agentcrafter.steps
 
-import agentcrafter.marl.DSL.{SimulationDSL, SimulationWrapper}
+import agentcrafter.marl.dsl.{Simulationdsl, SimulationWrapper}
 import agentcrafter.marl.builders.SimulationBuilder
 import agentcrafter.common.{GridWorld, QLearner, State}
-import agentcrafter.llmqlearning.LLMDSLProperties.*
+import agentcrafter.llmqlearning.LLMdslProperties.*
 import agentcrafter.llmqlearning.{LLMConfig, LLMHttpClient, LLMQLearning, QTableLoader}
 import io.cucumber.scala.{EN, ScalaDsl}
 import org.scalatest.matchers.should.Matchers
@@ -27,7 +27,7 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   private def createSimpleGrid(): GridWorld =
     GridWorld(rows = 3, cols = 3, walls = Set.empty)
 
-  private class TestSimulation extends SimulationDSL with LLMQLearning
+  private class TestSimulation extends Simulationdsl with LLMQLearning
 
   private class MockLLMApiClient extends LLMHttpClient("mock-url", "mock-key"):
     override def callLLM(

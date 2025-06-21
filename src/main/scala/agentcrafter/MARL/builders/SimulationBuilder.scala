@@ -1,28 +1,13 @@
 package agentcrafter.marl.builders
 
-import agentcrafter.marl.{AgentSpec, Runner, Trigger, WorldSpec}
-import agentcrafter.common.State
+import agentcrafter.common.*
+import agentcrafter.marl.*
+import agentcrafter.marl.dsl.*
+import agentcrafter.marl.visualizers.Visualizer
 
 import scala.collection.mutable
 
-/**
- * Constants for SimulationBuilder default values
- */
-object SimulationBuilderConstants:
-  /** Default number of rows */
-  val DEFAULT_ROWS: Int = 5
-  /** Default number of columns */
-  val DEFAULT_COLS: Int = 5
-  /** Default step limit */
-  val DEFAULT_STEP_LIMIT: Int = 400
-  /** Default step delay in milliseconds */
-  val DEFAULT_STEP_DELAY: Int = 70
-  /** Default show after episodes */
-  val DEFAULT_SHOW_AFTER: Int = 0
-  /** Default step penalty */
-  val DEFAULT_STEP_PENALTY: Double = -3.0
-  /** Default number of episodes */
-  val DEFAULT_EPISODES: Int = 10_000
+
 
 /**
  * Builder for creating Multi-Agent Reinforcement Learning (MARL) simulations.
@@ -34,13 +19,13 @@ class SimulationBuilder:
   private val walls = mutable.Set.empty[State]
   private val agents = mutable.Map.empty[String, AgentSpec]
   private val triggers = mutable.Buffer.empty[Trigger]
-  private var rows = SimulationBuilderConstants.DEFAULT_ROWS
-  private var cols = SimulationBuilderConstants.DEFAULT_COLS
-  private var nEpisodes = SimulationBuilderConstants.DEFAULT_EPISODES
-  private var stepLimit = SimulationBuilderConstants.DEFAULT_STEP_LIMIT
-  private var stepDelay = SimulationBuilderConstants.DEFAULT_STEP_DELAY
-  private var showAfter = SimulationBuilderConstants.DEFAULT_SHOW_AFTER
-  private var stepPenalty = SimulationBuilderConstants.DEFAULT_STEP_PENALTY
+  private var rows = Constants.DEFAULT_GRID_ROWS
+  private var cols = Constants.DEFAULT_GRID_COLS
+  private var nEpisodes = Constants.DEFAULT_TRAINING_EPISODES
+  private var stepLimit = Constants.DEFAULT_SIMULATION_STEP_LIMIT
+  private var stepDelay = Constants.DEFAULT_STEP_DELAY_MS
+  private var showAfter = Constants.DEFAULT_SHOW_AFTER_EPISODES
+  private var stepPenalty = Constants.DEFAULT_STEP_PENALTY
 
   private var gui = false
 

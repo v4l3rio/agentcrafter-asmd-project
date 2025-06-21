@@ -2,6 +2,7 @@ package agentcrafter.properties
 
 import agentcrafter.common.*
 import agentcrafter.llmqlearning.*
+import agentcrafter.llmqlearning.LLMdslProperties.*
 import org.scalacheck.Prop.{forAll, propBoolean}
 import org.scalacheck.{Gen, Properties}
 import org.scalatest.matchers.should.Matchers
@@ -13,12 +14,17 @@ import org.scalatest.matchers.should.Matchers
  */
 object LLMProperties extends Properties("LLM") with Matchers:
 
+  // Test constants
+  private val TEST_GRID_SIZE: Int = 5
+  private val TEST_Q_VALUE_MIN: Double = -10.0
+  private val TEST_Q_VALUE_MAX: Double = 10.0
+
   private val stateGen: Gen[State] = for {
-    x <- Gen.choose(0, 4)
-    y <- Gen.choose(0, 4)
+    x <- Gen.choose(0, TEST_GRID_SIZE - 1)
+    y <- Gen.choose(0, TEST_GRID_SIZE - 1)
   } yield State(x, y)
   private val actionGen: Gen[Action] = Gen.oneOf(Action.values)
-  private val qValueGen: Gen[Double] = Gen.choose(-10.0, 10.0)
+  private val qValueGen: Gen[Double] = Gen.choose(TEST_Q_VALUE_MIN, TEST_Q_VALUE_MAX)
 
 
   property("LLM configuration maintains valid state") = forAll(llmConfigGen) { config =>
@@ -34,10 +40,10 @@ object LLMProperties extends Properties("LLM") with Matchers:
 
     given LLMConfig = config
 
-    LLMDSLProperties.Enabled >> true
-    LLMDSLProperties.Model >> model
-    LLMDSLProperties.WallsEnabled >> true
-    LLMDSLProperties.WallsModel >> model
+    LLMdslProperties.Enabled >> true
+    LLMdslProperties.Model >> model
+    LLMdslProperties.WallsEnabled >> true
+    LLMdslProperties.WallsModel >> model
 
     config.enabled &&
       config.model == model &&
@@ -64,8 +70,8 @@ object LLMProperties extends Properties("LLM") with Matchers:
 
     given LLMConfig = config
 
-    LLMDSLProperties.Enabled >> enabled
-    LLMDSLProperties.WallsEnabled >> wallsEnabled
+    LLMdslProperties.Enabled >> enabled
+    LLMdslProperties.WallsEnabled >> wallsEnabled
 
     config.enabled == enabled && config.wallsEnabled == wallsEnabled
   }
@@ -76,8 +82,8 @@ object LLMProperties extends Properties("LLM") with Matchers:
 
     given LLMConfig = config
 
-    LLMDSLProperties.Model >> model1
-    LLMDSLProperties.WallsModel >> model2
+    LLMdslProperties.Model >> model1
+    LLMdslProperties.WallsModel >> model2
 
     config.model == model1 && config.wallsModel == model2
   }
@@ -89,11 +95,11 @@ object LLMProperties extends Properties("LLM") with Matchers:
     given LLMConfig = config
 
 
-    LLMDSLProperties.Enabled >> originalConfig.enabled
-    LLMDSLProperties.Model >> originalConfig.model
-    LLMDSLProperties.WallsEnabled >> originalConfig.wallsEnabled
-    LLMDSLProperties.WallsModel >> originalConfig.wallsModel
-    LLMDSLProperties.WallsPrompt >> originalConfig.wallsPrompt
+    LLMdslProperties.Enabled >> originalConfig.enabled
+    LLMdslProperties.Model >> originalConfig.model
+    LLMdslProperties.WallsEnabled >> originalConfig.wallsEnabled
+    LLMdslProperties.WallsModel >> originalConfig.wallsModel
+    LLMdslProperties.WallsPrompt >> originalConfig.wallsPrompt
 
 
     config.enabled == originalConfig.enabled &&
@@ -110,8 +116,8 @@ object LLMProperties extends Properties("LLM") with Matchers:
     given LLMConfig = config
 
 
-    LLMDSLProperties.Model >> ""
-    LLMDSLProperties.WallsPrompt >> ""
+    LLMdslProperties.Model >> ""
+    LLMdslProperties.WallsPrompt >> ""
 
 
     config.model.isEmpty && config.wallsPrompt.isEmpty
@@ -160,8 +166,8 @@ object LLMProperties extends Properties("LLM") with Matchers:
     given LLMConfig = config1
 
 
-    LLMDSLProperties.Model >> model1
-    LLMDSLProperties.Enabled >> true
+    LLMdslProperties.Model >> model1
+    LLMdslProperties.Enabled >> true
 
 
     config1.model == model1 &&

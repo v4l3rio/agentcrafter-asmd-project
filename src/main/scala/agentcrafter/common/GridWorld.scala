@@ -1,5 +1,8 @@
 package agentcrafter.common
 
+import agentcrafter.common.Constants
+import scala.util.Random
+
 /**
  * Factory object for creating GridWorld instances.
  *
@@ -22,13 +25,10 @@ object GridWorld:
    *   A new GridWorld instance with the specified configuration
    */
   def apply(
-    rows: Int = 13,
-    cols: Int = 15,
-    walls: Set[State] = Set(
-      State(1, 2),
-      State(2, 2)
-    ),
-    stepPenalty: Double = -3.0
+    rows: Int = Constants.DEFAULT_GRID_ROWS,
+    cols: Int = Constants.DEFAULT_GRID_COLS,
+    walls: Set[State] = Constants.DEFAULT_GRID_WALLS,
+    stepPenalty: Double = Constants.DEFAULT_STEP_PENALTY
   ): GridWorld = new GridWorld(rows, cols, walls, stepPenalty)
 
 /**
