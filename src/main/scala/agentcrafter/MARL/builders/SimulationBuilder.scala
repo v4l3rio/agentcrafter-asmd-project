@@ -232,3 +232,48 @@ class SimulationBuilder:
       showAfter
     )
     new Runner(spec, gui).run()
+
+  /**
+   * Generates a string representation of the current simulation configuration.
+   * This includes grid dimensions, walls, agents, triggers, and simulation parameters.
+   *
+   * @return
+   *   A comprehensive string representation of the simulation state
+   */
+  override def toString: String =
+    val sb = new StringBuilder
+    sb.append(s"simulation:\n")
+    sb.append(s"  grid: ${rows} x ${cols}\n")
+    
+    if walls.nonEmpty then
+      sb.append(s"  walls:\n")
+      walls.toSeq.sortBy(w => (w.x, w.y)).foreach { wall =>
+        sb.append(s"    (${wall.x}, ${wall.y})\n")
+      }
+    
+    if agents.nonEmpty then
+      sb.append(s"  agents:\n")
+      agents.values.foreach { agent =>
+        sb.append(s"    agent:\n")
+        sb.append(s"      name: ${agent.id}\n")
+        sb.append(s"      start: (${agent.start.x}, ${agent.start.y})\n")
+        sb.append(s"      goal: (${agent.goal.x}, ${agent.goal.y})\n")
+      }
+    
+    if triggers.nonEmpty then
+      sb.append(s"  triggers:\n")
+      triggers.foreach { trigger =>
+        sb.append(s"    trigger:\n")
+        sb.append(s"      agent: ${trigger.who}\n")
+        sb.append(s"      position: (${trigger.at.x}, ${trigger.at.y})\n")
+        sb.append(s"      effects: ${trigger.effects.size} effect(s)\n")
+      }
+    
+    sb.append(s"  episodes: ${nEpisodes}\n")
+    sb.append(s"  stepLimit: ${stepLimit}\n")
+    sb.append(s"  stepDelay: ${stepDelay}\n")
+    sb.append(s"  showAfter: ${showAfter}\n")
+    sb.append(s"  stepPenalty: ${stepPenalty}\n")
+    sb.append(s"  gui: ${gui}\n")
+    
+    sb.toString

@@ -44,6 +44,41 @@ object LLMWallGenerator:
         None
 
   /**
+   * Generates walls from LLM using simulation content directly.
+   *
+   * @param builder
+   *   The simulation builder
+   * @param model
+   *   The LLM model to use
+   * @param prompt
+   *   The custom prompt for wall generation
+   * @param simulationContent
+   *   The simulation configuration as a string
+   * @return
+   *   Some(asciiWalls) if successful, None otherwise
+   */
+  def generateWallsFromLLMWithContent(
+    builder: SimulationBuilder,
+    model: String,
+    prompt: String,
+    simulationContent: String
+  ): Option[String] =
+    val client = LLMHttpClient()
+    val fullPrompt = buildWallPrompt(builder, prompt)
+
+    println(s"Calling LLM API ($model) to generate walls…")
+    client.callLLMWithContent(fullPrompt, model, simulationContent) match
+      case Success(response) =>
+        extractAsciiFromResponse(response) match
+          case Some(ascii) => Some(ascii)
+          case None =>
+            println("Failed to extract valid ASCII map from LLM response")
+            None
+      case Failure(ex) =>
+        println(s"LLM API call failed: ${ex.getMessage}")
+        None
+
+  /**
    * Builds a comprehensive prompt for wall generation including simulation context.
    */
   private def buildWallPrompt(builder: SimulationBuilder, userPrompt: String): String =
