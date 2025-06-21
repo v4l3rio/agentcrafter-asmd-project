@@ -46,12 +46,6 @@ class Visualizer(
   delayMs: Int = Constants.DEFAULT_STEP_DELAY_MS
 ):
 
-  val frame: MainFrame =
-    new MainFrame:
-      title = windowTitle
-      contents = panel
-      centerOnScreen()
-      visible = true
   private val colors = Array(
     Color.blue,
     Color.magenta,
@@ -59,6 +53,7 @@ class Visualizer(
     Color.pink,
     Color.red,
   )
+  
   private val panel = new Panel:
     preferredSize = new java.awt.Dimension(cols * cell, rows * cell + Constants.INFO_PANEL_HEIGHT)
 
@@ -71,14 +66,14 @@ class Visualizer(
         val screenY = y * cell
         val isWall = staticWalls.contains(p) && !openWalls.contains(p)
         g.setColor(if isWall then Color.darkGray else Color.white)
-        g.fillRect(screenX, screenY, cell, cell)
+        g.fillRect(screenY, screenX, cell, cell)
         g.setColor(Color.lightGray)
-        g.drawRect(screenX, screenY, cell, cell)
+        g.drawRect(screenY, screenX, cell, cell)
 
       def fillCells(cells: Set[State], color: Color): Unit =
         cells.foreach { p =>
           g.setColor(color)
-          g.fillRect(p.x * cell, p.y * cell, cell, cell)
+          g.fillRect(p.y * cell, p.x * cell, cell, cell)
         }
 
       fillCells(switchCells, Color.yellow)
@@ -117,6 +112,14 @@ class Visualizer(
       g.drawString(s"Mode: ${if explorationMode then "Exploration" else "Exploitation"}", Constants.INFO_TEXT_X_POSITION, infoY + Constants.INFO_TEXT_LINE_SPACING * 2)
       g.drawString(s"Episode Reward: ${"%.2f".format(episodeReward)}", Constants.INFO_TEXT_X_POSITION, infoY + Constants.INFO_TEXT_LINE_SPACING * 3)
       g.drawString(s"Epsilon: ${"%.3f".format(epsilon)}", Constants.INFO_TEXT_X_POSITION, infoY + Constants.INFO_TEXT_LINE_SPACING * 4)
+
+  val frame: MainFrame =
+    new MainFrame:
+      title = windowTitle
+      contents = panel
+      centerOnScreen()
+      visible = true
+      
   private var singleAgentPos: Option[State] = None
   private var startPos: Option[State] = None
   private var goalPos: Option[State] = None

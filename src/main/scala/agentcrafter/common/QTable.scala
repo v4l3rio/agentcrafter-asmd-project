@@ -37,8 +37,8 @@ class QTable(config: LearningConfig):
    * @param nextState Lo stato risultante dopo aver preso l'azione
    */
   def updateValue(state: State, action: Action, reward: Reward, nextState: State): Unit =
-    val currentValue = table((state, action))
-    val maxNextValue = Action.values.map(a => table((nextState, a))).max
+    val currentValue = getValue(state, action)
+    val maxNextValue = Action.values.map(a => getValue(nextState, a)).max
     
     val newValue = (1.0 - config.alpha) * currentValue + 
                    config.alpha * (reward + config.gamma * maxNextValue)
@@ -52,7 +52,7 @@ class QTable(config: LearningConfig):
    * @return Array dei valori Q per tutte le azioni possibili
    */
   def getStateValues(state: State): Array[Double] =
-    Action.values.map(action => table((state, action)))
+    Action.values.map(action => getValue(state, action))
 
   /**
    * Seleziona l'azione con il valore Q più alto per uno stato dato (politica greedy).
@@ -63,7 +63,7 @@ class QTable(config: LearningConfig):
    * @return L'azione con il valore Q più alto
    */
   def getBestAction(state: State)(using rng: Random): Action =
-    val actionValues = Action.values.map(action => action -> table((state, action)))
+    val actionValues = Action.values.map(action => action -> getValue(state, action))
     val maxValue = actionValues.map(_._2).max
     val bestActions = actionValues.filter(_._2 == maxValue).map(_._1)
     

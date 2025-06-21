@@ -24,16 +24,6 @@ import javax.swing.JTable
  */
 class QTableVisualizer(agentId: String, learner: Learner, spec: WorldSpec):
 
-  val frame: MainFrame = new MainFrame {
-    title = s"Q-Table: $agentId"
-    contents = scrollPane
-    size = new java.awt.Dimension(Constants.QTABLE_WINDOW_WIDTH, Constants.QTABLE_WINDOW_HEIGHT)
-    location = new java.awt.Point(
-      Constants.WINDOW_POSITION_OFFSET + agentId.hashCode.abs % Constants.WINDOW_POSITION_X_RANGE,
-      Constants.WINDOW_POSITION_OFFSET + agentId.hashCode.abs % Constants.WINDOW_POSITION_Y_RANGE
-    )
-    visible = true
-  }
   private val cellSize = Constants.DEFAULT_VISUALIZATION_CELL_SIZE
   private val fontSize = Constants.QTABLE_FONT_SIZE
   private val tableModel = new DefaultTableModel(
@@ -50,6 +40,17 @@ class QTableVisualizer(agentId: String, learner: Learner, spec: WorldSpec):
   private val scrollPane = new ScrollPane {
     contents = scala.swing.Component.wrap(table)
     preferredSize = new java.awt.Dimension(Constants.QTABLE_SCROLL_PANE_WIDTH, Constants.QTABLE_SCROLL_PANE_HEIGHT)
+  }
+
+  val frame: MainFrame = new MainFrame {
+    title = s"Q-Table: $agentId"
+    contents = scrollPane
+    size = new java.awt.Dimension(Constants.QTABLE_WINDOW_WIDTH, Constants.QTABLE_WINDOW_HEIGHT)
+    location = new java.awt.Point(
+      Constants.WINDOW_POSITION_OFFSET + agentId.hashCode.abs % Constants.WINDOW_POSITION_X_RANGE,
+      Constants.WINDOW_POSITION_OFFSET + agentId.hashCode.abs % Constants.WINDOW_POSITION_Y_RANGE
+    )
+    visible = true
   }
 
   /**
