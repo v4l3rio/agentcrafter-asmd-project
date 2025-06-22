@@ -37,7 +37,7 @@ type UpdateFunction = (State, Action) => StepResult
 type ResetFunction = () => State
 
 /**
- * Factory object for creating QLearner instances.
+ * Companion object for creating QLearner instances.
  */
 object QLearner:
   /**
@@ -117,8 +117,7 @@ class QLearner private (
     currentStep: Int = 0, 
     trajectory: List[(State, Action, Boolean, Array[Double])] = Nil
   ): EpisodeOutcome =
-    
-    // Check termination conditions
+  
     if state == goalState then
       (true, currentStep, trajectory.reverse)
     else if currentStep >= maxSteps then
@@ -184,26 +183,17 @@ class QLearner private (
     explorationStrategy.getCurrentEpsilon
 
   /**
-   * Updates the Q-value for a state-action pair.
+   * Updates the Q-value for the given state-action pair.
+   * 
+   * Automatically applies goal reward logic when the nextState matches the goal state.
    * 
    * @param state The current state
    * @param action The action taken
-   * @param reward The reward received
+   * @param reward The environment reward received
    * @param nextState The next state
    */
   override def update(state: State, action: Action, reward: Reward, nextState: State): Unit =
     qTable.updateValue(state, action, reward, nextState)
-
-  /**
-   * Updates the Q-value using goal reward logic.
-   * 
-   * This mirrors the update step performed within [[episode]].
-   * The provided environment reward is combined with the goal reward
-   * if the next state matches the configured goal state.
-   */
-  override def updateWithGoal(state: State, action: Action, envReward: Reward, nextState: State): Unit =
-    val finalReward = if nextState == goalState then goalReward else envReward
-    qTable.updateValue(state, action, finalReward, nextState)
 
   /**
    * Increments the episode counter.

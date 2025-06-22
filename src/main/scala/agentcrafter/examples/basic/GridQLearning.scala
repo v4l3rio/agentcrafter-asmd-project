@@ -18,7 +18,7 @@ import scala.collection.immutable.Vector
   val agent = QLearner(
     goalState = goal,
     goalReward = 50,
-    updateFunction = env.step,
+    updateFunction = env.step, // Function to update the environment state based on the agent's action
     resetFunction = () => start
   )
   val episodes = 20_000

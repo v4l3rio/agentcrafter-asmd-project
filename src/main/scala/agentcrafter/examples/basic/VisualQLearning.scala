@@ -38,7 +38,7 @@ import agentcrafter.common.{GridWorld, LearningConfig, QLearner, State, Constant
       optimistic = 5.0
     )
   )
-  val vis = Visualizer("Q-Learning live debug", env.rows, env.cols, cell = 60, delayMs = 300)
+  val vis = Visualizer("Q-Learning live debug", env.rows, env.cols, cell = 60, delayMs = 50)
   vis.configureSingleAgent(start, goal, env.walls)
 
   val episodes = 10_000

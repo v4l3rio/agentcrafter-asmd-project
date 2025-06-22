@@ -32,7 +32,7 @@ case class LearningConfig(
   def calculateEpsilon(episodeNumber: Int): Double =
     if episodeNumber < warm then 
       eps0 
-    else 
+    else
       math.max(epsMin, eps0 - (eps0 - epsMin) * (episodeNumber - warm) / warm)
 
   /**

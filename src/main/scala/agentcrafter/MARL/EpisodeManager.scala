@@ -149,7 +149,7 @@ class EpisodeManager(spec: WorldSpec, agentsQL: Map[String, Learner]):
     agentsQL.foreach { case (id, learner) =>
       val action = actions(id)
       val totalReward = stepRewards.getOrElse(id, 0.0) + triggerRewards.getOrElse(id, 0.0)
-      learner.updateWithGoal(agentPositions(id), action, totalReward, nextPositions(id))
+      learner.update(agentPositions(id), action, totalReward, nextPositions(id))
     }
 
   /**

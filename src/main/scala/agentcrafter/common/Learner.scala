@@ -19,6 +19,9 @@ trait Learner:
 
   /**
    * Updates the learning algorithm with the result of taking an action.
+   * 
+   * For goal-aware learners, this method should automatically handle goal rewards
+   * when the nextState matches the goal state.
    *
    * @param state
    *   The state from which the action was taken
@@ -30,20 +33,6 @@ trait Learner:
    *   The resulting state after taking the action
    */
   def update(state: State, action: Action, reward: Reward, nextState: State): Unit
-
-  /**
-   * Updates the learning algorithm when a goal state is reached.
-   *
-   * @param state
-   *   The state from which the action was taken
-   * @param action
-   *   The action that was taken
-   * @param envReward
-   *   The environment reward received
-   * @param nextState
-   *   The resulting state (typically the goal state)
-   */
-  def updateWithGoal(state: State, action: Action, envReward: Reward, nextState: State): Unit
 
   /**
    * Runs a complete episode of learning.

@@ -159,7 +159,7 @@ object QLearnerProperties extends Properties("QLearner") with Matchers:
       val initialQ = learner.getQValue(state, action)
 
       (1 to 10).foreach { _ =>
-        learner.updateWithGoal(state, action, 0.0, goalState)
+        learner.update(state, action, 0.0, goalState)
       }
 
       val finalQ = learner.getQValue(state, action)
