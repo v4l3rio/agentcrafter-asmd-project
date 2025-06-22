@@ -17,21 +17,21 @@ import scala.annotation.targetName
  *   {{{} // Using the dsl syntax LLMProperty.Enabled >> true LLMProperty.Model >> "gpt-4o" LLMProperty.WallsEnabled >>
  *   false }}}
  */
-enum LLMdslProperties[T]:
+enum LLMDSLProperties[T]:
   /** Enables or disables LLM integration for Q-learning */
-  case Enabled extends LLMdslProperties[Boolean]
+  case Enabled extends LLMDSLProperties[Boolean]
 
   /** Specifies the LLM model to use for Q-learning assistance */
-  case Model extends LLMdslProperties[String]
+  case Model extends LLMDSLProperties[String]
 
   /** Enables or disables LLM-powered dynamic wall generation */
-  case WallsEnabled extends LLMdslProperties[Boolean]
+  case WallsEnabled extends LLMDSLProperties[Boolean]
 
   /** Specifies the LLM model to use for wall generation */
-  case WallsModel extends LLMdslProperties[String]
+  case WallsModel extends LLMDSLProperties[String]
 
   /** Sets the custom prompt template for wall generation requests */
-  case WallsPrompt extends LLMdslProperties[String]
+  case WallsPrompt extends LLMDSLProperties[String]
 
   /**
    * Sets the property value using dsl syntax.
@@ -46,8 +46,8 @@ enum LLMdslProperties[T]:
    */
   @targetName("setProperty")
   infix def >>(value: T)(using config: LLMConfig): Unit = this match
-    case LLMdslProperties.Enabled => config.enabled = value.asInstanceOf[Boolean]
-    case LLMdslProperties.Model => config.model = value.asInstanceOf[String]
-    case LLMdslProperties.WallsEnabled => config.wallsEnabled = value.asInstanceOf[Boolean]
-    case LLMdslProperties.WallsModel => config.wallsModel = value.asInstanceOf[String]
-    case LLMdslProperties.WallsPrompt => config.wallsPrompt = value.asInstanceOf[String]
+    case LLMDSLProperties.Enabled => config.enabled = value.asInstanceOf[Boolean]
+    case LLMDSLProperties.Model => config.model = value.asInstanceOf[String]
+    case LLMDSLProperties.WallsEnabled => config.wallsEnabled = value.asInstanceOf[Boolean]
+    case LLMDSLProperties.WallsModel => config.wallsModel = value.asInstanceOf[String]
+    case LLMDSLProperties.WallsPrompt => config.wallsPrompt = value.asInstanceOf[String]

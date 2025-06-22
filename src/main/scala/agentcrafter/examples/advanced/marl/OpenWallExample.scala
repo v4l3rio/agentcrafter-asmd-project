@@ -1,4 +1,5 @@
-package agentcrafter.marl.scenarios
+package agentcrafter.examples.advanced.marl
+
 
 import agentcrafter.marl.dsl.*
 
@@ -8,7 +9,7 @@ import agentcrafter.marl.dsl.*
  * - Agent "Runner" must reach a goal on the other side of the wall
  * - The simulation ends when both agents reach their respective goals
  */
-object OpenWallExample extends App with Simulationdsl:
+object OpenWallExample extends App with SimulationDSL:
 
   import AgentProperty.*
   import LearnerProperty.*

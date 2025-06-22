@@ -9,7 +9,7 @@ import agentcrafter.marl.builders.{AgentBuilder, SimulationBuilder, TriggerBuild
  * simulation parameters. The dsl uses Scala 3's context functions and given/using syntax to create a clean, readable
  * configuration syntax.
  */
-trait Simulationdsl:
+trait SimulationDSL:
   /**
    * Main entry point for defining a simulation.
    *

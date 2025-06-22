@@ -1,4 +1,4 @@
-package agentcrafter.marl.scenarios
+package agentcrafter.examples.advanced.marl
 
 import agentcrafter.marl.dsl.*
 
@@ -13,7 +13,7 @@ import agentcrafter.marl.dsl.*
  * The agents must coordinate: both switches must be activated to open
  * the walls before the hunter can reach the treasure inside.
  */
-object TreasureHuntExample extends App with Simulationdsl:
+object TreasureHuntExample extends App with SimulationDSL:
 
   import AgentProperty.*
   import LearnerProperty.*
