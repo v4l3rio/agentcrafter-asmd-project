@@ -1,8 +1,8 @@
 package agentcrafter.examples.advanced.llm
 
 import agentcrafter.marl.dsl.*
-import agentcrafter.llmqlearning.LLMdslProperties.{Enabled, Model}
 import agentcrafter.llmqlearning.LLMQLearning
+import agentcrafter.llmqlearning.LLMdslProperties.{Enabled, Model}
 
 /**
  * Example demonstrating multi-agent QTable loading from LLM.
@@ -13,8 +13,8 @@ object MultiAgentQTableExample extends App with LLMQLearning:
 
   import AgentProperty.*
   import LearnerProperty.*
+  import SimulationProperty.*
   import TriggerProperty.*
-  import agentcrafter.marl.dsl.SimulationProperty.*
 
   simulation:
     // Enable LLM for Q-table generation

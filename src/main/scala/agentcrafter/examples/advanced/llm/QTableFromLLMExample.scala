@@ -1,15 +1,15 @@
 package agentcrafter.examples.advanced.llm
 
 import agentcrafter.marl.dsl.*
-import agentcrafter.llmqlearning.LLMdslProperties.{Enabled, Model}
 import agentcrafter.llmqlearning.LLMQLearning
+import agentcrafter.llmqlearning.LLMdslProperties.{Enabled, Model}
 
 object QTableFromLLMExample extends App with LLMQLearning:
 
   import AgentProperty.*
   import LearnerProperty.*
+  import SimulationProperty.*
   import TriggerProperty.*
-  import agentcrafter.marl.dsl.SimulationProperty.*
 
   simulation:
     useLLM:

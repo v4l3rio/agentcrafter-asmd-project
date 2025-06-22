@@ -12,9 +12,9 @@ object OpenWallExample extends App with Simulationdsl:
 
   import AgentProperty.*
   import LearnerProperty.*
-  import LineProperty.*
   import SimulationProperty.*
   import TriggerProperty.*
+  import LineProperty.*
 
   simulation:
     grid:
