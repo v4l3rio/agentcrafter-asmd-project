@@ -11,10 +11,10 @@ import agentcrafter.common.State
  *
  * Key features:
  *   - Pure functional rendering (no side effects in core logic)
- *   - Visit order visualization using alphabetic characters (a-z, A-Z)
+ *   - Movement sequence visualization using alphabetic characters (a-z, A-Z)
  *   - Clear representation of walls (##), start (S), goal (G), and unvisited cells (.)
  *   - Support for both string generation and direct console output
- *   - Handles revisits by showing only the first visit to each state
+ *   - Handles revisits by showing the most recent visit to each state
  *
  * The visualization is particularly useful for:
  *   - Debugging agent behavior
@@ -84,8 +84,8 @@ object ConsoleVisualizer:
    *   - "##" for walls (impassable obstacles)
    *   - "S " for the start position
    *   - "G " for the goal position
-   *   - "a"-"z", "A"-"Z" for visited states (in visit order)
-   *   - "* " for visits beyond the 52-character alphabet
+   *   - "a"-"z", "A"-"Z" for states in movement sequence (most recent visit shown)
+   *   - "* " for movements beyond the 52-character alphabet
    *   - ". " for unvisited, passable states
    *
    * @param start
@@ -112,9 +112,10 @@ object ConsoleVisualizer:
     cols: Int
   ): Vector[String] =
 
-    val firstVisit: Map[State, Int] =
+    // Track all movements in sequence, overwriting previous visits
+    val stateToStep: Map[State, Int] =
       path.drop(1).zipWithIndex.foldLeft(Map.empty[State, Int]) {
-        case (m, (s, i)) => if m.contains(s) then m else m.updated(s, i)
+        case (m, (s, i)) => m.updated(s, i) // Always update, allowing overwrite
       }
 
     (0 until rows).toVector.map { x =>
@@ -124,7 +125,7 @@ object ConsoleVisualizer:
         else if s == start then "S "
         else if s == goal then "G "
         else
-          firstVisit.get(s) match
+          stateToStep.get(s) match
             case Some(i) => s"${glyph(i)} "
             case None => ". "
       }.mkString

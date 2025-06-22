@@ -40,4 +40,9 @@ import scala.collection.immutable.Vector
     if ep % evaluateEvery == 0 then
       val (_, greedySteps, trajEval) = agent.episode()
       println(s"Greedy policy needs $greedySteps steps:")
-      println(ConsoleVisualizer.asciiString(start, goal, env.walls, trajEval.map(_._1), env.rows, env.cols))
+      // Reconstruct complete movement sequence including blocked moves
+      val allStates = trajEval.foldLeft(List(start)) { case (states, (fromState, action, _, _)) =>
+        val nextState = env.step(fromState, action).state
+        states :+ nextState
+      }
+      println(ConsoleVisualizer.asciiString(start, goal, env.walls, allStates, env.rows, env.cols))

@@ -1,7 +1,7 @@
 package agentcrafter.examples.basic
 
 import agentcrafter.marl.visualizers.Visualizer
-import agentcrafter.common.{GridWorld, LearningConfig, QLearner, State}
+import agentcrafter.common.{GridWorld, LearningConfig, QLearner, State, Constants}
 
 /**
  * Main training program with real-time visualization.
@@ -38,15 +38,37 @@ import agentcrafter.common.{GridWorld, LearningConfig, QLearner, State}
       optimistic = 5.0
     )
   )
-  val vis = Visualizer("Q-Learning live debug", env.rows, env.cols, cell = 60, delayMs = 100)
+  val vis = Visualizer("Q-Learning live debug", env.rows, env.cols, cell = 60, delayMs = 300)
   vis.configureSingleAgent(start, goal, env.walls)
 
   val episodes = 10_000
   val testEvery = 500
+  val printEvery = 100
 
   for ep <- 1 to episodes do
     agent.episode()
     if ep % testEvery == 0 then
-      val (_, _, path) = agent.episode()
-      path.foreach { case (s, a, e, q) => vis.updateSingleAgent(s, a, e, q) }
-      println(f"Ep $ep%5d | ε=${agent.eps}%.3f | steps=${path.size}")
+      val (success, steps, path) = agent.episode()
+      
+      // Calculate episode reward: step penalties + goal reward if successful
+      val stepPenalties = steps * Constants.DEFAULT_STEP_PENALTY
+      val episodeReward = if success then stepPenalties + 50 else stepPenalties
+      
+      // Real-time visualization: show every step with accumulating reward
+      var cumulativeReward = 0.0
+      path.zipWithIndex.foreach { case ((s, a, e, q), stepIndex) => 
+        // Add step penalty for each step
+        cumulativeReward += Constants.DEFAULT_STEP_PENALTY
+        
+        // Add goal reward if this is the final step and successful
+        val currentReward = if (stepIndex == path.length - 1 && success) then cumulativeReward + 50 else cumulativeReward
+        
+        vis.updateSingleAgent(s, a, e, q, stepIndex + 1, ep)
+        vis.updateSimulationInfo(ep, stepIndex == path.length - 1 && success, currentReward, agent.eps)
+      }
+      
+      println(f"Ep $ep%5d | ε=${agent.eps}%.3f | steps=${path.size} | reward=${episodeReward}%.1f")
+    
+    // Print progress less frequently to avoid console spam
+    if ep % printEvery == 0 then
+      println(f"Training progress: Ep $ep%5d | ε=${agent.eps}%.3f")
