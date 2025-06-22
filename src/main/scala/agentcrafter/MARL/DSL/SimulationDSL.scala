@@ -55,36 +55,7 @@ trait Simulationdsl:
   def asciiWalls(ascii: String)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.wallsFromAscii(ascii.stripMargin)
 
-  /**
-   * Generates walls from LLM using a configuration block.
-   *
-   * @param block
-   *   Configuration block for LLM wall generation (model, prompt)
-   */
-  def wallsFromLLM(block: WallLLMConfig ?=> Unit)(using wrapper: SimulationWrapper): Unit =
-    val config = WallLLMConfig()
 
-    given WallLLMConfig = config
-
-    block
-
-    if config.model.nonEmpty && config.prompt.nonEmpty then
-      import agentcrafter.llmqlearning.LLMWallGenerator
-      // Use the simulation builder's toString instead of file path inspection
-      val simulationContent = wrapper.builder.toString
-      LLMWallGenerator.generateWallsFromLLMWithContent(
-        wrapper.builder,
-        config.model,
-        config.prompt,
-        simulationContent
-      ) match
-        case Some(asciiWalls) =>
-          println(s"LLM wall generation successful, loading walls...")
-          LLMWallGenerator.loadWallsIntoBuilder(wrapper.builder, asciiWalls)
-        case None =>
-          println("LLM wall generation failed, proceeding without generated walls")
-    else
-      throw new IllegalArgumentException("wallsFromLLM requires both Model and Prompt to be specified")
 
   /**
    * Opens a walls configuration block.

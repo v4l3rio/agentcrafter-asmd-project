@@ -14,7 +14,7 @@ object WallsFromLLMExample extends App with LLMQLearning:
   import LearnerProperty.*
   import SimulationProperty.*
   import TriggerProperty.*
-  import WallLLMProperty.*
+  import agentcrafter.llmqlearning.WallLLMProperty.{Model, Prompt}
 
   simulation:
     grid:
