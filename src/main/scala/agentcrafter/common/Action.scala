@@ -10,11 +10,6 @@ package agentcrafter.common
  * Each action has an associated delta that represents the change in grid coordinates when the action is performed. The
  * coordinate system uses (row, column) indexing where (0,0) is typically the top-left corner.
  *
- * @example
- * {{{
- * val action = Action.Up
- * val (deltaRow, deltaCol) = action.delta
- * }}}
  */
 enum Action(val delta: (Int, Int)) derives CanEqual:
   case Up extends Action((-1, 0))

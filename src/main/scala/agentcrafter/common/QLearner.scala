@@ -105,11 +105,10 @@ class QLearner private (
    * handling action selection, environment execution,
    * Q-value updates and trajectory recording.
    *
-   * @param currentState The current state of the agent
-   * @param steps The number of steps executed so far
-   * @param maxSteps The maximum number of steps allowed
-   * @param trajectory The trajectory accumulated so far
-   * @return The final result of the episode
+   * @param state The current state of the agent
+   * @param maxSteps Maximum number of steps allowed in the episode
+   * @param currentStep The current step count in the episode
+   * @param trajectory The trajectory of the episode so far
    */
   @tailrec
   private def runEpisodeLoop(
