@@ -1,53 +1,166 @@
 # Multi-Agent Reinforcement Learning (MARL)
 
-The **Multi-Agent Reinforcement Learning (MARL)** framework is the core foundation of the AgentCrafter project. It provides a sophisticated, DSL-based approach to defining and executing multi-agent reinforcement learning simulations with advanced coordination mechanisms.
+The MARL framework extends the foundational Q-Learning implementation to support multiple coordinated agents working together in complex environments with triggers, switches, and dynamic interactions.
 
-## Overview
+## What's Beyond Basic Q-Learning?
 
-This framework represents the culmination of reinforcement learning evolution in the project, implementing a powerful Domain-Specific Language (DSL) that allows for intuitive definition of complex multi-agent scenarios with cooperative behaviors, environmental interactions, and advanced learning strategies.
-
-## Architecture Overview
-
-The MARL framework is built on a sophisticated multi-agent coordination architecture that enables complex cooperative behaviors and learning strategies.
-
-### Multi-Agent Coordination Architecture
-
-The system enables multiple agents to coordinate through triggers, effects, and shared world state, with Q-Learning components working together in a multi-agent environment.
-
-## Key Concepts
+While basic Q-Learning handles single agents in static environments, MARL adds:
 
 ### Multi-Agent Coordination
-- **Cooperative Learning**: Multiple agents working together to achieve shared objectives
-- **Trigger Systems**: Environmental switches and triggers that require agent coordination
-- **Shared State Management**: Synchronized state updates across multiple learning agents
-- **Dynamic Interactions**: Real-time agent-to-agent and agent-to-environment interactions
+- **Simultaneous Learning**: Multiple agents learning and acting concurrently
+- **Shared Environment**: Agents affect each other's state transitions and rewards
+- **Coordination Mechanisms**: Triggers and switches requiring collaborative activation
+- **Joint Action Spaces**: Complex interactions between agent decisions
 
-### Advanced Learning Mechanisms
-- **Q-Learning with Coordination**: Enhanced Q-Learning that considers multi-agent interactions
-- **Configurable Parameters**: Flexible learning rates, exploration strategies, and reward structures
-- **Policy Optimization**: Advanced algorithms for optimal policy discovery in multi-agent settings
-- **Experience Sharing**: Mechanisms for agents to learn from each other's experiences
+### Dynamic Environment Features
+- **Trigger Systems**: Environmental elements that respond to agent actions
+- **Wall Removal**: Dynamic environment modification based on agent coordination
+- **Conditional Rewards**: Context-aware reward systems responding to multi-agent behaviors
+- **State Synchronization**: Coordinated state updates across all agents
 
-### Environment Complexity
-- **Grid-Based Worlds**: Sophisticated 2D environments with walls, obstacles, and interactive elements
-- **Trigger Mechanisms**: Switches, buttons, and conditional elements requiring coordination
-- **Dynamic Rewards**: Context-aware reward systems that adapt to multi-agent behaviors
-- **Scalable Scenarios**: Support for varying numbers of agents and environment complexities
+### Enhanced DSL
 
-## DSL Architecture
+The DSL evolved from simple single-agent configuration to sophisticated multi-agent scenario definition:
 
-### Core DSL Components
+*[Pattern: Advanced DSL syntax for multi-agent scenarios]*
 
-The MARL framework is built around a powerful Scala 3 DSL that provides:
+**DSL Enhancements:**
+- Multiple agent definitions with individual configurations
+- Trigger and switch specifications
+- Complex reward structures
+- Coordination requirements
 
-```scala
-// Simulation Configuration
-simulation(
-  name = "CooperativeScenario",
-  width = 10,
-  height = 10,
-  episodes = 1000
-) {
+## Implementation Architecture
+
+### Core Components Added
+
+**EpisodeManager**: Orchestrates multi-agent episodes with synchronized state updates
+
+*[Pattern: EpisodeManager coordination logic]*
+
+**WorldSpec**: Complete specification of multi-agent environments including agents, triggers, and dynamic elements
+
+**AgentBuilder**: Fluent API for configuring individual agents within the simulation
+
+### Multi-Agent Coordination
+
+The system handles complex coordination through:
+
+*[Pattern: Multi-agent action coordination and state synchronization]*
+
+**Key Coordination Features:**
+- **Joint Action Execution**: All agents act simultaneously each step
+- **Trigger Processing**: Environmental responses to coordinated actions
+- **Reward Distribution**: Individual and shared rewards based on cooperation
+- **Episode Termination**: Coordinated stopping conditions
+
+## Advanced DSL Features
+
+### Agent Configuration
+
+Each agent can be individually configured:
+
+*[Pattern: Individual agent configuration in DSL]*
+
+**Agent Properties:**
+- Unique names and starting positions
+- Individual learning parameters
+- Specific goal states and rewards
+- Custom behavior triggers
+
+### Trigger Systems
+
+Complex environmental interactions:
+
+*[Pattern: Trigger definition and activation]*
+
+**Trigger Types:**
+- **Switches**: Require specific agent positions for activation
+- **Wall Removal**: Dynamic environment modification
+- **Reward Triggers**: Conditional reward distribution
+- **Episode Control**: Triggers that affect episode termination
+
+### Environment Dynamics
+
+Advanced environment features:
+
+*[Pattern: Dynamic environment modification]*
+
+**Dynamic Features:**
+- Walls that can be removed by triggers
+- Multiple goal states with different rewards
+- Conditional pathways opening based on cooperation
+- Real-time environment state visualization
+
+## Testing Strategy
+
+### Gherkin Specifications
+
+Behavior-driven development with Cucumber tests:
+
+*[Pattern: Gherkin scenarios for multi-agent behaviors]*
+
+**BDD Test Coverage:**
+- Multi-agent coordination scenarios
+- Trigger activation and effects
+- Complex reward distribution
+- Episode termination conditions
+
+### Integration Testing
+
+Comprehensive validation of:
+- Multi-agent learning convergence
+- Coordination mechanism effectiveness
+- DSL parsing and execution
+- Visualization system integration
+
+## Implementation Challenges
+
+### Coordination Complexity
+
+**Challenge**: Ensuring agents learn effective coordination strategies
+**Solution**: Careful reward design and trigger placement to encourage cooperation
+
+### State Synchronization
+
+**Challenge**: Managing consistent state across multiple learning agents
+**Solution**: Centralized episode management with atomic state updates
+
+### DSL Complexity
+
+**Challenge**: Balancing expressiveness with usability in the DSL
+**Solution**: Fluent API design with sensible defaults and clear error messages
+
+### Performance Scaling
+
+**Challenge**: Maintaining performance with multiple agents and complex environments
+**Solution**: Efficient data structures and optimized coordination algorithms
+
+## Key Insights
+
+### Successful Patterns
+
+1. **Centralized Coordination**: EpisodeManager provides clean separation of concerns
+2. **Fluent DSL Design**: Builder pattern makes complex configurations intuitive
+3. **Modular Triggers**: Extensible trigger system supports diverse coordination scenarios
+4. **Comprehensive Testing**: BDD tests validate complex multi-agent behaviors
+
+### Lessons Learned
+
+1. **Reward Design Critical**: Multi-agent rewards require careful balance to encourage cooperation
+2. **Visualization Essential**: Complex coordination behaviors need visual debugging
+3. **DSL Evolution**: Language must grow incrementally to maintain usability
+4. **Testing Complexity**: Multi-agent scenarios require sophisticated test strategies
+
+## Foundation for LLM Integration
+
+The robust MARL framework provides the foundation for LLM enhancements:
+- **Complex Scenarios**: Rich environments benefit from AI-generated content
+- **Coordination Patterns**: Multi-agent behaviors provide training data for LLM understanding
+- **DSL Maturity**: Sophisticated language enables LLM-powered configuration
+- **Testing Infrastructure**: Comprehensive tests validate LLM-generated content
+
+The MARL implementation demonstrates that extending single-agent RL to multi-agent scenarios requires fundamental architectural changes, not just parameter scaling. The resulting framework successfully enables complex cooperative behaviors while maintaining the flexibility and testability established in the foundational Q-Learning implementation.
   // Agent definitions with learning parameters
   agent("Agent1") {
     position = (0, 0)
