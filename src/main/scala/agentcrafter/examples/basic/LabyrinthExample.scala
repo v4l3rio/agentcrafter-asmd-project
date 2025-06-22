@@ -48,5 +48,6 @@ object LabyrinthExample extends App with Simulationdsl:
     Penalty >> -3.0
     Episodes >> 15_000
     Steps >> 500
+    ShowAfter >> 10_000
     Delay >> 100
     WithGUI >> true

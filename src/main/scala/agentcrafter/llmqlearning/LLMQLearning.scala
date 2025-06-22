@@ -10,6 +10,7 @@ import agentcrafter.marl.builders.SimulationBuilder
 trait LLMQLearning extends Simulationdsl:
 
   private var llmConfig: LLMConfig = LLMConfig()
+  private var wallConfig: Option[WallLLMConfig] = None
 
   def useLLM(block: LLMConfig ?=> Unit)(using wrapper: SimulationWrapper): Unit =
     given config: LLMConfig = llmConfig
@@ -22,26 +23,32 @@ trait LLMQLearning extends Simulationdsl:
     given WallLLMConfig = config
 
     block
-
-    if config.model.nonEmpty && config.prompt.nonEmpty then
-      // Use the simulation builder's toString instead of file path inspection
-      val simulationContent = wrapper.builder.toString
-      LLMWallGenerator.generateWallsFromLLMWithContent(
-        wrapper.builder,
-        config.model,
-        config.prompt,
-        simulationContent
-      ) match
-        case Some(asciiWalls) =>
-          println(s"LLM wall generation successful, loading walls...")
-          LLMWallGenerator.loadWallsIntoBuilder(wrapper.builder, asciiWalls)
-        case None =>
-          println("LLM wall generation failed, proceeding without generated walls")
+    
+    // Store the config for later execution after the simulation block is complete
+    wallConfig = Some(config)
 
   override def simulation(block: SimulationWrapper ?=> Unit): Unit =
     given wrapper: SimulationWrapper = SimulationWrapper(new SimulationBuilder)
 
     block
+
+    // Generate walls from LLM after the simulation block is complete (so agents are defined)
+    wallConfig.foreach { config =>
+      if config.model.nonEmpty && config.prompt.nonEmpty then
+        // Now the simulation builder's toString includes all agent information
+        val simulationContent = wrapper.builder.toString
+        LLMWallGenerator.generateWallsFromLLMWithContent(
+          wrapper.builder,
+          config.model,
+          config.prompt,
+          simulationContent
+        ) match
+          case Some(asciiWalls) =>
+            println(s"LLM wall generation successful, loading walls...")
+            LLMWallGenerator.loadWallsIntoBuilder(wrapper.builder, asciiWalls)
+          case None =>
+            println("LLM wall generation failed, proceeding without generated walls")
+    }
 
     if llmConfig.enabled then
       // Use the simulation builder's toString instead of file path inspection

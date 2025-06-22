@@ -19,14 +19,12 @@ object BasicLLMWallGenerationExample extends App with LLMQLearning:
     grid:
       8 x 10
 
-
     wallsFromLLM:
       Model >> "gpt-4o"
       Prompt >>
         """
         Create a simple but interesting maze for a single agent.
         """
-
 
     agent:
       Name >> "Runner"
@@ -38,7 +36,7 @@ object BasicLLMWallGenerationExample extends App with LLMQLearning:
         EpsMin >> 0.1
         Warm >> 1_000
         Optimistic >> 0.4
-      Goal >> (6, 8)
+      Goal >> (8, 6)
       onGoal:
         Give >> 100.0
         EndEpisode >> true

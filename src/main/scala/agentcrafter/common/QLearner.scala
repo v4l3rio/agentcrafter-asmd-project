@@ -212,6 +212,20 @@ class QLearner private (
     explorationStrategy.incrementEpisode()
 
   /**
+   * Gets the learning configuration used by this QLearner.
+   * 
+   * @return The LearningConfig instance
+   */
+  def getLearningConfig: LearningConfig = config
+
+  /**
+   * Gets the goal reward value.
+   * 
+   * @return The goal reward value
+   */
+  def getGoalReward: Reward = goalReward
+
+  /**
    * Gets debug information about the current configuration.
    * 
    * @return String containing configuration information

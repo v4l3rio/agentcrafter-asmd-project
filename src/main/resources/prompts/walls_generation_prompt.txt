@@ -12,6 +12,10 @@ GENERAL GUIDELINES:
    - Open rooms connected by passages
    - Dead ends that require backtracking
    - Alternative routes of different lengths
+6. The indexes start from 0
+7. Follow the dimensions specified
+8. Absolutely do NOT put walls in the spaces where “Start” and “Goal” are.
+9. Remember that if an agent starts in a position, he must be able to get to the goal somehow, so don't create blocks that totally prevent that agent from getting to the goal
 
 DESIGN PRINCIPLES:
 - Balance challenge with solvability
