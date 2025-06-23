@@ -57,11 +57,11 @@ The documentation follows the development journey, explaining how each component
 
 *This section covers experimental AI integration, including both successes and limitations.*
 
-### [Grammar](grammar.md)
+### [Grammar](grammar/)
 **Complete DSL Specification**
 Comprehensive syntax reference and language specification (unchanged from original)
 
-### [Conclusions](conclusions.md)
+### [Conclusions](conclusions/)
 **Project Outcomes and Insights**
 - **MARL Success**: Why multi-agent coordination works effectively
 - **LLM Limitations**: Why AI integration faces significant challenges and what this teaches us
