@@ -17,7 +17,7 @@ The Q-Learning implementation evolved through several key phases:
 
 The foundation is built on a discrete grid world environment where agents learn optimal policies through Q-Learning:
 
-*[Pattern: Basic GridWorld setup and QLearner initialization]*
+![Q-Learning Diagram](./big_picture.svg)
 
 **Key Components:**
 - `GridWorld`: Discrete environment with configurable walls and penalties
@@ -29,12 +29,22 @@ The foundation is built on a discrete grid world environment where agents learn 
 
 The Q-Learning implementation follows the classical algorithm:
 
-*[Pattern: Q-Learning update equation and action selection]*
+$$
+\text{newValue}  = (1-\alpha)\,\text{currentValue} + \alpha\bigl(r + \gamma\,\text{maxNextValue}\bigr)
+$$
+
+Parameters:
+- currentValue $Q_{\text{old}}(s,a)$: the agent’s current estimate of the value of taking action a in state s. 
+- r (reward): the immediate scalar reward returned by the environment after executing action a in state s.
+- maxNextValue $\displaystyle\max_{a’} Q_{\text{old}}(s’,a’)$: the highest estimated value among all actions $a′$ available in the next state $s′$, providing a one-step look-ahead toward the future.
+- $\alpha$ (alpha): learning rate, $0 < \alpha \le 1$; how strongly new information overrides the old estimate.
+- $\gamma$ (gamma): discount factor, $0 \le \gamma < 1$; weights future rewards relative to the immediate reward.
+- newValue $Q_{\text{new}}(s,a)$: the value stored back into the Q-table, moving $Q(s,a)$ toward the optimal action–value function through repeated updates.
 
 **Learning Parameters:**
-- **Alpha (α)**: Learning rate controlling how much new information overwrites old
-- **Gamma (γ)**: Discount factor determining importance of future rewards
-- **Epsilon (ε)**: Exploration rate with decay from eps0 to epsMin over warm-up period
+- **Alpha ($α$)**: Learning rate controlling how much new information overwrites old
+- **Gamma ($γ$)**: Discount factor determining importance of future rewards
+- **Epsilon ($ε$)**: Exploration rate with decay from eps0 to epsMin over warm-up period
 - **Optimistic Initialization**: Starting Q-values to encourage exploration
 
 ### Environment Dynamics
@@ -51,7 +61,7 @@ The grid world provides:
 
 The visual component adds comprehensive monitoring capabilities:
 
-*[Pattern: Visualizer setup and real-time updates]*
+![Q-Learning Visualization](./gui.png)
 
 **Visualization Features:**
 - **Live Agent Movement**: Real-time display of agent position and trajectory
@@ -71,7 +81,21 @@ The visualization system enables:
 
 The initial DSL provided basic simulation configuration:
 
-*[Pattern: Early DSL syntax for simple scenarios]*
+```dsl
+simulation:
+  grid:
+    5 x 5
+  wall:
+    (2, 2)
+  agent:
+    Start >> (0, 0)
+    Goal >> (4, 4)
+  Episodes >> 100
+  Steps >> 50
+  GoalReward >> 10
+  WithGUI >> true
+```
+This example uses the same DSL syntax style as the Scala example, with indentation and property assignment, but remains minimal and single-agent.
 
 **Early DSL Features:**
 - Simple agent configuration
@@ -85,62 +109,8 @@ The initial DSL provided basic simulation configuration:
 
 Comprehensive testing validates:
 
-*[Pattern: Key unit test examples]*
-
 **Test Coverage:**
 - Q-Learning algorithm correctness
 - Environment state transitions
 - Parameter handling and validation
 - Edge cases and boundary conditions
-
-### Integration Tests
-
-End-to-end validation ensures:
-- Complete learning episodes
-- Convergence to optimal policies
-- Visualization system integration
-- Performance characteristics
-
-## Implementation Insights
-
-### Design Decisions
-
-**Immutable State Management**: All state transitions create new state objects, ensuring thread safety and enabling easy rollback for analysis.
-
-**Configurable Learning**: Extensive parameterization allows experimentation with different learning strategies without code changes.
-
-**Separation of Concerns**: Clear separation between environment logic, learning algorithms, and visualization components.
-
-### Performance Considerations
-
-**Memory Efficiency**: Q-tables use sparse representation, only storing visited state-action pairs.
-
-**Computational Optimization**: Efficient action selection and Q-value updates minimize per-step overhead.
-
-**Visualization Overhead**: Rendering can be disabled for training-only scenarios to maximize learning speed.
-
-## Key Learnings
-
-### Successful Patterns
-
-1. **Modular Architecture**: Clean separation enables easy extension and testing
-2. **Visual Feedback**: Real-time visualization dramatically improves understanding
-3. **Configurable Parameters**: Extensive configuration options support experimentation
-4. **Comprehensive Testing**: Unit tests catch regressions and validate correctness
-
-### Challenges Addressed
-
-1. **Exploration vs Exploitation**: Epsilon decay schedules balance learning phases
-2. **Convergence Speed**: Optimistic initialization accelerates early learning
-3. **Debugging Complexity**: Visualization makes learning process transparent
-4. **Parameter Sensitivity**: Extensive testing identifies robust parameter ranges
-
-## Foundation for Advanced Features
-
-This Q-Learning foundation enables:
-- **Multi-Agent Extensions**: Core algorithms scale to multiple coordinated agents
-- **Complex Environments**: Basic grid world extends to triggers and dynamic elements
-- **LLM Integration**: Solid base allows AI-enhanced initialization and environment generation
-- **Advanced DSL**: Initial language concepts evolve into sophisticated multi-agent syntax
-
-The robust foundation established here proves essential for all subsequent enhancements, demonstrating the value of starting with solid fundamentals before adding complexity.

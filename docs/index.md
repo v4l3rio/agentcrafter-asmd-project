@@ -10,15 +10,18 @@ This project was developed following a structured, incremental approach that dem
 1. **Grid Q-Learning** - Core reinforcement learning implementation
 2. **Visual Q-Learning** - Enhanced visualization and user experience  
 3. **First DSL Version** - Domain-specific language foundation
-4. **Unit Tests** - Comprehensive testing framework (developed in parallel)
 
 ### Advanced Features Phase
-5. **MARL Extension** - Multi-agent reinforcement learning capabilities
-6. **DSL Adaptation** - Enhanced DSL for multi-agent scenarios
-7. **Gherkin/Cucumber Tests** - Behavior-driven development testing
-8. **QTable LLM** - AI-powered Q-table generation
-9. **Wall LLM** - AI-powered environment design
-10. **ScalaCheck Tests** - Property-based testing framework
+1. **MARL Extension** - Multi-agent reinforcement learning capabilities
+2. **DSL Adaptation** - Enhanced DSL for multi-agent scenarios
+3. **QTable LLM** - AI-powered Q-table generation
+4. **Wall LLM** - AI-powered environment design
+
+### Testing and Validation Phase
+The following tests were developed, before, during, and after development incrementally:
+1. **Unit Tests** - Comprehensive testing framework
+2. **Gherkin/Cucumber Tests** - Behavior-driven development testing
+3. **ScalaCheck Tests** - Property-based testing framework
 
 This roadmap explicitly shows how each component builds upon previous work, creating a robust foundation for complex multi-agent reinforcement learning scenarios.
 
@@ -70,14 +73,11 @@ Comprehensive syntax reference and language specification (unchanged from origin
 **✅ MARL Works Effectively**
 - Reliable multi-agent coordination in complex environments
 - Seamless DSL integration with advanced features
-- Scalable architecture supporting multiple coordination patterns
-- Comprehensive testing validates multi-agent scenarios
 
 **⚠️ LLM Integration Has Limitations**
 - Technical integration succeeds but practical benefits are limited
 - LLMs struggle with optimal policy understanding and spatial reasoning
-- Generated content requires extensive validation and often needs correction
-- Traditional algorithmic approaches often provide better reliability
+- - Traditional algorithmic approaches often provide better reliability
 
 ## Getting Started
 

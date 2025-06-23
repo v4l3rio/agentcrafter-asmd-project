@@ -2,37 +2,27 @@ package agentcrafter.marl
 
 import agentcrafter.common.*
 
-import scala.collection.mutable
-
 /**
  * Manages the execution of individual episodes in a Multi-Agent Reinforcement Learning (marl) simulation.
  *
- * This class orchestrates the complex interactions between multiple learning agents in a shared environment, handling
- * state transitions, trigger activations, dynamic environment changes, and coordinated Q-learning updates. It maintains
- * the episode state and ensures proper synchronization between agents while managing environmental effects and rewards.
+ * This class orchestrates episode execution by coordinating specialized managers for different concerns:
+ * - AgentManager: handles agent actions and Q-learning updates
+ * - EnvironmentManager: manages environment state and trigger processing
+ * - SimulationState: tracks episode progress and statistics
  *
  * Key responsibilities:
- *   - Coordinating simultaneous agent actions
- *   - Managing dynamic environment changes (wall removal, triggers)
- *   - Applying environmental effects and bonus rewards
- *   - Tracking episode termination conditions
- *   - Facilitating Q-learning updates for all agents
+ *   - Orchestrating episode execution flow
+ *   - Coordinating between specialized managers
+ *   - Managing episode termination conditions
  *
  * @param spec
  *   The complete world specification including agents, triggers, and environment parameters
- * @param agentsQL
- *   Map of agent IDs to their respective Q-learning instances
  */
-class EpisodeManager(spec: WorldSpec, agentsQL: Map[String, Learner]):
+class EpisodeManager(spec: WorldSpec):
 
-  private val staticWalls = spec.staticWalls.to(mutable.Set)
-  private val dynamicWalls = mutable.Set.empty[State]
-  private val agentMap = spec.agents.map(a => a.id -> a).toMap
-  private var episodeDone = false
-  private var activeTriggers: List[Trigger] = spec.triggers
-  private var agentPositions = agentMap.view.mapValues(_.start).toMap
-
-  private var episodeReward = 0.0
+  private val agentManager = new AgentManager(spec)
+  private val environmentManager = new EnvironmentManager(spec)
+  private val simulationState = new SimulationState()
 
   /**
    * Executes a complete episode of the marl simulation.
@@ -49,133 +39,73 @@ class EpisodeManager(spec: WorldSpec, agentsQL: Map[String, Learner]):
   def runEpisode(onStep: (EpisodeState, Int, Boolean) => Unit = (_, _, _) => ()): EpisodeResult =
     var steps = 0
 
-    while !episodeDone && steps < spec.stepLimit do
+    while !environmentManager.isEpisodeDone && steps < spec.stepLimit do
       val stepResult = executeStep()
       steps += 1
-      episodeReward += stepResult.totalReward
+      simulationState.addEpisodeReward(stepResult.totalReward)
 
-      val currentState = EpisodeState(agentPositions, dynamicWalls.toSet, episodeDone, episodeReward)
+      val currentState = simulationState.createEpisodeState(
+        agentManager.getPositions, 
+        environmentManager.getOpenedWalls, 
+        environmentManager.isEpisodeDone
+      )
       onStep(currentState, steps, stepResult.anyAgentExploring)
 
-    EpisodeResult(steps, episodeReward, agentPositions, dynamicWalls.toSet, episodeDone)
+    EpisodeResult(
+      steps, 
+      simulationState.getEpisodeReward, 
+      agentManager.getPositions, 
+      environmentManager.getOpenedWalls, 
+      environmentManager.isEpisodeDone
+    )
 
   /**
    * Executes a single step in the episode.
    */
   private def executeStep(): EpisodeStepResult =
+    val (jointActions, anyAgentExploring) = agentManager.chooseJointActions()
 
-    val jointActionsWithExploration: Map[String, (Action, Boolean)] =
-      agentsQL.map { case (id, ql) => id -> ql.choose(agentPositions(id)) }
+    val (nextPositions, stepRewards) = environmentManager.executeActions(jointActions, agentManager.getPositions)
 
-    val jointActions: Map[String, Action] = jointActionsWithExploration.view.mapValues(_._1).toMap
-    val anyAgentExploring = jointActionsWithExploration.values.exists(_._2)
+    val triggerRewards = environmentManager.processTriggers(nextPositions)
 
-    val (nextPositions, stepRewards) = executeActions(jointActions)
-
-    val triggerRewards = processTriggers(nextPositions)
-
-    updateQLearning(jointActions, stepRewards, triggerRewards, nextPositions)
-
-    agentPositions = nextPositions
+    agentManager.updateQLearning(jointActions, stepRewards, triggerRewards, nextPositions)
+    agentManager.updatePositions(nextPositions)
 
     val totalReward = (stepRewards.values.sum + triggerRewards.values.sum)
-    EpisodeStepResult(agentPositions, totalReward, anyAgentExploring)
+    EpisodeStepResult(agentManager.getPositions, totalReward, anyAgentExploring)
 
   /**
-   * Executes actions for all agents and returns new positions and step rewards.
+   * Gets the agent manager for external access to agent operations.
    */
-  private def executeActions(actions: Map[String, Action]): (Map[String, State], Map[String, Double]) =
-    actions.foldLeft(agentPositions -> Map.empty[String, Double]) {
-      case ((posAcc, rewAcc), (id, action)) =>
-        val stepResult = currentGrid.step(posAcc(id), action)
-        (posAcc + (id -> stepResult.state), rewAcc + (id -> stepResult.reward))
-    }
-
-  /**
-   * Creates a GridWorld instance reflecting the current environment state.
-   *
-   * This method generates a new GridWorld with the current wall configuration, accounting for both static walls
-   * (permanent obstacles) and dynamic walls that may have been removed by trigger effects during the episode.
-   *
-   * @return
-   *   A GridWorld instance with the current wall configuration
-   */
-  private def currentGrid: GridWorld =
-    GridWorld(spec.rows, spec.cols, staticWalls.toSet -- dynamicWalls, spec.stepPenalty)
-
-  /**
-   * Processes triggers and returns trigger-based rewards.
-   */
-  private def processTriggers(positions: Map[String, State]): Map[String, Double] =
-    val (fired, remaining) = activeTriggers.partition(t => positions(t.who) == t.at)
-    activeTriggers = remaining
-
-    val triggerRewards = mutable.Map.empty[String, Double].withDefaultValue(0.0)
-    fired.foreach { trigger =>
-      val bonus = applyEffects(trigger.effects)
-      triggerRewards(trigger.who) += bonus
-    }
-    triggerRewards.toMap
-
-  /**
-   * Applies a list of trigger effects and calculates the total bonus reward.
-   *
-   * This method processes various environmental effects that can be triggered by agent actions, including wall removal,
-   * bonus rewards, and episode termination. Effects are applied immediately and may modify the environment state.
-   *
-   * @param effects
-   *   List of effects to apply to the environment
-   * @return
-   *   The total bonus reward accumulated from all reward effects
-   */
-  private def applyEffects(effects: List[Effect]): Double =
-    var bonus = 0.0
-    effects.foreach {
-      case OpenWall(pos) => dynamicWalls += pos
-      case Reward(x) => bonus += x
-      case EndEpisode => episodeDone = true
-    }
-    bonus
-
-  /**
-   * Updates Q-learning for all agents.
-   */
-  private def updateQLearning(
-    actions: Map[String, Action],
-    stepRewards: Map[String, Double],
-    triggerRewards: Map[String, Double],
-    nextPositions: Map[String, State]
-  ): Unit =
-    agentsQL.foreach { case (id, learner) =>
-      val action = actions(id)
-      val totalReward = stepRewards.getOrElse(id, 0.0) + triggerRewards.getOrElse(id, 0.0)
-      learner.update(agentPositions(id), action, totalReward, nextPositions(id))
-    }
+  def getAgentManager: AgentManager = agentManager
 
   /**
    * Resets the episode state for a new episode.
    */
   def resetEpisode(): Unit =
-    agentPositions = agentMap.view.mapValues(_.start).toMap
-    dynamicWalls.clear()
-    episodeDone = false
-    activeTriggers = spec.triggers
-    episodeReward = 0.0
+    agentManager.resetAgents()
+    environmentManager.resetEnvironment()
+    simulationState.resetEpisodeReward()
 
   /**
    * Gets the current state for visualization.
    */
   def getCurrentState: EpisodeState =
-    EpisodeState(agentPositions, dynamicWalls.toSet, episodeDone, episodeReward)
+    simulationState.createEpisodeState(
+      agentManager.getPositions,
+      environmentManager.getOpenedWalls,
+      environmentManager.isEpisodeDone
+    )
 
   /**
    * Gets the current epsilon value for exploration tracking.
    */
   def getCurrentEpsilon: Double =
-    agentsQL.values.headOption.map(_.eps).getOrElse(0.0)
+    agentManager.getCurrentEpsilon
 
   /**
    * Increments episode count for all learners.
    */
   def incrementEpisode(): Unit =
-    agentsQL.values.foreach(_.incEp())
+    agentManager.incrementEpisode()

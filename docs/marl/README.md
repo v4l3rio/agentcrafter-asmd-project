@@ -10,24 +10,135 @@ While basic Q-Learning handles single agents in static environments, MARL adds:
 - **Simultaneous Learning**: Multiple agents learning and acting concurrently
 - **Shared Environment**: Agents affect each other's state transitions and rewards
 - **Coordination Mechanisms**: Triggers and switches requiring collaborative activation
-- **Joint Action Spaces**: Complex interactions between agent decisions
 
 ### Dynamic Environment Features
 - **Trigger Systems**: Environmental elements that respond to agent actions
 - **Wall Removal**: Dynamic environment modification based on agent coordination
 - **Conditional Rewards**: Context-aware reward systems responding to multi-agent behaviors
-- **State Synchronization**: Coordinated state updates across all agents
 
 ### Enhanced DSL
 
 The DSL evolved from simple single-agent configuration to sophisticated multi-agent scenario definition:
 
-*[Pattern: Advanced DSL syntax for multi-agent scenarios]*
+**Option 1: Structured Wall Definition**
+```scala
+simulation:
+  grid:
+    8 x 12
+
+  walls:
+    line:
+      Direction >> "vertical"
+      From >> (1, 6)
+      To >> (6, 6)
+    block >> (2, 2)
+    block >> (3, 2)
+    block >> (5, 9)
+    block >> (6, 9)
+
+  agent:
+    Name >> "Opener"
+    Start >> (1, 1)
+    withLearner:
+      Alpha >> 0.15
+      Gamma >> 0.9
+      Eps0 >> 0.8
+      EpsMin >> 0.1
+      Warm >> 1_500
+      Optimistic >> 0.5
+    Goal >> (6, 2)
+    onGoal:
+      Give >> 25.0
+      OpenWall >> (4, 6)
+      EndEpisode >> false
+
+  agent:
+    Name >> "Runner"
+    Start >> (1, 2)
+    withLearner:
+      Alpha >> 0.15
+      Gamma >> 0.9
+      Eps0 >> 0.8
+      EpsMin >> 0.1
+      Warm >> 1_500
+      Optimistic >> 0.5
+    Goal >> (6, 10)
+    onGoal:
+      Give >> 55.0
+      EndEpisode >> true
+  Penalty >> -3.0
+  Episodes >> 12_000
+  Steps >> 300
+  ShowAfter >> 10_000
+  Delay >> 100
+  WithGUI >> true
+```
+
+**Option 2: ASCII Wall Definition**
+```scala
+simulation:
+  grid:
+    10 x 8
+
+  asciiWalls:
+    """########
+      |#..##..#
+      |#.####.#
+      |#.#.#..#
+      |#.#.#..#
+      |########
+      |#......#
+      |########
+      |#......#
+      |########"""
+
+  agent:
+    Name >> "WallOpener1"
+    Start >> (1, 1)
+    withLearner:
+      Alpha >> 0.15
+      Gamma >> 0.95
+      Eps0 >> 0.9
+      EpsMin >> 0.05
+      Warm >> 3_000
+      Optimistic >> 1.0
+    Goal >> (4, 1)
+    onGoal:
+      Give >> 70.0
+      OpenWall >> (7, 5)
+      EndEpisode >> false
+
+  agent:
+    Name >> "Hunter"
+    Start >> (8, 1)
+    withLearner:
+      Alpha >> 0.15
+      Gamma >> 0.95
+      Eps0 >> 0.9
+      EpsMin >> 0.05
+      Warm >> 3_000
+      Optimistic >> 0.5
+    Goal >> (4, 3)
+    onGoal:
+      Give >> 100.0
+      EndEpisode >> true
+  Penalty >> -3.0
+  Episodes >> 20_000
+  Steps >> 600
+  ShowAfter >> 17_000
+  Delay >> 150
+  WithGUI >> true
+```
+
+These examples demonstrate two different approaches for defining walls in multi-agent scenarios:
+- **Structured walls**: Use `walls:` with `line:` and `block` elements for precise programmatic control
+- **ASCII walls**: Use `asciiWalls:` with visual string representation for intuitive maze design
+
+Both showcase cooperative multi-agent scenarios with hierarchical DSL syntax, `withLearner` blocks, and coordination triggers as used in the actual codebase.
 
 **DSL Enhancements:**
 - Multiple agent definitions with individual configurations
 - Trigger and switch specifications
-- Complex reward structures
 - Coordination requirements
 
 ## Implementation Architecture
@@ -36,7 +147,7 @@ The DSL evolved from simple single-agent configuration to sophisticated multi-ag
 
 **EpisodeManager**: Orchestrates multi-agent episodes with synchronized state updates
 
-*[Pattern: EpisodeManager coordination logic]*
+![EpisodeManager Architecture](./marl.svg)
 
 **WorldSpec**: Complete specification of multi-agent environments including agents, triggers, and dynamic elements
 
