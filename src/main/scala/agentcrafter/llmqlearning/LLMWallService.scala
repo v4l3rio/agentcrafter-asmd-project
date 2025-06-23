@@ -1,12 +1,13 @@
 package agentcrafter.llmqlearning
 
 import agentcrafter.marl.builders.SimulationBuilder
-
 import scala.util.matching.Regex
 import scala.util.{Failure, Success}
 
-/** Service responsible for LLM wall generation and loading into simulation. */
-object LLMWallService:
+/**
+ * Service responsible for LLM wall generation and loading into simulation.
+ */
+object LLMWallService extends LLMService[String]:
 
   /**
    * Generates walls from LLM using simulation content directly.
@@ -22,31 +23,30 @@ object LLMWallService:
    * @return
    *   Some(asciiWalls) if successful, None otherwise
    */
+  def generateFromLLM(
+    builder: SimulationBuilder,
+    model: String,
+    prompt: String,
+    simulationContent: String
+  ): Option[String] =
+    val fullPrompt = buildPrompt(builder, prompt)
+    callLLMAndProcess(model, fullPrompt, simulationContent, "walls")
+
+  /**
+   * Alias for backward compatibility.
+   */
   def generateWallsUsingLLM(
     builder: SimulationBuilder,
     model: String,
     prompt: String,
     simulationContent: String
   ): Option[String] =
-    val client = LLMHttpClient()
-    val fullPrompt = buildWallPrompt(builder, prompt)
-
-    println(s"Calling LLM API ($model) to generate walls…")
-    client.callLLMWithContent(fullPrompt, model, simulationContent) match
-      case Success(response) =>
-        extractAsciiFromResponse(response) match
-          case Some(ascii) => Some(ascii)
-          case None =>
-            println("Failed to extract valid ASCII map from LLM response")
-            None
-      case Failure(ex) =>
-        println(s"LLM API call failed: ${ex.getMessage}")
-        None
+    generateFromLLM(builder, model, prompt, simulationContent)
 
   /**
    * Builds a comprehensive prompt for wall generation including simulation context.
    */
-  private def buildWallPrompt(builder: SimulationBuilder, userPrompt: String): String =
+  protected override def buildPrompt(builder: SimulationBuilder, userPrompt: String): String =
     val basePrompt = Prompts.walls
 
     s"""
@@ -61,7 +61,7 @@ object LLMWallService:
   /**
    * Extracts ASCII map from LLM response.
    */
-  private def extractAsciiFromResponse(response: String): Option[String] =
+  protected def extractContentFromResponse(response: String): Option[String] =
     // Look for ASCII content between ```ascii and ``` tags
     val asciiPattern = "```ascii\\s*\\n([\\s\\S]*?)\\n```".r
     asciiPattern.findFirstMatchIn(response) match
@@ -89,10 +89,16 @@ object LLMWallService:
    * @param asciiWalls
    *   The ASCII representation of walls
    */
-  def loadWallsIntoBuilder(builder: SimulationBuilder, asciiWalls: String): Unit =
+  def loadIntoBuilder(builder: SimulationBuilder, asciiWalls: String): Unit =
     try
       builder.wallsFromAscii(asciiWalls)
       println("Successfully loaded LLM-generated walls into simulation")
     catch
       case ex: Exception =>
         println(s"Error loading walls into simulation: ${ex.getMessage}")
+
+  /**
+   * Alias for backward compatibility.
+   */
+  def loadWallsIntoBuilder(builder: SimulationBuilder, asciiWalls: String): Unit =
+    loadIntoBuilder(builder, asciiWalls)
