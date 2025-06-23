@@ -1,8 +1,9 @@
 package agentcrafter.examples.advanced.llm
 
 
+import agentcrafter.llmqlearning.dsl.LLMQLearning
 import agentcrafter.marl.dsl.*
-import agentcrafter.llmqlearning.LLMQLearning
+import agentcrafter.llmqlearning.dsl.LLMWallProperty.{Model, Prompt}
 
 /**
  * Example demonstrating the wallsFromLLM feature with cooperative switch mechanism.
@@ -15,7 +16,6 @@ object WallsFromLLMExample extends App with LLMQLearning:
   import LearnerProperty.*
   import SimulationProperty.*
   import TriggerProperty.*
-  import agentcrafter.llmqlearning.WallLLMProperty.{Model, Prompt}
 
   simulation:
     grid:

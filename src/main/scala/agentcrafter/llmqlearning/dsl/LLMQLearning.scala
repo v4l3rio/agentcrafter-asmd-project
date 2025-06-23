@@ -1,16 +1,17 @@
-package agentcrafter.llmqlearning
+package agentcrafter.llmqlearning.dsl
 
-import agentcrafter.marl.dsl.{SimulationDSL, SimulationWrapper}
+import agentcrafter.llmqlearning.{LLMQTableService, LLMWallService}
 import agentcrafter.marl.builders.SimulationBuilder
+import agentcrafter.marl.dsl.{SimulationDSL, SimulationWrapper}
 
 /**
- * Mixin that augments the base `Simulationdsl` with an `useLLM { … }` block allowing users to enable LLM‑generated
+ * Mixin that augments the base `SimulationDSL` with an `useLLM { … }` block allowing users to enable LLM‑generated
  * Q‑tables.
  */
 trait LLMQLearning extends SimulationDSL:
 
   private var llmConfig: LLMConfig = LLMConfig()
-  private var wallConfig: Option[WallLLMConfig] = None
+  private var wallConfig: Option[LLMWallConfig] = None
 
   def useLLM(block: LLMConfig ?=> Unit)(using wrapper: SimulationWrapper): Unit =
     given config: LLMConfig = llmConfig
@@ -18,12 +19,12 @@ trait LLMQLearning extends SimulationDSL:
     block
     llmConfig = config
 
-  def wallsFromLLM(block: WallLLMConfig ?=> Unit)(using wrapper: SimulationWrapper): Unit =
-    val config = WallLLMConfig()
-    given WallLLMConfig = config
+  def wallsFromLLM(block: LLMWallConfig ?=> Unit)(using wrapper: SimulationWrapper): Unit =
+    val config = LLMWallConfig()
+    given LLMWallConfig = config
 
     block
-    
+
     // Store the config for later execution after the simulation block is complete
     wallConfig = Some(config)
 
@@ -37,7 +38,7 @@ trait LLMQLearning extends SimulationDSL:
       if config.model.nonEmpty && config.prompt.nonEmpty then
         // Now the simulation builder's toString includes all agent information
         val simulationContent = wrapper.builder.toString
-        LLMWallGenerator.generateWallsFromLLMWithContent(
+        LLMWallService.generateWallsUsingLLM(
           wrapper.builder,
           config.model,
           config.prompt,
@@ -45,7 +46,7 @@ trait LLMQLearning extends SimulationDSL:
         ) match
           case Some(asciiWalls) =>
             println(s"LLM wall generation successful, loading walls...")
-            LLMWallGenerator.loadWallsIntoBuilder(wrapper.builder, asciiWalls)
+            LLMWallService.loadWallsIntoBuilder(wrapper.builder, asciiWalls)
           case None =>
             println("LLM wall generation failed, proceeding without generated walls")
     }

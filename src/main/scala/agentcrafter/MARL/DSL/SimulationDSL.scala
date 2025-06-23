@@ -106,7 +106,7 @@ trait SimulationDSL:
 
     given LearnerConfig = config
 
-    block // Apply the changes defined in the block
+    block
     agentWrapper.builder = agentWrapper.builder.withLearner(
       alpha = config.alpha,
       gamma = config.gamma,
@@ -132,16 +132,10 @@ trait SimulationDSL:
   /**
    * Trigger effect that removes a wall at the specified position.
    *
-   * @param r
-   *   Row position of the wall to remove
-   * @param c
-   *   Column position of the wall to remove
-   */
-  /**
    * @param x
-   *   Row coordinate
+   *   Row position of the wall to remove
    * @param y
-   *   Column coordinate
+   *   Column position of the wall to remove
    */
   def openWall(x: Int, y: Int)(using tb: TriggerBuilder): Unit =
     tb.openWall(x, y)

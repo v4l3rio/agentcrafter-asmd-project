@@ -1,5 +1,4 @@
-package agentcrafter.llmqlearning
-
+package agentcrafter.llmqlearning.dsl
 import scala.annotation.targetName
 
 /**
@@ -13,7 +12,7 @@ import scala.annotation.targetName
  * @param prompt
  *   The prompt template for requesting wall layouts from the LLM
  */
-case class WallLLMConfig(
+case class LLMWallConfig(
   var model: String = "",
   var prompt: String = ""
 )
@@ -28,13 +27,13 @@ case class WallLLMConfig(
  * @tparam T
  *   The type of value this property accepts
  */
-enum WallLLMProperty[T]:
+enum LLMWallProperty[T]:
   /** The LLM model identifier to use for wall generation */
-  case Model extends WallLLMProperty[String]
+  case Model extends LLMWallProperty[String]
   /** The prompt template for requesting wall layouts from the LLM */
-  case Prompt extends WallLLMProperty[String]
+  case Prompt extends LLMWallProperty[String]
 
   @targetName("to")
-  infix def >>(obj: T)(using config: WallLLMConfig): Unit = this match 
-    case WallLLMProperty.Model => config.model = obj.asInstanceOf[String]
-    case WallLLMProperty.Prompt => config.prompt = obj.asInstanceOf[String]
+  infix def >>(obj: T)(using config: LLMWallConfig): Unit = this match
+    case LLMWallProperty.Model => config.model = obj.asInstanceOf[String]
+    case LLMWallProperty.Prompt => config.prompt = obj.asInstanceOf[String]
