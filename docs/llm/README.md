@@ -17,14 +17,14 @@ Both features integrate seamlessly with the MARL framework while providing optio
 
 Traditional Q-Learning starts with zero or optimistically initialized Q-values, requiring extensive exploration to discover good policies. LLM Q-Learning attempts to leverage the spatial reasoning capabilities of large language models to provide intelligent initial Q-tables.
 
-*[Pattern: LLM Q-table generation workflow]*
+![LLM Q-Learning Workflow](./qtable_generation.svg)
 
 ### Implementation Architecture
 
 **Core Components:**
 - `LLMQLearning` trait: Provides LLM integration capabilities
 - `QTableLoader`: Handles parsing and loading of LLM-generated Q-tables
-- `LLMdslProperties`: DSL extensions for LLM configuration
+- `LLMProperties`: DSL extensions for LLM configuration
 
 ### How It Works
 
@@ -32,7 +32,7 @@ Traditional Q-Learning starts with zero or optimistically initialized Q-values, 
 The system analyzes the grid environment, including:
 - Grid dimensions and wall positions
 - Agent starting positions and goals
-- Obstacle patterns and accessibility
+- Obstacle (such as walls) configurations
 
 **Step 2: Prompt Generation**
 A structured prompt is created describing:
@@ -40,8 +40,15 @@ A structured prompt is created describing:
 - Grid layout with ASCII representation
 - Optimal policy requirements
 - Expected Q-table format
+- Uses templates stored in `src/main/resources/prompts/`:
+    
+    **Multi-Agent Q-Table Generation** (`multi_agent_qtable_generation_prompt.txt`):
+    - Handles complex multi-agent scenarios with coordination
+    - Generates complete Q-tables for all grid states
+    - Considers agent interactions and conflict avoidance
+    - Supports 5 actions: Up, Down, Left, Right, Stay
+    - Uses agent-specific optimization strategies
 
-*[Pattern: LLM prompt structure for Q-table generation]*
 
 **Step 3: LLM Processing**
 The prompt is sent to the configured LLM (typically GPT-4o) which:
@@ -56,22 +63,9 @@ The generated Q-table is:
 - Loaded into the QLearner instance
 - Used as initialization for continued learning
 
-### DSL Integration
-
-LLM Q-Learning integrates naturally with the existing DSL:
-
-*[Pattern: DSL syntax for LLM Q-learning configuration]*
-
-**Configuration Options:**
-- **Enabled**: Toggle LLM features on/off
-- **Model**: Specify which LLM model to use
-- **Custom Prompts**: Override default prompt templates
-
 ### Data Processing
 
 The system handles various LLM output formats:
-
-*[Pattern: Q-table JSON parsing and validation]*
 
 **Supported Formats:**
 - Pure JSON Q-table data
@@ -106,8 +100,13 @@ The system constructs prompts that:
 - Explain wall coordinate format
 - Provide context about agent positions
 - Request specific layout characteristics
+- Uses templates stored in `src/main/resources/prompts/`:
 
-*[Pattern: Wall generation prompt structure]*
+  **Wall Generation** (`walls_generation_prompt.txt`):
+  - Creates ASCII-based grid environments from natural language
+  - Ensures accessibility between start and goal positions
+  - Generates interesting maze-like structures with strategic features
+  - Maintains solvability while providing learning challenges
 
 **Step 3: LLM Generation**
 The LLM processes the request and:
@@ -123,106 +122,38 @@ Generated walls are:
 - Integrated into the environment
 - Visualized for verification
 
-### DSL Integration
-
-Wall generation integrates seamlessly:
-
-*[Pattern: DSL syntax for wall generation]*
-
-**Configuration Properties:**
-- **Model**: LLM model selection
-- **Prompt**: Natural language environment description
-- **Fallback**: Default walls if generation fails
 
 ## Testing Strategy
 
-### LLM Q-Learning Tests
+... TODO
 
-Comprehensive testing validates:
+### DSL Integration
 
-*[Pattern: LLM Q-learning test scenarios]*
+LLM Q-Learning and Wall Generation introduces new DSL keywords:
 
-**Test Coverage:**
-- JSON parsing and validation
-- Q-table loading and integration
-- Error handling for malformed data
-- Performance comparison with traditional initialization
+**New Keywords:**
+- `useLLM` - Configure LLM-enhanced Q-learning
+  - `Enabled` - Toggle LLM features on/off
+  - `Model` - Specify which LLM model to use
+- `wallsFromLLM` - Generate environment walls using LLM
+  - `Model` - Specify which LLM model to use
+  - `Prompt` - Custom prompt for LLM generation
 
-### Wall Generation Tests
+```scala
+// LLM Q-table generation
+simulation:
+  useLLM:
+    Enabled >> true
+    Model >> "gpt-4o"
+  
 
-Validation of environment generation:
+// LLM wall generation
+simulation:
+  wallsFromLLM:
+    Model >> "gpt-4o"
+    Prompt >> "Create a challenging maze..."
 
-*[Pattern: Wall generation test scenarios]*
-
-**Test Coverage:**
-- Natural language prompt processing
-- Generated wall validation
-- Accessibility verification
-- Integration with existing environments
-
-### Integration Testing
-
-End-to-end validation ensures:
-- LLM features work within complete simulations
-- DSL parsing handles LLM properties correctly
-- Error recovery maintains system stability
-- Performance impact remains acceptable
-
-## Prompt Engineering
-
-### Q-Table Generation Prompts
-
-Effective prompts for Q-table generation include:
-
-*[Pattern: Effective Q-table generation prompts]*
-
-**Key Elements:**
-- Clear problem description
-- Grid layout visualization
-- Expected output format
-- Optimization objectives
-
-### Environment Generation Prompts
-
-Successful wall generation requires:
-
-*[Pattern: Effective wall generation prompts]*
-
-**Key Elements:**
-- Spatial constraint specification
-- Accessibility requirements
-- Aesthetic and challenge preferences
-- Output format specification
-
-## Results and Limitations
-
-### LLM Q-Learning Performance
-
-**Successes:**
-- Technical integration works reliably
-- Generated Q-tables are syntactically correct
-- System gracefully handles LLM failures
-- DSL integration is seamless
-
-**Limitations:**
-- LLMs struggle with optimal policy understanding
-- Generated Q-values often suboptimal
-- Spatial reasoning capabilities are inconsistent
-- Cost and latency considerations for real-time use
-
-### Wall Generation Performance
-
-**Successes:**
-- Creative and varied environment generation
-- Natural language interface is intuitive
-- Generated layouts are often interesting
-- Good integration with visualization systems
-
-**Limitations:**
-- Accessibility not always guaranteed
-- Difficulty controlling complexity precisely
-- Inconsistent quality across different prompts
-- Limited understanding of RL-specific design principles
+```
 
 ## Key Insights
 
@@ -239,32 +170,3 @@ Successful wall generation requires:
 2. **Spatial Reasoning**: Inconsistent performance on spatial optimization tasks
 3. **Domain Knowledge**: Limited understanding of RL-specific design principles
 4. **Consistency**: High variability in output quality
-
-### Lessons Learned
-
-1. **Prompt Engineering Critical**: Success heavily depends on prompt design
-2. **Validation Essential**: Generated content requires extensive validation
-3. **Fallback Necessary**: Robust fallback mechanisms are crucial
-4. **Expectations Management**: LLM capabilities are more limited than initially expected
-
-## Future Directions
-
-### Potential Improvements
-
-1. **Fine-Tuned Models**: Domain-specific training could improve performance
-2. **Iterative Refinement**: Multi-step generation with feedback loops
-3. **Hybrid Approaches**: Combine LLM creativity with algorithmic validation
-4. **Better Prompting**: Advanced prompt engineering techniques
-
-### Alternative Approaches
-
-1. **Procedural Generation**: Traditional algorithmic approaches for reliability
-2. **Human-AI Collaboration**: LLM suggestions with human validation
-3. **Specialized Models**: Purpose-built models for RL scenarios
-4. **Template-Based**: LLM-powered template selection and customization
-
-## Conclusion
-
-The LLM integration experiments demonstrate both the potential and limitations of current AI technology for reinforcement learning enhancement. While technically successful and architecturally sound, the practical benefits are limited by fundamental constraints in LLM spatial reasoning and RL domain understanding.
-
-The implementation provides a solid foundation for future improvements and serves as a valuable case study in AI-enhanced reinforcement learning, highlighting the importance of realistic expectations and robust validation when integrating cutting-edge AI capabilities.
