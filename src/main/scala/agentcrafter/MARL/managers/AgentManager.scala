@@ -1,6 +1,7 @@
-package agentcrafter.marl
+package agentcrafter.marl.managers
 
 import agentcrafter.common.*
+import agentcrafter.marl.WorldSpec
 
 /**
  * Manages agent-related operations and state in a multi-agent simulation.

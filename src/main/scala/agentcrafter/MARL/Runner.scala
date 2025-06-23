@@ -1,8 +1,7 @@
 package agentcrafter.marl
 
 import agentcrafter.common.*
-import agentcrafter.marl.visualizers.{QTableVisualizer, Visualizer}
-
+import agentcrafter.marl.managers.{EpisodeManager, VisualizationManager}
 
 
 /**

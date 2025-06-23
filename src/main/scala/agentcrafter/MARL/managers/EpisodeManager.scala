@@ -1,6 +1,7 @@
-package agentcrafter.marl
+package agentcrafter.marl.managers
 
 import agentcrafter.common.*
+import agentcrafter.marl.{SimulationState, WorldSpec}
 
 /**
  * Manages the execution of individual episodes in a Multi-Agent Reinforcement Learning (marl) simulation.
