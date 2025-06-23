@@ -76,8 +76,8 @@ class GridWorld private (override val rows: Int, override val cols: Int, val wal
     val (dr, dc) = a.delta
     val intendedNextRaw = State(s.x + dr, s.y + dc)
     // Toroidal wrapping
-    val wrappedX = (intendedNextRaw.x + rows) % rows
-    val wrappedY = (intendedNextRaw.y + cols) % cols
+    val wrappedX = (intendedNextRaw.x + cols) % cols
+    val wrappedY = (intendedNextRaw.y + rows) % rows
     val intendedNext = State(wrappedX, wrappedY)
   
     val isValidMove = !walls.contains(intendedNext)

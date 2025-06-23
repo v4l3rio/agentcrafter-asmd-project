@@ -1,0 +1,53 @@
+TASK: Analyze the provided Domain Specific Language (dsl) description and generate separate Q-Tables for each agent that represent optimal policies considering multi-agent interactions.
+
+CRITICAL REQUIREMENTS:
+1. OUTPUT FORMAT: Return ONLY a valid JSON object with agent-specific Q-tables - no additional text, explanations, or formatting
+2. COMPLETE Q-TABLES: Each agent MUST have a COMPLETE Q-table covering ALL possible states (coordinates) in the grid - no missing states allowed
+3. MULTI-AGENT AWARENESS: Consider agent interactions, potential conflicts, and coordination opportunities
+4. AGENT-SPECIFIC OPTIMIZATION: Each agent should have a Q-table optimized for their specific start position and goal
+5. PATH COORDINATION: Avoid creating policies that lead to frequent agent collisions or blocking
+
+ENVIRONMENT RULES:
+- Available actions: Up, Down, Left, Right, Stay
+- Coordinate system: starts at (0,0) and extends to grid dimensions
+- Step penalty: -1 for each action without positive reward
+- Walls: represented by '#' in asciiWalls, block movement
+- Goal rewards: specified in each agent's configuration
+- Multiple agents may occupy the same space but should coordinate paths
+
+MULTI-AGENT Q-TABLE GENERATION STRATEGY:
+1. Identify all agents, their start positions, goals, and reward values from the dsl
+2. MANDATORY: Generate Q-values for EVERY SINGLE STATE in the grid (from (0,0) to (max_row, max_col)) for EACH agent
+3. For each agent, calculate optimal distances considering:
+   - Their specific goal location
+   - Potential interference from other agents' likely paths
+   - Coordination opportunities (e.g., agents with nearby goals should coordinate)
+4. Assign Q-values that create gradients toward each agent's goal while minimizing conflicts:
+   - Higher values for actions leading toward the agent's specific goal
+   - Moderate penalties for actions that lead to high-traffic areas
+   - Bonus values for actions that facilitate coordination
+5. Consider wall obstacles and multi-agent dynamics when calculating paths
+6. Apply discount factor to create realistic value propagation
+7. VERIFY: Ensure no states are missing - every coordinate in the grid must have Q-values for all 5 actions
+
+JSON FORMAT (exact structure required):
+{
+  "AGENT_ID_1": {
+    "(row, col)": {"Up": value, "Down": value, "Left": value, "Right": value, "Stay": value}
+  },
+  "AGENT_ID_2": {
+    "(row, col)": {"Up": value, "Down": value, "Left": value, "Right": value, "Stay": value}
+  }
+}
+
+EXAMPLE MULTI-AGENT Q-VALUE ASSIGNMENT:
+- At each agent's goal: all actions have high positive values (goal reward - small penalty)
+- Adjacent to agent's goal: action toward goal = high value, others = lower values
+- In potential conflict zones: slightly lower values to encourage coordination
+- Near walls: actions toward walls = very negative values
+- In other agents' optimal paths: moderate penalty to encourage alternative routes
+- IMPORTANT: Every single coordinate in the grid must be present for every agent
+
+REMEMBER: The Q-table must be COMPLETE - include ALL states from (0,0) to the maximum grid dimensions for EVERY agent.
+
+Generate the complete multi-agent Q-Table set now:

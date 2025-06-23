@@ -39,13 +39,19 @@ enum WallProperty[T]:
         case "horizontal" =>
           val minCol = math.min(lineConfig.from._2, lineConfig.to._2)
           val maxCol = math.max(lineConfig.from._2, lineConfig.to._2)
-          for col <- minCol to maxCol do
-            wrapper.builder = wrapper.builder.wall(lineConfig.from._1, col)
-        case "vertical" =>
           val minRow = math.min(lineConfig.from._1, lineConfig.to._1)
           val maxRow = math.max(lineConfig.from._1, lineConfig.to._1)
           for row <- minRow to maxRow do
-            wrapper.builder = wrapper.builder.wall(row, lineConfig.from._2)
+            for col <- minCol to maxCol do
+              wrapper.builder = wrapper.builder.wall(row, col)
+        case "vertical" =>
+          val minRow = math.min(lineConfig.from._1, lineConfig.to._1)
+          val maxRow = math.max(lineConfig.from._1, lineConfig.to._1)
+          val minCol = math.min(lineConfig.from._2, lineConfig.to._2)
+          val maxCol = math.max(lineConfig.from._2, lineConfig.to._2)
+          for row <- minRow to maxRow do
+            for col <- minCol to maxCol do
+              wrapper.builder = wrapper.builder.wall(row, col)
     case WallProperty.Block =>
       val (x, y) = obj.asInstanceOf[(Int, Int)]
       wrapper.builder = wrapper.builder.wall(x, y)

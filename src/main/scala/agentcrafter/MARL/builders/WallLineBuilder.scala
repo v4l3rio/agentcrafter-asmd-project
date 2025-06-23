@@ -106,12 +106,18 @@ class WallLineBuilder(parent: SimulationBuilder):
           case "horizontal" =>
             val minCol = math.min(fromPos._2, toPos._2)
             val maxCol = math.max(fromPos._2, toPos._2)
-            for col <- minCol to maxCol do
-              parent.wall(fromPos._1, col)
-          case "vertical" =>
             val minRow = math.min(fromPos._1, toPos._1)
             val maxRow = math.max(fromPos._1, toPos._1)
             for row <- minRow to maxRow do
-              parent.wall(row, fromPos._2)
+              for col <- minCol to maxCol do
+                parent.wall(row, col)
+          case "vertical" =>
+            val minRow = math.min(fromPos._1, toPos._1)
+            val maxRow = math.max(fromPos._1, toPos._1)
+            val minCol = math.min(fromPos._2, toPos._2)
+            val maxCol = math.max(fromPos._2, toPos._2)
+            for row <- minRow to maxRow do
+              for col <- minCol to maxCol do
+                parent.wall(row, col)
         parent
       case _ => throw new IllegalArgumentException("Wall line must have direction, from, and to specified")

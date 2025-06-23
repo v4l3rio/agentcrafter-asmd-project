@@ -100,8 +100,8 @@ class SimulationBuilder:
    */
   def wallsFromAscii(s: String): SimulationBuilder =
     val lines = s.stripMargin.split("\n").map(_.trim)
-    lines.zipWithIndex.foreach { case (line, x) =>
-      line.zipWithIndex.foreach { case (ch, y) =>
+    lines.zipWithIndex.foreach { case (line, y) =>
+      line.zipWithIndex.foreach { case (ch, x) =>
         if ch == '#' then walls += State(x, y)
       }
     };

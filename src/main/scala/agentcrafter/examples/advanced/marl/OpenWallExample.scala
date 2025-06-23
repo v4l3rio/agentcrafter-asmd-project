@@ -2,6 +2,7 @@ package agentcrafter.examples.advanced.marl
 
 
 import agentcrafter.marl.dsl.*
+import agentcrafter.marl.dsl.LineProperty.To as >>
 
 /**
  * Wall Scenario: Two agents cooperate to solve a task.
@@ -22,21 +23,42 @@ object OpenWallExample extends App with SimulationDSL:
       8 x 12
 
     walls:
-
       line:
         Direction >> "vertical"
-        From >> (1, 6)
-        To >> (6, 6)
+        From >> (6, 2)
+        To >> (6, 5)
+      line:
+        Direction >> "horizontal"
+        From >> (2, 2)
+        To >> (3, 2)
+      line:
+        Direction >> "horizontal"
+        From >> (2, 5)
+        To >> (3, 5)
+      line:
+        Direction >> "horizontal"
+        From >> (9, 2)
+        To >> (10, 2)
+      line:
+        Direction >> "vertical"
+        From >> (11, 5)
+        To >> (11, 7)
+      line:
+        Direction >> "horizontal"
+        From >> (9, 5)
+        To >> (10, 5)
+      line:
+        Direction >> "horizontal"
+        From >> (9, 7)
+        To >> (10, 7)
 
-      block >> (2, 2)
-      block >> (3, 2)
-      block >> (5, 9)
-      block >> (6, 9)
+      block >> (4, 7)
+      block >> (9, 6)
 
 
     agent:
       Name >> "Opener"
-      Start >> (1, 1)
+      Start >> (7, 1)
       withLearner:
         Alpha >> 0.15
         Gamma >> 0.9
@@ -44,16 +66,16 @@ object OpenWallExample extends App with SimulationDSL:
         EpsMin >> 0.1
         Warm >> 1_500
         Optimistic >> 0.5
-      Goal >> (6, 2)
+      Goal >> (2, 6)
       onGoal:
         Give >> 25.0
-        OpenWall >> (4, 6)
+        OpenWall >> (9, 6)
         EndEpisode >> false
 
 
     agent:
       Name >> "Runner"
-      Start >> (1, 2)
+      Start >> (4, 1)
       withLearner:
         Alpha >> 0.15
         Gamma >> 0.9
@@ -61,11 +83,12 @@ object OpenWallExample extends App with SimulationDSL:
         EpsMin >> 0.1
         Warm >> 1_500
         Optimistic >> 0.5
-      Goal >> (6, 10)
+      Goal >> (10, 6)
       onGoal:
         Give >> 55.0
         EndEpisode >> true
-    Penalty >> -3.0
+
+    Penalty >> -2.0
     Episodes >> 12_000
     Steps >> 300
     ShowAfter >> 10_000

@@ -30,6 +30,16 @@ object Prompts:
     Using.resource(Source.fromResource("prompts/qtable_generation_prompt.txt"))(_.mkString)
 
   /**
+   * Multi-agent Q-table generation prompt template.
+   *
+   * This prompt is designed to help LLMs generate separate Q-tables for multiple agents
+   * while considering their interactions, potential conflicts, and coordination opportunities.
+   * Each agent receives a Q-table optimized for their specific goals and environment context.
+   */
+  lazy val multiAgentQTable: String =
+    Using.resource(Source.fromResource("prompts/multi_agent_qtable_generation_prompt.txt"))(_.mkString)
+
+  /**
    * Dynamic wall generation prompt template.
    *
    * This prompt enables LLMs to generate interesting and challenging wall configurations for grid world environments.

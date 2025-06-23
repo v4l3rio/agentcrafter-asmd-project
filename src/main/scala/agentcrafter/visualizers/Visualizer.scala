@@ -66,14 +66,14 @@ class Visualizer(
         val screenY = y * cell
         val isWall = staticWalls.contains(p) && !openWalls.contains(p)
         g.setColor(if isWall then Color.darkGray else Color.white)
-        g.fillRect(screenY, screenX, cell, cell)
+        g.fillRect(screenX, screenY, cell, cell)
         g.setColor(Color.lightGray)
-        g.drawRect(screenY, screenX, cell, cell)
+        g.drawRect(screenX, screenY, cell, cell)
 
       def fillCells(cells: Set[State], color: Color): Unit =
         cells.foreach { p =>
           g.setColor(color)
-          g.fillRect(p.y * cell, p.x * cell, cell, cell)
+          g.fillRect(p.x * cell, p.y * cell, cell, cell)
         }
 
       fillCells(switchCells, Color.yellow)
@@ -83,17 +83,17 @@ class Visualizer(
       if isSingleAgent then
         startPos.foreach { s =>
           g.setColor(Color.cyan)
-          g.fillRect(s.y * cell, s.x * cell, cell, cell)
+          g.fillRect(s.x * cell, s.y * cell, cell, cell)
         }
         goalPos.foreach { s =>
           g.setColor(Color.green)
-          g.fillRect(s.y * cell, s.x * cell, cell, cell)
+          g.fillRect(s.x * cell, s.y * cell, cell, cell)
         }
 
         singleAgentPos.foreach { pos =>
           g.setColor(Color.blue)
           val m = cell / Constants.AGENT_CIRCLE_MARGIN_DIVISOR
-          g.fillOval(pos.y * cell + m, pos.x * cell + m, cell - Constants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m, cell - Constants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m)
+          g.fillOval(pos.x * cell + m, pos.y * cell + m, cell - Constants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m, cell - Constants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m)
         }
       else
 
@@ -101,7 +101,7 @@ class Visualizer(
         multiAgentState.zipWithIndex.foreach { case ((id, p), idx) =>
           val col = colors(idx % colors.length)
           g.setColor(col)
-          g.fillOval(p.y * cell + m, p.x * cell + m, cell - Constants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m, cell - Constants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m)
+          g.fillOval(p.x * cell + m, p.y * cell + m, cell - Constants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m, cell - Constants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m)
         }
 
       g.setColor(Color.black)

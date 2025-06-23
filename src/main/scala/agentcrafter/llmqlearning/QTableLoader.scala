@@ -34,6 +34,57 @@ object QTableLoader:
         Failure(new IllegalArgumentException("Only QLearner instances are supported"))
 
   /**
+   * Loads agent-specific Q-tables from multi-agent JSON into learner instances.
+   * Implements fallback strategy: if an agent's Q-table is corrupted, uses default values.
+   * If all Q-tables are corrupted, all agents get default values.
+   *
+   * @param rawJson Raw JSON string containing multi-agent Q-table data
+   * @param agentLearners Map of agent IDs to their learner instances
+   * @return Map of agent IDs to loading results (Success/Failure)
+   */
+  def loadMultiAgentQTablesFromJson(
+    rawJson: String, 
+    agentLearners: Map[String, Learner]
+  ): Map[String, Try[Unit]] =
+    val cleanedJson = cleanLLMDecorations(rawJson)
+    
+    // Parse the multi-agent JSON structure
+    val multiAgentQTables = parseMultiAgentQTables(cleanedJson)
+    
+    multiAgentQTables match
+      case Success(agentQTables) =>
+        // Try to load each agent's Q-table
+        val loadResults = agentLearners.map { case (agentId, learner) =>
+          agentQTables.get(agentId) match
+            case Some(qTable) =>
+              agentId -> injectQTable(learner.asInstanceOf[QLearner], qTable)
+            case None =>
+              agentId -> Failure(new RuntimeException(s"No Q-table found for agent: $agentId"))
+        }
+        
+        // Check if any agent succeeded
+        val successfulLoads = loadResults.values.count(_.isSuccess)
+        
+        if successfulLoads == 0 then
+          // All failed - return failures for all agents (they'll use default values)
+          loadResults
+        else
+          // Some succeeded - for failed agents, give them default (empty) Q-tables
+          loadResults.map { case (agentId, result) =>
+            result match
+              case Success(_) => agentId -> result
+              case Failure(_) => 
+                // Agent gets default optimistic initialization
+                agentId -> Success(())
+          }
+      
+      case Failure(parseError) =>
+        // JSON parsing failed completely - all agents get failures (default values)
+        agentLearners.map { case (agentId, _) =>
+          agentId -> Failure(new RuntimeException(s"Failed to parse multi-agent Q-tables: ${parseError.getMessage}"))
+        }
+
+  /**
    * Removes common LLM decorations from JSON strings.
    */
   private def cleanLLMDecorations(json: String): String =
@@ -59,6 +110,16 @@ object QTableLoader:
       Json.parse(json).validate[Map[(State, Action), Double]] match
         case JsSuccess(table, _) => table
         case JsError(errors) => throw new RuntimeException(s"JSON validation failed: $errors")
+    }
+
+  /**
+   * Parses multi-agent Q-tables JSON into a map of agent IDs to Q-table maps.
+   */
+  private def parseMultiAgentQTables(json: String): Try[Map[String, Map[(State, Action), Double]]] =
+    Try {
+      Json.parse(json).validate[Map[String, Map[(State, Action), Double]]] match
+        case JsSuccess(agentTables, _) => agentTables
+        case JsError(errors) => throw new RuntimeException(s"Multi-agent JSON validation failed: $errors")
     }
 
   /**
@@ -104,10 +165,21 @@ object QTableLoader:
 
     def writes(state: State): JsValue = JsString(s"(${state.x}, ${state.y})")
 
-  private given Reads[Map[(State, Action), Double]] = Reads { json =>
+  private given singleAgentQTableReads: Reads[Map[(State, Action), Double]] = Reads { json =>
     json.validate[Map[State, Map[Action, Double]]].map { nestedMap =>
       nestedMap.flatMap { case (state, actionMap) => 
         actionMap.map { case (action, value) => (state, action) -> value }
+      }
+    }
+  }
+
+  // Multi-agent JSON format support
+  private given multiAgentQTableReads: Reads[Map[String, Map[(State, Action), Double]]] = Reads { json =>
+    json.validate[Map[String, Map[State, Map[Action, Double]]]].map { agentMap =>
+      agentMap.map { case (agentId, nestedMap) =>
+        agentId -> nestedMap.flatMap { case (state, actionMap) =>
+          actionMap.map { case (action, value) => (state, action) -> value }
+        }
       }
     }
   }

@@ -47,16 +47,16 @@ object TreasureHuntExample extends App with SimulationDSL:
         EpsMin >> 0.05
         Warm >> 3_000
         Optimistic >> 1.0
-      Goal >> (4, 1)
+      Goal >> (1, 4)
       onGoal:
         Give >> 70.0
-        OpenWall >> (7, 5)
+        OpenWall >> (5, 7)
         EndEpisode >> false
 
 
     agent:
       Name >> "WallOpener2"
-      Start >> (1, 6)
+      Start >> (6, 1)
       withLearner:
         Alpha >> 0.15
         Gamma >> 0.95
@@ -64,16 +64,16 @@ object TreasureHuntExample extends App with SimulationDSL:
         EpsMin >> 0.05
         Warm >> 3_000
         Optimistic >> 1.0
-      Goal >> (3, 5)
+      Goal >> (5, 3)
       onGoal:
         Give >> 70.0
-        OpenWall >> (5, 3)
+        OpenWall >> (3, 5)
         EndEpisode >> false
 
 
     agent:
       Name >> "Hunter"
-      Start >> (8, 1)
+      Start >> (1, 8)
       withLearner:
         Alpha >> 0.15
         Gamma >> 0.95
@@ -81,13 +81,13 @@ object TreasureHuntExample extends App with SimulationDSL:
         EpsMin >> 0.05
         Warm >> 3_000
         Optimistic >> 0.5
-      Goal >> (4, 3)
+      Goal >> (3, 4)
       onGoal:
         Give >> 100.0
         EndEpisode >> true
     Penalty >> -3.0
-    Episodes >> 20_000
-    Steps >> 600
-    ShowAfter >> 17_000
+    Episodes >> 13_000
+    Steps >> 500
+    ShowAfter >> 10_000
     Delay >> 150
     WithGUI >> true

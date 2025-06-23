@@ -12,8 +12,8 @@ package agentcrafter.common
  *
  */
 enum Action(val delta: (Int, Int)) derives CanEqual:
-  case Up extends Action((-1, 0))
-  case Down extends Action((1, 0))
-  case Left extends Action((0, -1))
-  case Right extends Action((0, 1))
+  case Up extends Action((0, -1))
+  case Down extends Action((0, 1))
+  case Left extends Action((-1, 0))
+  case Right extends Action((1, 0))
   case Stay extends Action((0, 0))
