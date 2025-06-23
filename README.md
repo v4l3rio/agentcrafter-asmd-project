@@ -47,31 +47,74 @@ AgentCrafter enables researchers and developers to:
 ## Quick Start
 
 ```scala
-import agentcrafter.MARL.DSL.{SimulationDSL, *}
+import agentcrafter.marl.dsl.SimulationDSL
 
 object BasicExample extends App with SimulationDSL:
   simulation:
-    grid: 8 x 10
+    grid:
+      10 x 8
     agent:
       Name >> "Explorer"
       Start >> (1, 1)
       Goal >> (6, 8)
+      withLearner:
+        Alpha >> 0.1
+        Gamma >> 0.9
+        Eps0 >> 0.3
     Episodes >> 1000
     WithGUI >> true
 ```
 
-For comprehensive examples including LLM integration and multi-agent scenarios, see the [examples documentation](docs/examples/comprehensive-example.md).
+For comprehensive examples including LLM integration and multi-agent scenarios, see the examples in `src/main/scala/agentcrafter/examples/`.
 
 ## Documentation
 
 Comprehensive documentation is available in the [`docs`](docs/) directory:
 
 - **[Framework Overview](docs/index.md)** - Architecture and core concepts
-- **[DSL Grammar](docs/grammar.md)** - Complete syntax reference
-- **[Grid Q-Learning](docs/gridqlearning/README.md)** - Basic reinforcement learning
+- **[DSL Grammar](docs/grammar/README.md)** - Complete syntax reference
+- **[Q-Learning Foundation](docs/qlearning/README.md)** - Basic reinforcement learning implementation
 - **[Multi-Agent RL](docs/marl/README.md)** - Multi-agent coordination and learning
-- **[LLM Q-Learning](docs/llmqlearning/README.md)** - AI-enhanced Q-table generation
-- **[LLM Wall Generation](docs/wallsfromllm/README.md)** - Dynamic environment creation
-- **[Visual Q-Learning](docs/visualqlearning/README.md)** - Enhanced learning with visualization
-- **[Visualizers](docs/visualizers/README.md)** - Real-time simulation visualization
-- **[Comprehensive Examples](docs/examples/comprehensive-example.md)** - Complete usage scenarios
+- **[LLM Integration](docs/llm/README.md)** - AI-enhanced Q-table generation and environment creation
+- **[Project Conclusions](docs/conclusions/README.md)** - Insights and lessons learned
+
+## Project Structure
+
+```
+src/main/scala/agentcrafter/
+├── common/         # Core RL components (QLearner, GridWorld, etc.)
+├── marl/           # Multi-agent RL framework
+│   ├── dsl/        # Domain-specific language
+│   ├── builders/   # Simulation builders
+│   └── managers/   # Agent, environment, and episode managers
+├── llmqlearning/   # LLM integration services
+├── visualizers/    # Real-time visualization components
+└── examples/       # Usage examples
+    ├── basic/      # Simple demonstrations
+    └── advanced/   # Complex scenarios including LLM integration
+```
+
+## Key Components
+
+### Core Framework (`agentcrafter.common`)
+- **QLearner**: Advanced Q-Learning implementation with configurable exploration strategies
+- **GridWorld**: Environment simulation with wall support and dynamic elements
+- **State & Action**: Type-safe state and action representations
+- **LearningConfig**: Flexible configuration for learning parameters
+
+### Multi-Agent Framework (`agentcrafter.marl`)
+- **SimulationDSL**: Declarative syntax for defining complex simulations
+- **AgentManager**: Coordinates multiple learning agents
+- **EnvironmentManager**: Handles shared environment state and interactions
+- **EpisodeManager**: Manages simulation episodes and learning cycles
+
+### LLM Integration (`agentcrafter.llmqlearning`)
+- **LLMQTableService**: AI-powered Q-table generation
+- **LLMWallService**: Natural language environment creation
+- **QTableLoader**: Intelligent Q-table initialization from LLM outputs
+- **Prompts**: Curated prompt templates for optimal LLM interaction
+
+### Visualization (`agentcrafter.visualizers`)
+- **Visualizer**: Real-time simulation rendering with agent tracking
+- **QTableVisualizer**: Interactive Q-value inspection and debugging
+- **ConsoleVisualizer**: Text-based output for headless environments
