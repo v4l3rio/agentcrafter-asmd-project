@@ -2,8 +2,7 @@ package agentcrafter.properties
 
 import agentcrafter.common.*
 import agentcrafter.llmqlearning.*
-import agentcrafter.llmqlearning.UseLLMProperty.*
-import agentcrafter.llmqlearning.WallLLMProperty.*
+import agentcrafter.llmqlearning.dsl.{LLMConfig, LLMWallConfig, LLMProperty, LLMWallProperty}
 import org.scalacheck.Prop.{forAll, propBoolean}
 import org.scalacheck.{Gen, Properties}
 import org.scalatest.matchers.should.Matchers
@@ -27,80 +26,80 @@ object LLMProperties extends Properties("LLM") with Matchers:
   private val actionGen: Gen[Action] = Gen.oneOf(Action.values)
   private val qValueGen: Gen[Double] = Gen.choose(TEST_Q_VALUE_MIN, TEST_Q_VALUE_MAX)
 
-  // UseLLMConfig tests
-  property("UseLLM configuration maintains valid state") = forAll(useLLMConfigGen) { config =>
+  // LLMConfig tests
+  property("LLM configuration maintains valid state") = forAll(llmConfigGen) { config =>
     config.model.nonEmpty &&
       (config.enabled || !config.enabled)
   }
 
-  property("UseLLM property setters update configuration") = forAll(modelGen) { model =>
-    val config = UseLLMConfig()
+  property("LLM property setters update configuration") = forAll(modelGen) { model =>
+    val config = LLMConfig()
 
-    given UseLLMConfig = config
+    given LLMConfig = config
 
-    UseLLMProperty.Enabled >> true
-    UseLLMProperty.Model >> model
+    LLMProperty.Enabled >> true
+    LLMProperty.Model >> model
 
     config.enabled &&
       config.model == model
   }
 
-  property("UseLLM config handles boolean toggles") = forAll(Gen.oneOf(true, false)) { enabled =>
-    val config = UseLLMConfig()
+  property("LLM config handles boolean toggles") = forAll(Gen.oneOf(true, false)) { enabled =>
+    val config = LLMConfig()
 
-    given UseLLMConfig = config
+    given LLMConfig = config
 
-    UseLLMProperty.Enabled >> enabled
+    LLMProperty.Enabled >> enabled
 
     config.enabled == enabled
   }
 
-  property("UseLLM model names are preserved correctly") = forAll(modelGen) { model =>
-    val config = UseLLMConfig()
+  property("LLM model names are preserved correctly") = forAll(modelGen) { model =>
+    val config = LLMConfig()
 
-    given UseLLMConfig = config
+    given LLMConfig = config
 
-    UseLLMProperty.Model >> model
+    LLMProperty.Model >> model
 
     config.model == model
   }
 
-  property("UseLLM config has sensible defaults") =
-    val config = UseLLMConfig()
+  property("LLM config has sensible defaults") =
+    val config = LLMConfig()
 
     !config.enabled &&
       config.model == "gpt-4o"
 
-  // WallLLMConfig tests
-  property("WallLLM configuration maintains valid state") = forAll(wallLLMConfigGen) { config =>
+  // LLMWallConfig tests
+  property("LLMWall configuration maintains valid state") = forAll(llmWallConfigGen) { config =>
     config.model.length >= 0 &&
       config.prompt.length >= 0
   }
 
-  property("WallLLM property setters update configuration") = forAll(modelGen, promptGen) { (model, prompt) =>
-    val config = WallLLMConfig()
+  property("LLMWall property setters update configuration") = forAll(modelGen, promptGen) { (model, prompt) =>
+    val config = LLMWallConfig()
 
-    given WallLLMConfig = config
+    given LLMWallConfig = config
 
-    WallLLMProperty.Model >> model
-    WallLLMProperty.Prompt >> prompt
+    LLMWallProperty.Model >> model
+    LLMWallProperty.Prompt >> prompt
 
     config.model == model &&
       config.prompt == prompt
   }
 
-  property("WallLLM config handles edge cases") =
-    val config = WallLLMConfig()
+  property("LLMWall config handles edge cases") =
+    val config = LLMWallConfig()
 
-    given WallLLMConfig = config
+    given LLMWallConfig = config
 
-    WallLLMProperty.Model >> ""
-    WallLLMProperty.Prompt >> ""
+    LLMWallProperty.Model >> ""
+    LLMWallProperty.Prompt >> ""
 
     config.model.isEmpty && config.prompt.isEmpty
 
-  property("WallLLM config has sensible defaults") =
-    val config = WallLLMConfig()
+  property("LLMWall config has sensible defaults") =
+    val config = LLMWallConfig()
 
     config.model.isEmpty &&
       config.prompt.isEmpty
@@ -140,13 +139,13 @@ object LLMProperties extends Properties("LLM") with Matchers:
   }
 
   property("LLM configurations are independent") = forAll(modelGen, modelGen) { (model1, model2) =>
-    val config1 = UseLLMConfig()
-    val config2 = UseLLMConfig()
+    val config1 = LLMConfig()
+    val config2 = LLMConfig()
 
-    given UseLLMConfig = config1
+    given LLMConfig = config1
 
-    UseLLMProperty.Model >> model1
-    UseLLMProperty.Enabled >> true
+    LLMProperty.Model >> model1
+    LLMProperty.Enabled >> true
 
     config1.model == model1 &&
       config1.enabled &&
@@ -156,14 +155,14 @@ object LLMProperties extends Properties("LLM") with Matchers:
 
   private val modelGen: Gen[String] = Gen.oneOf("gpt-4o", "gpt-4", "gpt-3.5-turbo")
   private val promptGen: Gen[String] = Gen.alphaNumStr
-  private val useLLMConfigGen: Gen[UseLLMConfig] = for {
+  private val llmConfigGen: Gen[LLMConfig] = for {
     enabled <- Gen.oneOf(true, false)
     model <- modelGen
-  } yield UseLLMConfig(enabled, model)
-  private val wallLLMConfigGen: Gen[WallLLMConfig] = for {
+  } yield LLMConfig(enabled, model)
+  private val llmWallConfigGen: Gen[LLMWallConfig] = for {
     model <- modelGen
     prompt <- promptGen
-  } yield WallLLMConfig(model, prompt)
+  } yield LLMWallConfig(model, prompt)
   private val validJsonGen: Gen[String] = Gen.oneOf(
     """{"(0, 0)": {"Up": 1.0, "Down": 0.5}}""",
     """{"(1, 1)": {"Left": 2.0, "Right": 1.5}}""",

@@ -3,9 +3,10 @@ package agentcrafter.steps
 import agentcrafter.marl.dsl.{SimulationDSL, SimulationWrapper}
 import agentcrafter.marl.builders.SimulationBuilder
 import agentcrafter.common.{GridWorld, QLearner, State}
-import agentcrafter.llmqlearning.UseLLMProperty.*
+import agentcrafter.llmqlearning.dsl.LLMProperty.*
 import agentcrafter.llmqlearning.dsl.LLMQLearning
-import agentcrafter.llmqlearning.{UseLLMConfig, LLMHttpClient, QTableLoader}
+import agentcrafter.llmqlearning.{LLMHttpClient, QTableLoader}
+import agentcrafter.llmqlearning.dsl.LLMConfig
 import io.cucumber.scala.{EN, ScalaDsl}
 import org.scalatest.matchers.should.Matchers
 
@@ -16,7 +17,7 @@ import scala.util.{Failure, Success, Try}
 class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
 
   private var simulation: TestSimulation = uninitialized
-  private var llmConfig: UseLLMConfig = uninitialized
+  private var llmConfig: LLMConfig = uninitialized
   private var simulationWrapper: SimulationWrapper = uninitialized
   private var apiCallsMade: Boolean = false
   private var mockApiResponse: Option[String] = None
@@ -50,7 +51,7 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   Given("""the LLM integration system is available""") { () =>
     simulation = new TestSimulation()
     simulationWrapper = SimulationWrapper(new SimulationBuilder)
-    llmConfig = UseLLMConfig()
+    llmConfig = LLMConfig()
     apiCallsMade = false
     mockApiResponse = None
     mockApiError = None
@@ -58,13 +59,13 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   }
 
   Given("""I create a simulation with LLM enabled""") { () =>
-    given config: UseLLMConfig = llmConfig
+    given config: LLMConfig = llmConfig
 
     Enabled >> true
   }
 
   Given("""I configure the LLM model as "gpt-4o"""") { () =>
-    given config: UseLLMConfig = llmConfig
+    given config: LLMConfig = llmConfig
 
     Model >> "gpt-4o"
   }
@@ -87,7 +88,7 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   }
 
   Given("""I enable LLM with model "gpt-3.5-turbo"""") { () =>
-    given config: UseLLMConfig = llmConfig
+    given config: LLMConfig = llmConfig
 
     Enabled >> true
     Model >> "gpt-3.5-turbo"
@@ -106,7 +107,7 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   }
 
   Given("""I create a simulation without enabling LLM""") { () =>
-    given config: UseLLMConfig = llmConfig
+    given config: LLMConfig = llmConfig
 
     Enabled >> false
   }
@@ -120,7 +121,7 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   }
 
   Given("""I enable LLM for the simulation""") { () =>
-    given config: UseLLMConfig = llmConfig
+    given config: LLMConfig = llmConfig
 
     Enabled >> true
   }
