@@ -1,26 +1,11 @@
 package agentcrafter.examples.advanced.llm.qtable
 
-import agentcrafter.llmqlearning.dsl.LLMProperty.*
+import agentcrafter.llmqlearning.dsl.LLMProperty.Model
 import agentcrafter.llmqlearning.dsl.LLMQLearning
-import agentcrafter.marl.dsl.*
 
-/**
- * Advanced example demonstrating multi-agent Q-table generation from LLM.
- * This scenario showcases:
- * - Multiple agents with different goals requiring coordination
- * - LLM-generated Q-tables that consider agent interactions
- * - Robust fallback handling for corrupted Q-tables
- * - Agent-specific optimization while avoiding conflicts
- */
 object MarlLLMQTableGenerationExample extends App with LLMQLearning:
 
-  import AgentProperty.*
-  import LearnerProperty.*
-  import SimulationProperty.*
-  import TriggerProperty.*
-
   simulation:
-    // Enable LLM for multi-agent Q-table generation
     useLLM:
       Enabled >> true
       Model >> "gpt-4o"
@@ -28,7 +13,6 @@ object MarlLLMQTableGenerationExample extends App with LLMQLearning:
     grid:
       5 x 5
 
-    // Create a complex environment requiring coordination
     asciiWalls:
       """#####
         |#....

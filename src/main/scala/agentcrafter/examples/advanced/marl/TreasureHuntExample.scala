@@ -15,11 +15,6 @@ import agentcrafter.marl.dsl.*
  */
 object TreasureHuntExample extends App with SimulationDSL:
 
-  import AgentProperty.*
-  import LearnerProperty.*
-  import SimulationProperty.*
-  import TriggerProperty.*
-
   simulation:
     grid:
       10 x 8

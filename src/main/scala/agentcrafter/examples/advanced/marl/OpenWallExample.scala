@@ -2,7 +2,6 @@ package agentcrafter.examples.advanced.marl
 
 
 import agentcrafter.marl.dsl.*
-import agentcrafter.marl.dsl.LineProperty.To as >>
 
 /**
  * Wall Scenario: Two agents cooperate to solve a task.
@@ -12,11 +11,6 @@ import agentcrafter.marl.dsl.LineProperty.To as >>
  */
 object OpenWallExample extends App with SimulationDSL:
 
-  import AgentProperty.*
-  import LearnerProperty.*
-  import SimulationProperty.*
-  import TriggerProperty.*
-  import LineProperty.*
 
   simulation:
     grid:

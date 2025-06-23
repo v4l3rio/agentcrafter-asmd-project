@@ -8,11 +8,6 @@ import agentcrafter.marl.dsl.*
  */
 object LabyrinthExample extends App with SimulationDSL:
 
-  import AgentProperty.*
-  import LearnerProperty.*
-  import SimulationProperty.*
-  import TriggerProperty.*
-
   simulation:
     grid:
       12 x 12

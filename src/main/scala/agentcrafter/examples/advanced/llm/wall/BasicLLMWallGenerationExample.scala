@@ -1,19 +1,13 @@
 package agentcrafter.examples.advanced.llm.wall
 
 import agentcrafter.llmqlearning.dsl.LLMQLearning
-import agentcrafter.marl.dsl.*
+import agentcrafter.llmqlearning.dsl.LLMWallProperty.Model
 
 /**
  * Simple example demonstrating the wallsFromLLM feature.
  * This shows basic usage with a single agent navigating an LLM-generated environment.
  */
 object BasicLLMWallGenerationExample extends App with LLMQLearning:
-
-  import AgentProperty.*
-  import LearnerProperty.*
-  import SimulationProperty.*
-  import TriggerProperty.*
-  import agentcrafter.llmqlearning.dsl.LLMWallProperty.*
 
   simulation:
     grid:

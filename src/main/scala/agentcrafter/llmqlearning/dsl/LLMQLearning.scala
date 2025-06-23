@@ -4,11 +4,18 @@ import agentcrafter.llmqlearning.{LLMQTableService, LLMWallService}
 import agentcrafter.marl.builders.SimulationBuilder
 import agentcrafter.marl.dsl.{SimulationDSL, SimulationWrapper}
 
+import scala.annotation.targetName
+
 /**
  * Mixin that augments the base `SimulationDSL` with an `useLLM { … }` block allowing users to enable LLM‑generated
  * Q‑tables.
  */
 trait LLMQLearning extends SimulationDSL:
+  // Export LLM-specific property enums to avoid manual imports
+  // Note: Model exports removed to avoid double definition - import directly in usage files
+
+  export agentcrafter.llmqlearning.dsl.LLMProperty.Enabled
+  export agentcrafter.llmqlearning.dsl.LLMWallProperty.Prompt
 
   private var llmConfig: LLMConfig = LLMConfig()
   private var wallConfig: Option[LLMWallConfig] = None

@@ -10,6 +10,13 @@ import agentcrafter.marl.builders.{AgentBuilder, SimulationBuilder, TriggerBuild
  * configuration syntax.
  */
 trait SimulationDSL:
+  // Export commonly used property enums to avoid manual imports
+  export agentcrafter.marl.dsl.AgentProperty.*
+  export agentcrafter.marl.dsl.LearnerProperty.*
+  export agentcrafter.marl.dsl.SimulationProperty.*
+  export agentcrafter.marl.dsl.TriggerProperty.*
+  export agentcrafter.marl.dsl.WallProperty.*
+  export agentcrafter.marl.dsl.LineProperty.*
   /**
    * Main entry point for defining a simulation.
    *
