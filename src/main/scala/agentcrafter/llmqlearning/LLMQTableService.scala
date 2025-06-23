@@ -32,21 +32,15 @@ object LLMQTableService extends LLMService[String]:
     callLLMAndProcess(model, fullPrompt, simulationContent, "Q-table")
 
   /**
-   * Convenience method that uses the default Q-table prompt.
-   */
-  def loadQTableFromLLM(builder: SimulationBuilder, model: String, simulationContent: String): Option[String] =
-    generateFromLLM(builder, model, Prompts.qTable, simulationContent)
-
-  /**
-   * Generates multi-agent Q-tables from LLM using the specified model.
-   * Uses the multi-agent prompt that considers agent interactions.
+   * Generates Q-tables from LLM using the multi-agent prompt.
+   * Works for both single and multiple agents.
    *
    * @param builder The simulation builder
    * @param model The LLM model to use
    * @param simulationContent The simulation configuration as a string
-   * @return Some(multiAgentQTableJson) if successful, None otherwise
+   * @return Some(qTableJson) if successful, None otherwise
    */
-  def loadMultiAgentQTableFromLLM(
+  def loadQTableFromLLM(
     builder: SimulationBuilder, 
     model: String, 
     simulationContent: String
@@ -54,35 +48,19 @@ object LLMQTableService extends LLMService[String]:
     generateFromLLM(builder, model, Prompts.multiAgentQTable, simulationContent)
 
   /**
-   * Loads the Q-table JSON into all agents in the simulation builder.
-   *
-   * @param builder
-   *   The simulation builder containing agents
-   * @param qTableJson
-   *   The Q-table JSON string to load
-   */
-  def loadIntoBuilder(builder: SimulationBuilder, qTableJson: String): Unit =
-    val agents = builder.getAgents
-
-    agents.values.foreach { agentSpec =>
-      QTableLoader.loadQTableFromJson(qTableJson, learner = agentSpec.learner) match
-        case Success(_) => println(s"Loaded LLM Q‑table for agent: ${agentSpec.id}")
-        case Failure(ex) => println(s"Failed to load Q‑table for agent ${agentSpec.id}: ${ex.getMessage}")
-    }
-
-  /**
-   * Loads multi-agent Q-tables into the simulation builder with robust fallback strategy.
+   * Loads Q-tables into the simulation builder with robust fallback strategy.
+   * Works for both single and multiple agents.
    * If some agent Q-tables are corrupted, only the valid ones are loaded.
    * If all are corrupted, all agents use default (optimistic) initialization.
    *
    * @param builder The simulation builder containing agents
-   * @param multiAgentQTableJson The multi-agent Q-table JSON string to load
+   * @param qTableJson The Q-table JSON string to load
    */
-  def loadMultiAgentQTablesIntoBuilder(builder: SimulationBuilder, multiAgentQTableJson: String): Unit =
+  def loadIntoBuilder(builder: SimulationBuilder, qTableJson: String): Unit =
     val agents = builder.getAgents
     val agentLearners = agents.map { case (id, spec) => id -> spec.learner }
     
-    val loadResults = QTableLoader.loadMultiAgentQTablesFromJson(multiAgentQTableJson, agentLearners)
+    val loadResults = QTableLoader.loadMultiAgentQTablesFromJson(qTableJson, agentLearners)
     
     // Count successful and failed loads
     val successCount = loadResults.values.count(_.isSuccess)
@@ -103,11 +81,7 @@ object LLMQTableService extends LLMService[String]:
     else
       println(s"Successfully loaded LLM Q-tables for all $totalCount agents.")
 
-  /**
-   * Alias for backward compatibility.
-   */
-  def loadQTableIntoAgents(builder: SimulationBuilder, qTableJson: String): Unit =
-    loadIntoBuilder(builder, qTableJson)
+
 
   /**
    * Extracts Q-table JSON from LLM response.

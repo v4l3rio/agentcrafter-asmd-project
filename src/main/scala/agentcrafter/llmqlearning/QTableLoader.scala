@@ -15,23 +15,7 @@ import scala.util.{Failure, Success, Try}
  */
 object QTableLoader:
 
-  /**
-   * Loads a Q-table from JSON string into a learner instance.
-   *
-   * @param rawJson Raw JSON string containing Q-table data
-   * @param learner The learner instance to load the Q-table into
-   * @return Success if loading succeeded, Failure with error details if it failed
-   */
-  def loadQTableFromJson(rawJson: String, learner: Learner): Try[Unit] =
-    learner match
-      case qLearner: QLearner =>
-        for
-          cleanedJson <- Try(cleanLLMDecorations(rawJson))
-          qTable <- parseQTable(cleanedJson)
-          _ <- injectQTable(qLearner, qTable)
-        yield ()
-      case _ => 
-        Failure(new IllegalArgumentException("Only QLearner instances are supported"))
+
 
   /**
    * Loads agent-specific Q-tables from multi-agent JSON into learner instances.
@@ -102,15 +86,7 @@ object QTableLoader:
       .replaceAll("(?i)^here.*?:\\s*", "")
       .trim
 
-  /**
-   * Parses cleaned JSON into a Q-table map.
-   */
-  private def parseQTable(json: String): Try[Map[(State, Action), Double]] =
-    Try {
-      Json.parse(json).validate[Map[(State, Action), Double]] match
-        case JsSuccess(table, _) => table
-        case JsError(errors) => throw new RuntimeException(s"JSON validation failed: $errors")
-    }
+
 
   /**
    * Parses multi-agent Q-tables JSON into a map of agent IDs to Q-table maps.

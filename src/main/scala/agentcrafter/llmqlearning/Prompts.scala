@@ -17,23 +17,11 @@ import scala.util.Using
  */
 object Prompts:
   /**
-   * Q-table generation and analysis prompt template.
+   * Q-table generation prompt template.
    *
-   * This prompt is designed to help LLMs understand and work with Q-tables in reinforcement learning contexts. It
-   * provides instructions for analyzing Q-values, suggesting optimal actions, and understanding the learning progress
-   * of agents in grid-based environments.
-   *
-   * The prompt is loaded lazily from `src/main/resources/prompts/qtable_generation_prompt.txt` and is bundled within
-   * the JAR for distribution.
-   */
-  lazy val qTable: String =
-    Using.resource(Source.fromResource("prompts/qtable_generation_prompt.txt"))(_.mkString)
-
-  /**
-   * Multi-agent Q-table generation prompt template.
-   *
-   * This prompt is designed to help LLMs generate separate Q-tables for multiple agents
-   * while considering their interactions, potential conflicts, and coordination opportunities.
+   * This prompt is designed to help LLMs generate Q-tables for both single and multiple agents.
+   * For multiple agents, it considers their interactions, potential conflicts, and coordination opportunities.
+   * For single agents, it generates a single optimized Q-table.
    * Each agent receives a Q-table optimized for their specific goals and environment context.
    */
   lazy val multiAgentQTable: String =

@@ -63,23 +63,12 @@ trait LLMQLearning extends SimulationDSL:
       val simulationContent = wrapper.builder.toString
       val agents = wrapper.builder.getAgents
       
-      if agents.size > 1 then
-        // Multi-agent scenario: use multi-agent Q-table generation
-        println(s"Detected ${agents.size} agents - using multi-agent Q-table generation...")
-        LLMQTableService.loadMultiAgentQTableFromLLM(wrapper.builder, llmConfig.model, simulationContent) match
-          case Some(multiAgentQTableJson) =>
-            println(s"LLM response from ${llmConfig.model} received – loading multi-agent Q‑tables…")
-            LLMQTableService.loadMultiAgentQTablesIntoBuilder(wrapper.builder, multiAgentQTableJson)
-          case None =>
-            println(s"Failed to obtain multi-agent Q‑tables from LLM (${llmConfig.model}); proceeding with normal simulation.")
-      else
-        // Single agent scenario: use original single Q-table generation
-        println(s"Single agent detected - using single Q-table generation...")
-        LLMQTableService.loadQTableFromLLM(wrapper.builder, llmConfig.model, simulationContent) match
-          case Some(qTableJson) =>
-            println(s"LLM response from ${llmConfig.model} received – loading agent Q‑table…")
-            LLMQTableService.loadQTableIntoAgents(wrapper.builder, qTableJson)
-          case None =>
-            println(s"Failed to obtain Q‑table from LLM (${llmConfig.model}); proceeding with normal simulation.")
+      println(s"Detected ${agents.size} agent(s) - using Q-table generation...")
+      LLMQTableService.loadQTableFromLLM(wrapper.builder, llmConfig.model, simulationContent) match
+        case Some(qTableJson) =>
+          println(s"LLM response from ${llmConfig.model} received – loading Q‑tables…")
+          LLMQTableService.loadIntoBuilder(wrapper.builder, qTableJson)
+        case None =>
+          println(s"Failed to obtain Q‑tables from LLM (${llmConfig.model}); proceeding with normal simulation.")
 
     wrapper.builder.build()
