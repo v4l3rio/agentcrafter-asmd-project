@@ -1,4 +1,4 @@
-package agentcrafter.examples.advanced.llm
+package agentcrafter.examples.advanced.llm.wall
 
 import agentcrafter.llmqlearning.dsl.LLMQLearning
 import agentcrafter.marl.dsl.*
@@ -17,7 +17,7 @@ object BasicLLMWallGenerationExample extends App with LLMQLearning:
 
   simulation:
     grid:
-      8 x 10
+      6 x 6
 
     wallsFromLLM:
       Model >> "gpt-4o"
@@ -32,17 +32,16 @@ object BasicLLMWallGenerationExample extends App with LLMQLearning:
       withLearner:
         Alpha >> 0.15
         Gamma >> 0.9
-        Eps0 >> 0.8
+        Eps0 >> 0.9
         EpsMin >> 0.1
         Warm >> 1_000
         Optimistic >> 0.4
-      Goal >> (8, 6)
+      Goal >> (4, 4)
       onGoal:
         Give >> 100.0
         EndEpisode >> true
 
-    Episodes >> 3_000
+    Episodes >> 5_000
     Steps >> 300
-    ShowAfter >> 2_500
     Delay >> 100
     WithGUI >> true

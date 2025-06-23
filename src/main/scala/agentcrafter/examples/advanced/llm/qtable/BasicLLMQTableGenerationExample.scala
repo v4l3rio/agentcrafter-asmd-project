@@ -1,11 +1,11 @@
-package agentcrafter.examples.advanced.llm
+package agentcrafter.examples.advanced.llm.qtable
 
-import agentcrafter.marl.dsl.*
 import agentcrafter.llmqlearning.dsl.LLMProperty.*
 import agentcrafter.llmqlearning.dsl.LLMQLearning
+import agentcrafter.marl.dsl.*
 
 
-object QTableFromLLMExample extends App with LLMQLearning:
+object BasicLLMQTableGenerationExample extends App with LLMQLearning:
 
   import AgentProperty.*
   import LearnerProperty.*
@@ -18,7 +18,7 @@ object QTableFromLLMExample extends App with LLMQLearning:
       Model >> "gpt-4o"
     grid:
       10 x 10
-    asciiWalls(
+    asciiWalls:
       """##########
         |#.......##
         |#.####...#
@@ -29,7 +29,7 @@ object QTableFromLLMExample extends App with LLMQLearning:
         |##.#......
         |#......#.#
         |#.#......#
-        """.stripMargin)
+        """
     agent:
       Name >> "Explorer"
       Start >> (5, 8)
