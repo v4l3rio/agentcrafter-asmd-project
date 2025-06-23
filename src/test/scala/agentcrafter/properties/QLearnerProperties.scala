@@ -175,3 +175,39 @@ object QLearnerProperties extends Properties("QLearner") with Matchers:
 
       Action.values.contains(action)
   }
+
+  property("action distribution is uniform when epsilon is 1.0") = {
+    val params = LearningConfig(eps0 = 1.0, epsMin = 1.0)
+    val learner = createLearner(params)
+    val state = State(0, 0)
+    val n = 10000
+    val counts = scala.collection.mutable.Map.empty[Action, Int].withDefaultValue(0)
+    (1 to n).foreach { _ =>
+      val (action, _) = learner.choose(state)
+      counts(action) += 1
+    }
+    val expected = n.toDouble / Action.values.size
+    val tolerance = expected * 0.10 // 10% tolerance
+    counts.values.forall(count => math.abs(count - expected) < tolerance)
+  }
+
+  property("optimal action is chosen most often when epsilon is low and Q is trained") = {
+    val params = LearningConfig(eps0 = 0.1, epsMin = 0.1)
+    val learner = createLearner(params)
+    val state = State(0, 0)
+    // Train Q-values: make Action.Up optimal
+    Action.values.zipWithIndex.foreach { case (action, idx) =>
+      val reward = if (action == Action.Up) 100.0 else 0.0
+      learner.update(state, action, reward, state)
+    }
+    val n = 10000
+    val counts = scala.collection.mutable.Map.empty[Action, Int].withDefaultValue(0)
+    (1 to n).foreach { _ =>
+      val (action, _) = learner.choose(state)
+      counts(action) += 1
+    }
+    val optimalCount = counts(Action.Up)
+    val nonOptimalCounts = Action.values.filter(_ != Action.Up).map(counts)
+    // Optimal should be chosen much more often than any non-optimal
+    optimalCount > nonOptimalCounts.max * 2
+  }
