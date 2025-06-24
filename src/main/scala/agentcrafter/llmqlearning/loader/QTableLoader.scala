@@ -14,8 +14,7 @@ import scala.util.{Failure, Success, Try}
  * reflection. Uses the common LLMResponseParser for consistent error handling.
  */
 object QTableLoader:
-
-  // JSON Format definitions
+  
   private val stateRegex = """\((\d+)\s*,\s*(\d+)\)""".r
 
   /**
@@ -33,13 +32,11 @@ object QTableLoader:
     rawJson: String,
     agentLearners: Map[String, Learner]
   ): Map[String, Try[Unit]] =
-
-    // Use common parser for JSON extraction and cleaning
+  
     val cleanedJsonResult = LLMResponseParser.extractJsonContent(rawJson)
 
     cleanedJsonResult match
       case Success(cleanedJson) =>
-        // Parse the multi-agent JSON structure
         val multiAgentQTables = parseMultiAgentQTables(cleanedJson)
 
         multiAgentQTables match
@@ -53,7 +50,6 @@ object QTableLoader:
                   agentId -> Failure(new RuntimeException(s"No Q-table found for agent: $agentId"))
             }
 
-            // Check if any agent succeeded
             val successfulLoads = loadResults.values.count(_.isSuccess)
 
             if successfulLoads == 0 then
@@ -70,7 +66,6 @@ object QTableLoader:
               }
 
           case Failure(parseError) =>
-            // JSON parsing failed completely - all agents get failures (default values)
             agentLearners.map { case (agentId, _) =>
               agentId -> Failure(
                 new RuntimeException(s"Failed to parse multi-agent Q-tables: ${parseError.getMessage}")
@@ -78,7 +73,6 @@ object QTableLoader:
             }
 
       case Failure(extractionError) =>
-        // Content extraction failed - all agents get failures (default values)
         agentLearners.map { case (agentId, _) =>
           agentId -> Failure(new RuntimeException(s"Failed to extract JSON content: ${extractionError.getMessage}"))
         }
@@ -107,7 +101,7 @@ object QTableLoader:
       val internalTable = tableField.get(qTableInstance).asInstanceOf[mutable.Map[(State, Action), Double]]
 
       internalTable ++= qTable
-      () // Return Unit explicitly
+      () 
     }.recoverWith { case NonFatal(e) =>
       Failure(new RuntimeException(s"Failed to inject Q-values via reflection: ${e.getMessage}", e))
     }
@@ -133,14 +127,7 @@ object QTableLoader:
 
     def writes(state: State): JsValue = JsString(s"(${state.x}, ${state.y})")
 
-  private given singleAgentQTableReads: Reads[Map[(State, Action), Double]] = Reads { json =>
-    json.validate[Map[State, Map[Action, Double]]].map { nestedMap =>
-      nestedMap.flatMap { case (state, actionMap) =>
-        actionMap.map { case (action, value) => (state, action) -> value }
-      }
-    }
-  }
-
+  
   // Multi-agent JSON format support
   private given multiAgentQTableReads: Reads[Map[String, Map[(State, Action), Double]]] = Reads { json =>
     json.validate[Map[String, Map[State, Map[Action, Double]]]].map { agentMap =>

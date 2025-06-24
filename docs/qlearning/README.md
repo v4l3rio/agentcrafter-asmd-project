@@ -86,7 +86,7 @@ simulation:
   grid:
     5 x 5
   wall:
-    (2, 2)
+    block >> (2, 2)
   agent:
     Start >> (0, 0)
     Goal >> (4, 4)

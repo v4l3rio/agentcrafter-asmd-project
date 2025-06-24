@@ -1,4 +1,4 @@
-# AgentCrafter: Advanced Software Modeling and Design for Reinforcement Learning
+# AgentCrafter: Advanced Software Modeling and Design Project
 
 Welcome to **AgentCrafter**, a comprehensive framework for Reinforcement Learning (RL) with advanced multi-agent capabilities and experimental Large Language Model (LLM) integration.
 
@@ -35,7 +35,6 @@ The documentation follows the development journey, explaining how each component
 - Grid Q-Learning: basic implementation and environment dynamics
 - Visual Q-Learning: enhanced user experience and visualization
 - First DSL version: design decisions and syntax foundation
-- Unit tests: validation strategies for core components
 
 *This section establishes the fundamental concepts and architecture that support all advanced features.*
 
@@ -44,7 +43,6 @@ The documentation follows the development journey, explaining how each component
 - What extends beyond basic Q-Learning: coordination mechanisms and shared environments
 - Multi-agent implementation: agent coordination, dynamic spawning, and state management
 - DSL additions: enhanced syntax for multi-agent scenarios, triggers, and complex configurations
-- Gherkin/Cucumber tests: behavior-driven testing for complex multi-agent scenarios
 
 *This section demonstrates how the foundation scales to support multiple coordinated agents in complex environments.*
 
@@ -53,7 +51,6 @@ The documentation follows the development journey, explaining how each component
 - LLM Q-Learning: AI-generated Q-tables for intelligent initialization
 - Wall LLM: natural language environment design and generation
 - Prompt engineering: how prompts are structured and data is processed
-- ScalaCheck tests: property-based testing for AI-generated content
 
 *This section covers experimental AI integration, including both successes and limitations.*
 
@@ -65,7 +62,6 @@ Comprehensive syntax reference and language specification (unchanged from origin
 **Project Outcomes and Insights**
 - **MARL Success**: Why multi-agent coordination works effectively
 - **LLM Limitations**: Why AI integration faces significant challenges and what this teaches us
-- **Lessons Learned**: Key insights from the complete development journey
 - **Future Directions**: Recommendations based on project outcomes
 
 ## Key Results Summary

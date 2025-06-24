@@ -30,7 +30,7 @@ trait LLMQLearning extends SimulationDSL:
 
     block
 
-    // Store the config for later execution after the simulation block is complete
+
     wallConfig = Some(config)
 
   override def simulation(block: SimulationWrapper ?=> Unit): Unit =
