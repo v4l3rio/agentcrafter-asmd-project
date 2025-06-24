@@ -5,7 +5,8 @@ import agentcrafter.marl.builders.SimulationBuilder
 import agentcrafter.common.{GridWorld, QLearner, State}
 import agentcrafter.llmqlearning.dsl.LLMProperty.*
 import agentcrafter.llmqlearning.dsl.LLMQLearning
-import agentcrafter.llmqlearning.{LLMHttpClient, QTableLoader}
+import agentcrafter.llmqlearning.{LLMHttpClient}
+import agentcrafter.llmqlearning.loader.QTableLoader
 import agentcrafter.llmqlearning.dsl.LLMConfig
 import io.cucumber.scala.{EN, ScalaDsl}
 import org.scalatest.matchers.should.Matchers

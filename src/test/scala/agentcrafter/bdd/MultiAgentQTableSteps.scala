@@ -1,7 +1,7 @@
 package agentcrafter.bdd
 
 import agentcrafter.common.{Action, GridWorld, QLearner, State}
-import agentcrafter.llmqlearning.QTableLoader
+import agentcrafter.llmqlearning.loader.QTableLoader
 import io.cucumber.scala.{EN, ScalaDsl}
 import org.scalatest.matchers.should.Matchers
 

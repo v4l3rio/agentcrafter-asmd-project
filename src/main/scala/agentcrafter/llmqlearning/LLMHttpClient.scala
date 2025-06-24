@@ -2,12 +2,11 @@ package agentcrafter.llmqlearning
 
 import io.github.cdimascio.dotenv.Dotenv
 import play.api.libs.json.*
-import sttp.client4.httpclient.HttpClientSyncBackend
-import sttp.client4.{Response, quickRequest}
+import sttp.client4.Response
 import sttp.model.Uri
+import agentcrafter.llmqlearning.SimpleHttpClient
 
 import java.io.File
-import scala.concurrent.duration.Duration
 import scala.io.Source
 import scala.util.{Failure, Try, Using}
 
@@ -25,7 +24,8 @@ import scala.util.{Failure, Try, Using}
  */
 class LLMHttpClient(
   baseUrl: String = "https://api.openai.com",
-  apiKey: String = Dotenv.configure().ignoreIfMissing().load().get("OPENAI_API_KEY", "API")
+  apiKey: String = Dotenv.configure().ignoreIfMissing().load().get("OPENAI_API_KEY", "API"),
+  httpClient: SimpleHttpClient = SimpleHttpClient()
 ):
   /**
    * Trigger an LLM generation.
@@ -121,13 +121,7 @@ class LLMHttpClient(
 
     Try {
       val uri = fullUri(endpoint)
-      val resp: Response[String] = quickRequest
-        .post(uri)
-        .contentType("application/json")
-        .header("Authorization", s"Bearer $apiKey")
-        .body(body)
-        .readTimeout(Duration.Inf) // wait indefinitely for response
-        .send(HttpClientSyncBackend())
+      val resp: Response[String] = httpClient.post(uri, body, apiKey)
 
       if resp.code.isSuccess then
         // Parse OpenAI response format

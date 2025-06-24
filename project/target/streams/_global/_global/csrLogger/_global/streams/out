@@ -1,2 +1,8 @@
-[debug] downloaded https://repo1.maven.org/maven2/nl/gn0s1s/sbt-dotenv_2.12_1.0/3.1.1/sbt-dotenv_2.12_1.0-3.1.1.pom
-[debug] downloaded https://repo1.maven.org/maven2/nl/gn0s1s/sbt-dotenv_2.12_1.0/3.1.1/sbt-dotenv_2.12_1.0-3.1.1.jar
+[debug] downloaded https://repo1.maven.org/maven2/com/lightbend/sbt/sbt-javaagent_2.12_1.0/0.5.0/sbt-javaagent_2.12_1.0-0.5.0.pom
+[debug] downloaded https://repo1.maven.org/maven2/com/lightbend/sbt/sbt-javaagent_2.12_1.0/0.5.0/sbt-javaagent_2.12_1.0-0.5.0.pom.sha1
+[debug] downloaded https://repo1.maven.org/maven2/com/lightbend/sbt/sbt-javaagent_2.12_1.0/0.5.0/sbt-javaagent-0.5.0.pom
+[debug] downloaded https://repo1.maven.org/maven2/com/lightbend/sbt/sbt-javaagent_2.12_1.0/0.5.0/sbt-javaagent-0.5.0.pom.sha1
+[debug] downloaded https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/com.lightbend.sbt/sbt-javaagent/scala_2.12/sbt_1.0/0.5.0/ivys/ivy.xml
+[debug] downloaded https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/com.lightbend.sbt/sbt-javaagent/scala_2.12/sbt_1.0/0.5.0/ivys/ivy.xml.sha1
+[debug] downloaded https://repo.typesafe.com/typesafe/ivy-releases/com.lightbend.sbt/sbt-javaagent/scala_2.12/sbt_1.0/0.5.0/ivys/ivy.xml
+[debug] downloaded https://repo.typesafe.com/typesafe/ivy-releases/com.lightbend.sbt/sbt-javaagent/scala_2.12/sbt_1.0/0.5.0/ivys/ivy.xml.sha1
