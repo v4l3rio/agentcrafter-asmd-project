@@ -77,7 +77,7 @@ The system handles various LLM output formats:
 
 ### Concept and Motivation
 
-Creating interesting and challenging environments manually is time-consuming and requires design expertise. Wall LLM enables natural language description of desired environments, with AI generating the corresponding wall configurations.
+Creating interesting and challenging environments manually is time-consuming. Wall LLM enables natural language description of desired environments, with AI generating the corresponding wall configurations.
 
 ### Implementation Architecture
 

@@ -118,7 +118,6 @@ class LLMHttpClient(
          |  ],
          |  "stream": $stream
          |}""".stripMargin
-    print(body)
 
     Try {
       val uri = fullUri(endpoint)
