@@ -3,7 +3,7 @@ package agentcrafter.properties
 import agentcrafter.common.*
 import agentcrafter.llmqlearning.*
 import agentcrafter.llmqlearning.dsl.{LLMConfig, LLMWallConfig, LLMProperty, LLMWallProperty}
-import org.scalacheck.Prop.{forAll, propBoolean}
+import org.scalacheck.Prop.forAll
 import org.scalacheck.{Gen, Properties}
 import org.scalatest.matchers.should.Matchers
 
@@ -16,15 +16,11 @@ object LLMProperties extends Properties("LLM") with Matchers:
 
   // Test constants
   private val TEST_GRID_SIZE: Int = 5
-  private val TEST_Q_VALUE_MIN: Double = -10.0
-  private val TEST_Q_VALUE_MAX: Double = 10.0
 
   private val stateGen: Gen[State] = for {
     x <- Gen.choose(0, TEST_GRID_SIZE - 1)
     y <- Gen.choose(0, TEST_GRID_SIZE - 1)
   } yield State(x, y)
-  private val actionGen: Gen[Action] = Gen.oneOf(Action.values)
-  private val qValueGen: Gen[Double] = Gen.choose(TEST_Q_VALUE_MIN, TEST_Q_VALUE_MAX)
 
   // LLMConfig tests
   property("LLM configuration maintains valid state") = forAll(llmConfigGen) { config =>

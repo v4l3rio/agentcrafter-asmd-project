@@ -169,7 +169,7 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
       updateFunction = env.step,
       resetFunction = () => State(0, 0)
     )
-    qTableLoadResult = QTableLoader.loadQTableFromJson(jsonResponse, learner)
+    qTableLoadResult = QTableLoader.loadMultiAgentQTablesFromJson(jsonResponse, Map("agent1" -> learner))
   }
 
   Then("""the loading should fail safely""") { () =>
