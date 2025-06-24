@@ -34,7 +34,7 @@ import agentcrafter.common.{GridWorld, LearningConfig, QLearner, State, Constant
     learningConfig = LearningConfig(
       eps0 = 0.95,
       epsMin = 0.1,
-      warm = 1_000,
+      warm = 200,
       optimistic = 5.0
     )
   )
