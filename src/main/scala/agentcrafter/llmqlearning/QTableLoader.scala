@@ -16,7 +16,6 @@ import scala.util.{Failure, Success, Try}
 object QTableLoader:
 
 
-
   /**
    * Loads agent-specific Q-tables from multi-agent JSON into learner instances.
    * Implements fallback strategy: if an agent's Q-table is corrupted, uses default values.
@@ -73,18 +72,16 @@ object QTableLoader:
    */
   private def cleanLLMDecorations(json: String): String =
     val trimmed = json.trim
-    val withoutCodeBlocks = 
-      if trimmed.startsWith("```") then
-        trimmed
-          .stripPrefix("```json")
-          .stripPrefix("```")
-          .stripSuffix("```")
-      else trimmed
     
-    withoutCodeBlocks
+    // Handle markdown code blocks - remove ```json and ``` markers
+    val withoutCodeBlocks = trimmed
+      .replaceAll("```json\\s*", "")
+      .replaceAll("```\\s*", "")
       .replaceAll("(?i)^json\\s*", "")
       .replaceAll("(?i)^here.*?:\\s*", "")
       .trim
+    
+    withoutCodeBlocks
 
 
 

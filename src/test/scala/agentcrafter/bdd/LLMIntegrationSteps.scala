@@ -23,6 +23,7 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
   private var mockApiResponse: Option[String] = None
   private var mockApiError: Option[Throwable] = None
   private var qTableLoadResult: Try[Unit] = uninitialized
+  private var multiAgentLoadResults: Map[String, Try[Unit]] = Map.empty
   private var agentCount: Int = 0
   private var loggedWarnings: mutable.Buffer[String] = mutable.Buffer.empty
 
@@ -169,7 +170,8 @@ class LLMIntegrationSteps extends ScalaDsl with EN with Matchers:
       updateFunction = env.step,
       resetFunction = () => State(0, 0)
     )
-    qTableLoadResult = QTableLoader.loadMultiAgentQTablesFromJson(jsonResponse, Map("agent1" -> learner))
+    multiAgentLoadResults = QTableLoader.loadMultiAgentQTablesFromJson(jsonResponse, Map("agent1" -> learner))
+    qTableLoadResult = multiAgentLoadResults.getOrElse("agent1", Failure(new RuntimeException("Agent not found")))
   }
 
   Then("""the loading should fail safely""") { () =>

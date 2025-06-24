@@ -86,14 +86,20 @@ class LLMQTableLoadingSteps extends ScalaDsl with EN with Matchers:
 
     initialQValues = learner.QTableSnapshot
 
-    loadResult = QTableLoader.loadQTableFromJson(jsonString, learner)
+    val multiAgentJson = s"""{"agent1": $jsonString}"""
+    val agentMap = Map("agent1" -> learner)
+    val results = QTableLoader.loadMultiAgentQTablesFromJson(multiAgentJson, agentMap)
+    loadResult = results.getOrElse("agent1", Failure(new RuntimeException("Failed to load Q-table")))
   }
 
   When("""I attempt to load the Q-Table from JSON""") { () =>
 
     initialQValues = learner.QTableSnapshot
 
-    loadResult = QTableLoader.loadQTableFromJson(jsonString, learner)
+    val multiAgentJson = s"""{"agent1": $jsonString}"""
+    val agentMap = Map("agent1" -> learner)
+    val results = QTableLoader.loadMultiAgentQTablesFromJson(multiAgentJson, agentMap)
+    loadResult = results.getOrElse("agent1", Failure(new RuntimeException("Failed to load Q-table")))
   }
 
   Then("""the Q-Table should be loaded successfully""") { () =>

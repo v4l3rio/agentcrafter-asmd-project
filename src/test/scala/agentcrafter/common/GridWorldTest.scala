@@ -21,11 +21,11 @@ class GridWorldTest extends AnyFunSuite with Matchers:
   test("step moves in open space"):
     val env = GridWorld(rows = TEST_GRID_ROWS, cols = TEST_GRID_COLS, walls = Set.empty)
     val StepResult(next, reward) = env.step(State(1, 1), Action.Right)
-    next shouldBe State(1, 2)
+    next shouldBe State(1, 2)  // Right: x=row stays same, y=column increases
     reward shouldBe TEST_STEP_PENALTY
 
   test("step blocked by walls and boundaries"):
     val env = GridWorld(rows = TEST_GRID_ROWS, cols = TEST_GRID_COLS, walls = Set(State(1, 2)))
     env.step(State(1, 1), Action.Right).state shouldBe State(1, 1) // Blocked by wall
-    env.step(State(0, 0), Action.Up).state shouldBe State(2, 0) // Toroidal wrapping
-    env.step(State(2, 2), Action.Right).state shouldBe State(2, 0) // Toroidal wrapping
+    env.step(State(0, 0), Action.Up).state shouldBe State(2, 0) // Toroidal wrapping: Up from row 0 goes to row 2
+    env.step(State(2, 2), Action.Right).state shouldBe State(2, 0) // Toroidal wrapping: Right from col 2 goes to col 0

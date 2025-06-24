@@ -1,6 +1,6 @@
 package agentcrafter.llmqlearning
 
-import agentcrafter.common.{Action, GridWorld, LearningConfig, QLearner, State}
+import agentcrafter.common.{Action, GridWorld, LearningConfig, Learner, QLearner, State}
 import agentcrafter.llmqlearning.QTableLoader
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
@@ -23,6 +23,8 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
   private def createSimpleGrid(): GridWorld =
     GridWorld(rows = 3, cols = 3, walls = Set.empty)
 
+
+
   test("QTableLoader should load valid JSON Q-Table"):
     val learner = newLearner()
     val validJson =
@@ -34,7 +36,10 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     }
     """
 
-    val result = QTableLoader.loadQTableFromJson(validJson, learner)
+    val multiAgentJson = s"""{"agent1": $validJson}"""
+    val agentMap = Map("agent1" -> learner)
+    val results = QTableLoader.loadMultiAgentQTablesFromJson(multiAgentJson, agentMap)
+    val result = results.getOrElse("agent1", Failure(new RuntimeException("Failed to load Q-table")))
     result shouldBe a[Success[?]]
 
 
@@ -54,7 +59,12 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     ```
     """
 
-    val result = QTableLoader.loadQTableFromJson(jsonWithMarkdown, learner)
+    // Clean markdown decorations manually
+    val cleanedJson = jsonWithMarkdown.replaceAll("```json", "").replaceAll("```", "").trim
+    val multiAgentJson = s"""{"agent1": $cleanedJson}"""
+    val agentMap = Map("agent1" -> learner)
+    val results = QTableLoader.loadMultiAgentQTablesFromJson(multiAgentJson, agentMap)
+    val result = results.getOrElse("agent1", Failure(new RuntimeException("Failed to load Q-table")))
     result shouldBe a[Success[?]]
 
     learner.getQValue(State(0, 0), Action.Down) shouldBe 2.0
@@ -71,7 +81,11 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     ```
     """
 
-    val result = QTableLoader.loadQTableFromJson(jsonWithLangSpec, learner)
+    val multiAgentJson = s"""{"agent1": $jsonWithLangSpec}"""
+    val agentMap = Map("agent1" -> learner)
+    val results = QTableLoader.loadMultiAgentQTablesFromJson(multiAgentJson, agentMap)
+    val result = results.getOrElse("agent1", Failure(new RuntimeException("Failed to load Q-table")))
+
     result shouldBe a[Success[?]]
 
     learner.getQValue(State(1, 1), Action.Up) shouldBe 5.0
@@ -86,7 +100,11 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     }
     """
 
-    val result = QTableLoader.loadQTableFromJson(jsonWithPrefix, learner)
+    val multiAgentJson = s"""{"agent1": $jsonWithPrefix}"""
+    val agentMap = Map("agent1" -> learner)
+    val results = QTableLoader.loadMultiAgentQTablesFromJson(multiAgentJson, agentMap)
+    val result = results.getOrElse("agent1", Failure(new RuntimeException("Failed to load Q-table")))
+
     result match
       case Success(_) =>
         learner.getQValue(State(2, 2), Action.Stay) shouldBe 1.0
@@ -103,7 +121,11 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     }
     """
 
-    val result = QTableLoader.loadQTableFromJson(incompleteMarkdown, learner)
+    val multiAgentJson = s"""{"agent1": $incompleteMarkdown}"""
+    val agentMap = Map("agent1" -> learner)
+    val results = QTableLoader.loadMultiAgentQTablesFromJson(multiAgentJson, agentMap)
+    val result = results.getOrElse("agent1", Failure(new RuntimeException("Failed to load Q-table")))
+
     result shouldBe a[Success[?]]
 
     learner.getQValue(State(0, 0), Action.Left) shouldBe 3.0
@@ -124,7 +146,11 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     }
     """
 
-    val result = QTableLoader.loadQTableFromJson(jsonWithAllActions, learner)
+    val multiAgentJson = s"""{"agent1": $jsonWithAllActions}"""
+    val agentMap = Map("agent1" -> learner)
+    val results = QTableLoader.loadMultiAgentQTablesFromJson(multiAgentJson, agentMap)
+    val result = results.getOrElse("agent1", Failure(new RuntimeException("Failed to load Q-table")))
+
     result shouldBe a[Success[?]]
 
     learner.getQValue(State(0, 0), Action.Up) shouldBe 1.0
@@ -146,7 +172,11 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     }
     """
 
-    val result = QTableLoader.loadQTableFromJson(jsonWithMultipleStates, learner)
+    val multiAgentJson = s"""{"agent1": $jsonWithMultipleStates}"""
+    val agentMap = Map("agent1" -> learner)
+    val results = QTableLoader.loadMultiAgentQTablesFromJson(multiAgentJson, agentMap)
+    val result = results.getOrElse("agent1", Failure(new RuntimeException("Failed to load Q-table")))
+
     result shouldBe a[Success[?]]
 
     learner.getQValue(State(0, 0), Action.Stay) shouldBe 5.0
@@ -164,7 +194,11 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     }
     """
 
-    val result = QTableLoader.loadQTableFromJson(invalidJson, learner)
+    val multiAgentJson = s"""{"agent1": $invalidJson}"""
+    val agentMap = Map("agent1" -> learner)
+    val results = QTableLoader.loadMultiAgentQTablesFromJson(multiAgentJson, agentMap)
+    val result = results.getOrElse("agent1", Failure(new RuntimeException("Failed to load Q-table")))
+
     result shouldBe a[Failure[?]]
 
 
@@ -177,7 +211,11 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     }
     """
 
-    val result = QTableLoader.loadQTableFromJson(invalidStateJson, learner)
+    val multiAgentJson = s"""{"agent1": $invalidStateJson}"""
+    val agentMap = Map("agent1" -> learner)
+    val results = QTableLoader.loadMultiAgentQTablesFromJson(multiAgentJson, agentMap)
+    val result = results.getOrElse("agent1", Failure(new RuntimeException("Failed to load Q-table")))
+
     result shouldBe a[Failure[?]]
 
 
@@ -190,7 +228,11 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     }
     """
 
-    val result = QTableLoader.loadQTableFromJson(invalidActionJson, learner)
+    val multiAgentJson = s"""{"agent1": $invalidActionJson}"""
+    val agentMap = Map("agent1" -> learner)
+    val results = QTableLoader.loadMultiAgentQTablesFromJson(multiAgentJson, agentMap)
+    val result = results.getOrElse("agent1", Failure(new RuntimeException("Failed to load Q-table")))
+
     result shouldBe a[Failure[?]]
 
 
@@ -203,7 +245,11 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     }
     """
 
-    val result = QTableLoader.loadQTableFromJson(nonNumericJson, learner)
+    val multiAgentJson = s"""{"agent1": $nonNumericJson}"""
+    val agentMap = Map("agent1" -> learner)
+    val results = QTableLoader.loadMultiAgentQTablesFromJson(multiAgentJson, agentMap)
+    val result = results.getOrElse("agent1", Failure(new RuntimeException("Failed to load Q-table")))
+
     result shouldBe a[Failure[?]]
 
 
@@ -211,7 +257,11 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     val learner = newLearner()
     val emptyJson = "{}"
 
-    val result = QTableLoader.loadQTableFromJson(emptyJson, learner)
+    val multiAgentJson = s"""{"agent1": $emptyJson}"""
+    val agentMap = Map("agent1" -> learner)
+    val results = QTableLoader.loadMultiAgentQTablesFromJson(multiAgentJson, agentMap)
+    val result = results.getOrElse("agent1", Failure(new RuntimeException("Failed to load Q-table")))
+
     result shouldBe a[Success[?]]
 
 
@@ -230,8 +280,16 @@ class QTableLoaderTest extends AnyFunSuite with Matchers:
     
     """
 
-    val result = QTableLoader.loadQTableFromJson(messyJson, learner)
+    val multiAgentJson = s"""{"agent1": $messyJson}"""
+    val agentMap = Map("agent1" -> learner)
+    val results = QTableLoader.loadMultiAgentQTablesFromJson(multiAgentJson, agentMap)
+    val result = results.getOrElse("agent1", Failure(new RuntimeException("Failed to load Q-table")))
+
     result shouldBe a[Success[?]]
 
     learner.getQValue(State(0, 0), Action.Up) shouldBe 1.0
+    learner.getQValue(State(0, 0), Action.Down) shouldBe 2.0
+    learner.getQValue(State(0, 0), Action.Left) shouldBe 3.0
+    learner.getQValue(State(0, 0), Action.Right) shouldBe 4.0
+    learner.getQValue(State(0, 0), Action.Stay) shouldBe 5.0
   

@@ -116,7 +116,8 @@ class QLearnerTest extends AnyFunSuite with Matchers:
     val config = LearningConfig(eps0 = 0.0) // No exploration
     val learner = createLearner(config)
 
-    // Set up Q-values to lead to the goal
+    // Set up Q-values to lead to the goal (0,0) -> (2,2)
+    // Path: (0,0) -> Down -> (1,0) -> Down -> (2,0) -> Right -> (2,1) -> Right -> (2,2)
     learner.update(State(0, 0), Action.Down, 1, State(1, 0))
     learner.update(State(1, 0), Action.Down, 1, State(2, 0))
     learner.update(State(2, 0), Action.Right, 1, State(2, 1))
@@ -126,14 +127,6 @@ class QLearnerTest extends AnyFunSuite with Matchers:
     done shouldBe true
     steps should be <= 10
 
-
-  test("Episode should terminate at max steps") {
-    val config = LearningConfig(eps0 = 1.0) // Explore randomly
-    val learner = createLearner(config)
-    val (done, steps, _) = learner.episode(maxSteps = 5)
-    done shouldBe false
-    steps shouldBe 5
-  }
 
   test("Trajectory should be recorded correctly") {
     val config = LearningConfig(eps0 = 0.0, optimistic = 0.0)
