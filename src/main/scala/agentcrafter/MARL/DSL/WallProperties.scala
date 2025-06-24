@@ -1,6 +1,7 @@
 package agentcrafter.marl.dsl
 
 import agentcrafter.marl.builders.WallLineBuilder
+
 import scala.annotation.targetName
 
 /**
@@ -18,9 +19,8 @@ case class LineWallConfig(direction: String, from: (Int, Int), to: (Int, Int))
 /**
  * DSL properties for configuring wall creation in the simulation.
  *
- * This enumeration provides type-safe property setters for wall configuration
- * through the DSL syntax. Each case corresponds to a specific wall creation method
- * and enforces the correct value type at compile time.
+ * This enumeration provides type-safe property setters for wall configuration through the DSL syntax. Each case
+ * corresponds to a specific wall creation method and enforces the correct value type at compile time.
  *
  * @tparam T
  *   The type of value this property accepts
@@ -28,6 +28,7 @@ case class LineWallConfig(direction: String, from: (Int, Int), to: (Int, Int))
 enum WallProperty[T]:
   /** Creates a line of walls using LineWallConfig specification */
   case Line extends WallProperty[LineWallConfig]
+
   /** Creates a single wall block at specified coordinates */
   case Block extends WallProperty[(Int, Int)]
 
@@ -59,9 +60,8 @@ enum WallProperty[T]:
 /**
  * DSL properties for configuring wall line creation parameters.
  *
- * This enumeration provides type-safe property setters for wall line configuration
- * through the DSL syntax. Each case corresponds to a specific line parameter
- * and enforces the correct value type at compile time.
+ * This enumeration provides type-safe property setters for wall line configuration through the DSL syntax. Each case
+ * corresponds to a specific line parameter and enforces the correct value type at compile time.
  *
  * @tparam T
  *   The type of value this property accepts
@@ -69,8 +69,10 @@ enum WallProperty[T]:
 enum LineProperty[T]:
   /** Direction of the wall line ("horizontal" or "vertical") */
   case Direction extends LineProperty[String]
+
   /** Starting coordinates (row, column) of the wall line */
   case From extends LineProperty[(Int, Int)]
+
   /** Ending coordinates (row, column) of the wall line */
   case To extends LineProperty[(Int, Int)]
 

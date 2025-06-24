@@ -2,6 +2,7 @@ package agentcrafter.llmqlearning
 
 import agentcrafter.llmqlearning.loader.WallLoader
 import agentcrafter.marl.builders.SimulationBuilder
+
 import scala.util.matching.Regex
 import scala.util.{Failure, Success}
 
@@ -9,6 +10,17 @@ import scala.util.{Failure, Success}
  * Service responsible for LLM wall generation and loading into simulation.
  */
 object LLMWallService extends LLMService[String]:
+
+  /**
+   * Alias for backward compatibility.
+   */
+  def generateWallsUsingLLM(
+    builder: SimulationBuilder,
+    model: String,
+    prompt: String,
+    simulationContent: String
+  ): Option[String] =
+    generateFromLLM(builder, model, prompt, simulationContent)
 
   /**
    * Generates walls from LLM using simulation content directly.
@@ -34,17 +46,6 @@ object LLMWallService extends LLMService[String]:
     callLLMAndProcess(model, fullPrompt, simulationContent, "walls")
 
   /**
-   * Alias for backward compatibility.
-   */
-  def generateWallsUsingLLM(
-    builder: SimulationBuilder,
-    model: String,
-    prompt: String,
-    simulationContent: String
-  ): Option[String] =
-    generateFromLLM(builder, model, prompt, simulationContent)
-
-  /**
    * Builds a comprehensive prompt for wall generation including simulation context.
    */
   protected override def buildPrompt(builder: SimulationBuilder, userPrompt: String): String =
@@ -60,10 +61,10 @@ object LLMWallService extends LLMService[String]:
     """.stripMargin
 
   /**
-   * Extracts ASCII map from LLM response using the common loader.
+   * Alias for backward compatibility.
    */
-  protected def extractContentFromResponse(response: String): Option[String] =
-    WallLoader.extractWallsFromResponse(response).toOption
+  def loadWallsIntoBuilder(builder: SimulationBuilder, asciiWalls: String): Unit =
+    loadIntoBuilder(builder, asciiWalls)
 
   /**
    * Loads the ASCII walls into the simulation builder.
@@ -81,7 +82,7 @@ object LLMWallService extends LLMService[String]:
         println(s"Error loading walls into simulation: ${ex.getMessage}")
 
   /**
-   * Alias for backward compatibility.
+   * Extracts ASCII map from LLM response using the common loader.
    */
-  def loadWallsIntoBuilder(builder: SimulationBuilder, asciiWalls: String): Unit =
-    loadIntoBuilder(builder, asciiWalls)
+  protected def extractContentFromResponse(response: String): Option[String] =
+    WallLoader.extractWallsFromResponse(response).toOption

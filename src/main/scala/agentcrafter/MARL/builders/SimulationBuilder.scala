@@ -2,12 +2,8 @@ package agentcrafter.marl.builders
 
 import agentcrafter.common.*
 import agentcrafter.marl.*
-import agentcrafter.marl.dsl.*
-import agentcrafter.marl.visualizers.Visualizer
 
 import scala.collection.mutable
-
-
 
 /**
  * Builder for creating Multi-Agent Reinforcement Learning (MARL) simulations.
@@ -53,9 +49,6 @@ class SimulationBuilder:
    */
   def grid(rows: Int, cols: Int): SimulationBuilder =
     this.rows = rows; this.cols = cols; this
-
-  private[marl] def newTrigger(who: String, x: Int, y: Int): TriggerBuilder =
-    new TriggerBuilder(who, x, y, this)
 
   /**
    * Creates a new wall line builder for configuring a line of walls.
@@ -234,22 +227,22 @@ class SimulationBuilder:
     new Runner(spec, gui).run()
 
   /**
-   * Generates a comprehensive string representation of the simulation configuration.
-   * This includes all DSL content that would be useful for LLM processing.
+   * Generates a comprehensive string representation of the simulation configuration. This includes all DSL content that
+   * would be useful for LLM processing.
    *
    * @return
    *   A comprehensive string representation of the simulation state
    */
   override def toString: String =
     val sb = new StringBuilder
-    sb.append(s"Grid dimension (rows x cols):${rows} x ${cols}\n")
-    
+    sb.append(s"Grid dimension (rows x cols):$rows x ${cols}\n")
+
     if walls.nonEmpty then
       sb.append(s"Walls (Positions in which the agent may NOT pass):\n")
       walls.toSeq.sortBy(w => (w.x, w.y)).foreach { wall =>
         sb.append(s" (x,y): (${wall.x}, ${wall.y})\n")
       }
-    
+
     if agents.nonEmpty then
       agents.values.foreach { agent =>
         sb.append(s"Agent ${agent.id}:\n")
@@ -257,3 +250,6 @@ class SimulationBuilder:
         sb.append(s"Goal: (${agent.goal.x}, ${agent.goal.y})\n")
       }
     sb.toString
+
+  private[marl] def newTrigger(who: String, x: Int, y: Int): TriggerBuilder =
+    new TriggerBuilder(who, x, y, this)

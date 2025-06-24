@@ -1,23 +1,12 @@
 package agentcrafter.marl
 
+import agentcrafter.common.{GridWorld, LearningConfig, QLearner, State}
 import agentcrafter.marl.managers.EnvironmentManager
-import agentcrafter.marl.{WorldSpec, Trigger, OpenWall, Reward, EndEpisode, AgentSpec}
-import agentcrafter.common.{State, QLearner, GridWorld, LearningConfig}
+import agentcrafter.marl.{AgentSpec, EndEpisode, OpenWall, Reward, Trigger, WorldSpec}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
 class EnvironmentManagerTest extends AnyFunSuite with Matchers:
-
-  private def dummyAgent(id: String, start: State = State(0,0)): AgentSpec =
-    val env = GridWorld(3,3, Set.empty)
-    val learner = QLearner(
-      goalState = State(2,2),
-      goalReward = 0.0,
-      updateFunction = env.step,
-      resetFunction = () => start,
-      learningConfig = LearningConfig()
-    )
-    AgentSpec(id, start, State(2,2), learner)
 
   private def baseSpec(triggers: List[Trigger]) =
     WorldSpec(
@@ -32,6 +21,17 @@ class EnvironmentManagerTest extends AnyFunSuite with Matchers:
       stepDelay = 0,
       showAfter = 100
     )
+
+  private def dummyAgent(id: String, start: State = State(0,0)): AgentSpec =
+    val env = GridWorld(3,3, Set.empty)
+    val learner = QLearner(
+      goalState = State(2,2),
+      goalReward = 0.0,
+      updateFunction = env.step,
+      resetFunction = () => start,
+      learningConfig = LearningConfig()
+    )
+    AgentSpec(id, start, State(2,2), learner)
 
   test("processTriggers should open walls and keep episode running"):
     val trig = Trigger("A", State(0,0), List(OpenWall(State(1,1))))

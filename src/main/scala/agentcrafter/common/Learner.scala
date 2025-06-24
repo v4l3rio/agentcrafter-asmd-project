@@ -19,9 +19,9 @@ trait Learner:
 
   /**
    * Updates the learning algorithm with the result of taking an action.
-   * 
-   * For goal-aware learners, this method should automatically handle goal rewards
-   * when the nextState matches the goal state.
+   *
+   * For goal-aware learners, this method should automatically handle goal rewards when the nextState matches the goal
+   * state.
    *
    * @param state
    *   The state from which the action was taken

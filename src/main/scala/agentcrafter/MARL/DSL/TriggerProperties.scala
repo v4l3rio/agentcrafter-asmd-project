@@ -1,14 +1,14 @@
 package agentcrafter.marl.dsl
 
 import agentcrafter.marl.builders.TriggerBuilder
+
 import scala.annotation.targetName
 
 /**
  * DSL properties for configuring trigger effects.
  *
- * This enumeration provides type-safe property setters for trigger configuration
- * through the DSL syntax. Each case corresponds to a specific trigger effect
- * and enforces the correct value type at compile time.
+ * This enumeration provides type-safe property setters for trigger configuration through the DSL syntax. Each case
+ * corresponds to a specific trigger effect and enforces the correct value type at compile time.
  *
  * @tparam T
  *   The type of value this property accepts
@@ -16,8 +16,10 @@ import scala.annotation.targetName
 enum TriggerProperty[T]:
   /** Opens a wall at the specified coordinates (row, column) */
   case OpenWall extends TriggerProperty[(Int, Int)]
+
   /** Gives a bonus reward to the triggering agent */
   case Give extends TriggerProperty[Double]
+
   /** Ends the current episode when triggered */
   case EndEpisode extends TriggerProperty[Boolean]
 
@@ -32,4 +34,3 @@ enum TriggerProperty[T]:
     case TriggerProperty.EndEpisode =>
       val shouldEnd = obj.asInstanceOf[Boolean]
       if shouldEnd then tb.endEpisode()
-  

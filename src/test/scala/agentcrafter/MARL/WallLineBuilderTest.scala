@@ -1,7 +1,7 @@
 package agentcrafter.marl
 
-import agentcrafter.marl.builders.{SimulationBuilder, WallLineBuilder}
 import agentcrafter.common.State
+import agentcrafter.marl.builders.{SimulationBuilder, WallLineBuilder}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 

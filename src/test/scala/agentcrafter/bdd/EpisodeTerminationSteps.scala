@@ -1,6 +1,6 @@
 package agentcrafter.bdd
 
-import agentcrafter.common.{GridWorld, QLearner, State, StepResult, EpisodeOutcome}
+import agentcrafter.common.*
 import io.cucumber.scala.{EN, ScalaDsl}
 import org.scalatest.matchers.should.Matchers
 

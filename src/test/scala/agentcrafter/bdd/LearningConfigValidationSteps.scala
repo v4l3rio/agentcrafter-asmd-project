@@ -10,7 +10,9 @@ class LearningConfigValidationSteps extends ScalaDsl with EN with Matchers:
 
   private var config: LearningConfig = uninitialized
 
-  Given("""a learning configuration with alpha {double} gamma {double} eps0 {double} epsMin {double} warm {int} optimistic {double}""") {
+  Given(
+    """a learning configuration with alpha {double} gamma {double} eps0 {double} epsMin {double} warm {int} optimistic {double}"""
+  ) {
     (alpha: Double, gamma: Double, eps0: Double, epsMin: Double, warm: Int, optimistic: Double) =>
       config = LearningConfig(alpha, gamma, eps0, epsMin, warm, optimistic)
   }

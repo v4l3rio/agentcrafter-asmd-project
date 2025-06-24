@@ -1,7 +1,6 @@
 package agentcrafter.common
 
 import agentcrafter.common.Constants
-import scala.util.Random
 
 /**
  * Factory object for creating GridWorld instances.
@@ -73,13 +72,13 @@ class GridWorld private (override val rows: Int, override val cols: Int, val wal
    *   StepResult containing next state and reward
    */
   override def step(s: State, a: Action): StepResult =
-    val (dc, dr) = a.delta  // delta is (column_change, row_change)
-    val intendedNextRaw = State(s.x + dr, s.y + dc)  // x=row, y=column
+    val (dc, dr) = a.delta // delta is (column_change, row_change)
+    val intendedNextRaw = State(s.x + dr, s.y + dc) // x=row, y=column
     // Toroidal wrapping
-    val wrappedX = (intendedNextRaw.x + rows) % rows  // x is row index
-    val wrappedY = (intendedNextRaw.y + cols) % cols  // y is column index
+    val wrappedX = (intendedNextRaw.x + rows) % rows // x is row index
+    val wrappedY = (intendedNextRaw.y + cols) % cols // y is column index
     val intendedNext = State(wrappedX, wrappedY)
-  
+
     val isValidMove = !walls.contains(intendedNext)
     val next = if isValidMove then intendedNext else s
     StepResult(next, stepPenalty)

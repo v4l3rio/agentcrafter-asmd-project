@@ -2,30 +2,27 @@ package agentcrafter.properties
 
 import agentcrafter.common.*
 import agentcrafter.llmqlearning.*
-import agentcrafter.llmqlearning.dsl.{LLMConfig, LLMWallConfig, LLMProperty, LLMWallProperty}
+import agentcrafter.llmqlearning.dsl.{LLMConfig, LLMProperty, LLMWallConfig, LLMWallProperty}
 import org.scalacheck.Prop.forAll
 import org.scalacheck.{Gen, Properties}
 import org.scalatest.matchers.should.Matchers
 
 /**
- * Property-based tests for LLM integration using ScalaCheck.
- * These tests verify LLM configuration and basic integration properties
- * while avoiding expensive API calls and complex Q-table operations.
+ * Property-based tests for LLM integration using ScalaCheck. These tests verify LLM configuration and basic integration
+ * properties while avoiding expensive API calls and complex Q-table operations.
  */
 object LLMProperties extends Properties("LLM") with Matchers:
-
-  // Test constants
+  
   private val TEST_GRID_SIZE: Int = 5
 
   private val stateGen: Gen[State] = for {
     x <- Gen.choose(0, TEST_GRID_SIZE - 1)
     y <- Gen.choose(0, TEST_GRID_SIZE - 1)
   } yield State(x, y)
-
-  // LLMConfig tests
+  
   property("LLM configuration maintains valid state") = forAll(llmConfigGen) { config =>
     config.model.nonEmpty &&
-      (config.enabled || !config.enabled)
+    (config.enabled || !config.enabled)
   }
 
   property("LLM property setters update configuration") = forAll(modelGen) { model =>
@@ -37,7 +34,7 @@ object LLMProperties extends Properties("LLM") with Matchers:
     LLMProperty.Model >> model
 
     config.enabled &&
-      config.model == model
+    config.model == model
   }
 
   property("LLM config handles boolean toggles") = forAll(Gen.oneOf(true, false)) { enabled =>
@@ -64,12 +61,11 @@ object LLMProperties extends Properties("LLM") with Matchers:
     val config = LLMConfig()
 
     !config.enabled &&
-      config.model == "gpt-4o"
-
-  // LLMWallConfig tests
+    config.model == "gpt-4o"
+  
   property("LLMWall configuration maintains valid state") = forAll(llmWallConfigGen) { config =>
     config.model.length >= 0 &&
-      config.prompt.length >= 0
+    config.prompt.length >= 0
   }
 
   property("LLMWall property setters update configuration") = forAll(modelGen, promptGen) { (model, prompt) =>
@@ -81,7 +77,7 @@ object LLMProperties extends Properties("LLM") with Matchers:
     LLMWallProperty.Prompt >> prompt
 
     config.model == model &&
-      config.prompt == prompt
+    config.prompt == prompt
   }
 
   property("LLMWall config handles edge cases") =
@@ -98,13 +94,13 @@ object LLMProperties extends Properties("LLM") with Matchers:
     val config = LLMWallConfig()
 
     config.model.isEmpty &&
-      config.prompt.isEmpty
-
-  // General tests
+    config.prompt.isEmpty
+  
   property("JSON decoration stripping works correctly") = forAll(validJsonGen) { json =>
-    val stripped = if json.trim.startsWith("```") then
-      json.trim.stripPrefix("```json").stripPrefix("```").stripSuffix("```")
-    else json
+    val stripped =
+      if json.trim.startsWith("```") then
+        json.trim.stripPrefix("```json").stripPrefix("```").stripSuffix("```")
+      else json
 
     val finalStripped = stripped.replaceAll("(?i)^json\\s*", "").replaceAll("(?i)^here.*?:\\s*", "").trim
 
@@ -118,14 +114,15 @@ object LLMProperties extends Properties("LLM") with Matchers:
 
     val regex = """\(\s*(\d+)\s*,\s*(\d+)\s*\)""".r
 
-    def testMatch(str: String): Boolean = str match
-      case regex(x, y) =>
-        try {
-          x.toInt == state.x && y.toInt == state.y
-        } catch {
-          case _: NumberFormatException => false
-        }
-      case _ => false
+    def testMatch(str: String): Boolean =
+      str match
+        case regex(x, y) =>
+          try
+            x.toInt == state.x && y.toInt == state.y
+          catch {
+            case _: NumberFormatException => false
+          }
+        case _ => false
 
     val result1 = testMatch(stateString1)
     val result2 = testMatch(stateString2)
@@ -144,9 +141,9 @@ object LLMProperties extends Properties("LLM") with Matchers:
     LLMProperty.Enabled >> true
 
     config1.model == model1 &&
-      config1.enabled &&
-      config2.model == "gpt-4o" &&
-      !config2.enabled
+    config1.enabled &&
+    config2.model == "gpt-4o" &&
+    !config2.enabled
   }
 
   private val modelGen: Gen[String] = Gen.oneOf("gpt-4o", "gpt-4", "gpt-3.5-turbo")

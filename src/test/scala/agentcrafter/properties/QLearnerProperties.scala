@@ -10,8 +10,7 @@ import org.scalatest.matchers.should.Matchers
  * Q-learning algorithm.
  */
 object QLearnerProperties extends Properties("QLearner") with Matchers:
-
-  // Test constants
+  
   private val TEST_GRID_SIZE: Int = 5
   private val TEST_REWARD_MIN: Double = -100.0
   private val TEST_REWARD_MAX: Double = 100.0
@@ -157,8 +156,7 @@ object QLearnerProperties extends Properties("QLearner") with Matchers:
       val goalState = State(4, 4)
 
       val initialQ = learner.getQValue(state, action)
-
-      // Use the goal reward when reaching the goal state
+      
       (1 to 10).foreach { _ =>
         learner.update(state, action, learner.getGoalReward, goalState)
       }
@@ -195,7 +193,6 @@ object QLearnerProperties extends Properties("QLearner") with Matchers:
     val params = LearningConfig(eps0 = 0.1, epsMin = 0.1)
     val learner = createLearner(params)
     val state = State(0, 0)
-    // Train Q-values: make Action.Up optimal
     Action.values.zipWithIndex.foreach { case (action, idx) =>
       val reward = if (action == Action.Up) 100.0 else 0.0
       learner.update(state, action, reward, state)
@@ -208,6 +205,6 @@ object QLearnerProperties extends Properties("QLearner") with Matchers:
     }
     val optimalCount = counts(Action.Up)
     val nonOptimalCounts = Action.values.filter(_ != Action.Up).map(counts)
-    // Optimal should be chosen much more often than any non-optimal
+    
     optimalCount > nonOptimalCounts.max * 2
   }

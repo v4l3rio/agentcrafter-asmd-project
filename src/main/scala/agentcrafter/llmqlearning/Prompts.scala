@@ -19,10 +19,10 @@ object Prompts:
   /**
    * Q-table generation prompt template.
    *
-   * This prompt is designed to help LLMs generate Q-tables for both single and multiple agents.
-   * For multiple agents, it considers their interactions, potential conflicts, and coordination opportunities.
-   * For single agents, it generates a single optimized Q-table.
-   * Each agent receives a Q-table optimized for their specific goals and environment context.
+   * This prompt is designed to help LLMs generate Q-tables for both single and multiple agents. For multiple agents, it
+   * considers their interactions, potential conflicts, and coordination opportunities. For single agents, it generates
+   * a single optimized Q-table. Each agent receives a Q-table optimized for their specific goals and environment
+   * context.
    */
   lazy val multiAgentQTable: String =
     Using.resource(Source.fromResource("prompts/multi_agent_qtable_generation_prompt.txt"))(_.mkString)

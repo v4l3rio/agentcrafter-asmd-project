@@ -85,12 +85,12 @@ class AgentBuilder(parent: SimulationBuilder):
    *   This builder instance for method chaining
    */
   def withLearner(
-      alpha: Double = Constants.DEFAULT_LEARNING_RATE,
-      gamma: Double = Constants.DEFAULT_DISCOUNT_FACTOR,
-      eps0: Double = Constants.DEFAULT_INITIAL_EXPLORATION_RATE,
-      epsMin: Double = Constants.DEFAULT_MINIMUM_EXPLORATION_RATE,
-      warm: Int = Constants.DEFAULT_WARMUP_EPISODES,
-      optimistic: Double = Constants.DEFAULT_OPTIMISTIC_INITIALIZATION
+    alpha: Double = Constants.DEFAULT_LEARNING_RATE,
+    gamma: Double = Constants.DEFAULT_DISCOUNT_FACTOR,
+    eps0: Double = Constants.DEFAULT_INITIAL_EXPLORATION_RATE,
+    epsMin: Double = Constants.DEFAULT_MINIMUM_EXPLORATION_RATE,
+    warm: Int = Constants.DEFAULT_WARMUP_EPISODES,
+    optimistic: Double = Constants.DEFAULT_OPTIMISTIC_INITIALIZATION
   ): AgentBuilder =
     val gridWorld = GridWorld(
       rows = parent.getRows,

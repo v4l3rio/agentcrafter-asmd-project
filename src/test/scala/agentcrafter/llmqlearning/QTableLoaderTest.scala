@@ -1,6 +1,6 @@
 package agentcrafter.llmqlearning
 
-import agentcrafter.common.{Action, GridWorld, LearningConfig, Learner, QLearner, State}
+import agentcrafter.common.*
 import agentcrafter.llmqlearning.loader.QTableLoader
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers

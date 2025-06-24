@@ -1,8 +1,7 @@
 package agentcrafter.marl.builders
 
-import agentcrafter.marl.OpenWall
-import agentcrafter.marl.*
 import agentcrafter.common.State
+import agentcrafter.marl.*
 
 import scala.collection.mutable
 

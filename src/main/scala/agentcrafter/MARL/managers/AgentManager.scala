@@ -5,12 +5,12 @@ import agentcrafter.marl.WorldSpec
 
 /**
  * Manages agent-related operations and state in a multi-agent simulation.
- * 
+ *
  * This class follows the Single Responsibility Principle by focusing solely on:
- * - Agent initialization and mapping
- * - Agent action coordination
- * - Q-learning updates for all agents
- * - Agent state management
+ *   - Agent initialization and mapping
+ *   - Agent action coordination
+ *   - Q-learning updates for all agents
+ *   - Agent state management
  */
 class AgentManager(spec: WorldSpec):
 

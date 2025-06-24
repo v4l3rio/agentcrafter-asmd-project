@@ -4,8 +4,6 @@ import agentcrafter.llmqlearning.{LLMQTableService, LLMWallService}
 import agentcrafter.marl.builders.SimulationBuilder
 import agentcrafter.marl.dsl.{SimulationDSL, SimulationWrapper}
 
-import scala.annotation.targetName
-
 /**
  * Mixin that augments the base `SimulationDSL` with an `useLLM { … }` block allowing users to enable LLM‑generated
  * Q‑tables.
@@ -62,7 +60,7 @@ trait LLMQLearning extends SimulationDSL:
       // Use the simulation builder's toString instead of file path inspection
       val simulationContent = wrapper.builder.toString
       val agents = wrapper.builder.getAgents
-      
+
       println(s"Detected ${agents.size} agent(s) - using Q-table generation...")
       LLMQTableService.loadQTableFromLLM(wrapper.builder, llmConfig.model, simulationContent) match
         case Some(qTableJson) =>

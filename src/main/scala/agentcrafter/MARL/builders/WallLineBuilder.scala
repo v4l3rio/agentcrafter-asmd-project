@@ -5,9 +5,8 @@ import agentcrafter.marl.dsl.LineWallConfig
 /**
  * Builder for configuring wall lines in a Multi-Agent Reinforcement Learning simulation.
  *
- * This class provides a fluent API for setting up wall line properties including direction,
- * starting position, and ending position. Wall lines can be configured to create horizontal
- * or vertical walls between two points in the grid.
+ * This class provides a fluent API for setting up wall line properties including direction, starting position, and
+ * ending position. Wall lines can be configured to create horizontal or vertical walls between two points in the grid.
  *
  * @param parent
  *   The parent SimulationBuilder that this wall line belongs to

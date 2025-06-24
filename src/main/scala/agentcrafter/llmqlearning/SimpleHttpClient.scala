@@ -21,4 +21,3 @@ private class DefaultSimpleHttpClient extends SimpleHttpClient:
       .body(body)
       .readTimeout(Duration.Inf)
       .send(HttpClientSyncBackend())
-

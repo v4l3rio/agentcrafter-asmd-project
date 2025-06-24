@@ -17,6 +17,7 @@ trait SimulationDSL:
   export agentcrafter.marl.dsl.TriggerProperty.*
   export agentcrafter.marl.dsl.WallProperty.*
   export agentcrafter.marl.dsl.LineProperty.*
+
   /**
    * Main entry point for defining a simulation.
    *
@@ -62,16 +63,12 @@ trait SimulationDSL:
   def asciiWalls(ascii: String)(using wrapper: SimulationWrapper): Unit =
     wrapper.builder = wrapper.builder.wallsFromAscii(ascii.stripMargin)
 
-
-
   /**
    * Opens a walls configuration block.
    *
    * @param block
    *   Configuration block for defining walls
    */
-
-
 
   def walls(block: SimulationWrapper ?=> Unit)(using wrapper: SimulationWrapper): Unit =
     block

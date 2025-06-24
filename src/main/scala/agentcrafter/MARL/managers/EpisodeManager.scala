@@ -7,9 +7,9 @@ import agentcrafter.marl.{SimulationState, WorldSpec}
  * Manages the execution of individual episodes in a Multi-Agent Reinforcement Learning (marl) simulation.
  *
  * This class orchestrates episode execution by coordinating specialized managers for different concerns:
- * - AgentManager: handles agent actions and Q-learning updates
- * - EnvironmentManager: manages environment state and trigger processing
- * - SimulationState: tracks episode progress and statistics
+ *   - AgentManager: handles agent actions and Q-learning updates
+ *   - EnvironmentManager: manages environment state and trigger processing
+ *   - SimulationState: tracks episode progress and statistics
  *
  * Key responsibilities:
  *   - Orchestrating episode execution flow
@@ -46,17 +46,17 @@ class EpisodeManager(spec: WorldSpec):
       simulationState.addEpisodeReward(stepResult.totalReward)
 
       val currentState = simulationState.createEpisodeState(
-        agentManager.getPositions, 
-        environmentManager.getOpenedWalls, 
+        agentManager.getPositions,
+        environmentManager.getOpenedWalls,
         environmentManager.isEpisodeDone
       )
       onStep(currentState, steps, stepResult.anyAgentExploring)
 
     EpisodeResult(
-      steps, 
-      simulationState.getEpisodeReward, 
-      agentManager.getPositions, 
-      environmentManager.getOpenedWalls, 
+      steps,
+      simulationState.getEpisodeReward,
+      agentManager.getPositions,
+      environmentManager.getOpenedWalls,
       environmentManager.isEpisodeDone
     )
 

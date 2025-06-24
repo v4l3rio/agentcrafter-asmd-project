@@ -1,14 +1,10 @@
 package agentcrafter.marl.visualizers
 
+import agentcrafter.common.{Action, Constants, State}
 import agentcrafter.marl.{OpenWall, WorldSpec}
-import agentcrafter.common.{Action, State, Constants}
 
-import scala.swing.*
-import scala.swing.event.*
 import java.awt.{Color, Graphics2D}
-import javax.swing.Timer
-
-
+import scala.swing.*
 
 /**
  * Unified visualization component for both single-agent Q-Learning and multi-agent simulations.
@@ -46,14 +42,19 @@ class Visualizer(
   delayMs: Int = Constants.DEFAULT_STEP_DELAY_MS
 ):
 
+  val frame: MainFrame =
+    new MainFrame:
+      title = windowTitle
+      contents = panel
+      centerOnScreen()
+      visible = true
   private val colors = Array(
     Color.blue,
     Color.magenta,
     Color.cyan,
     Color.pink,
-    Color.red,
+    Color.red
   )
-  
   private val panel = new Panel:
     preferredSize = new java.awt.Dimension(cols * cell, rows * cell + Constants.INFO_PANEL_HEIGHT)
 
@@ -93,7 +94,12 @@ class Visualizer(
         singleAgentPos.foreach { pos =>
           g.setColor(Color.blue)
           val m = cell / Constants.AGENT_CIRCLE_MARGIN_DIVISOR
-          g.fillOval(pos.x * cell + m, pos.y * cell + m, cell - Constants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m, cell - Constants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m)
+          g.fillOval(
+            pos.x * cell + m,
+            pos.y * cell + m,
+            cell - Constants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m,
+            cell - Constants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m
+          )
         }
       else
 
@@ -101,7 +107,12 @@ class Visualizer(
         multiAgentState.zipWithIndex.foreach { case ((id, p), idx) =>
           val col = colors(idx % colors.length)
           g.setColor(col)
-          g.fillOval(p.x * cell + m, p.y * cell + m, cell - Constants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m, cell - Constants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m)
+          g.fillOval(
+            p.x * cell + m,
+            p.y * cell + m,
+            cell - Constants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m,
+            cell - Constants.AGENT_CIRCLE_MARGIN_MULTIPLIER * m
+          )
         }
 
       g.setColor(Color.black)
@@ -109,17 +120,21 @@ class Visualizer(
 
       g.drawString(s"Step: $step", Constants.INFO_TEXT_X_POSITION, infoY)
       g.drawString(s"Episode: $episode", Constants.INFO_TEXT_X_POSITION, infoY + Constants.INFO_TEXT_LINE_SPACING)
-      g.drawString(s"Mode: ${if explorationMode then "Exploration" else "Exploitation"}", Constants.INFO_TEXT_X_POSITION, infoY + Constants.INFO_TEXT_LINE_SPACING * 2)
-      g.drawString(s"Episode Reward: ${"%.2f".format(episodeReward)}", Constants.INFO_TEXT_X_POSITION, infoY + Constants.INFO_TEXT_LINE_SPACING * 3)
-      g.drawString(s"Epsilon: ${"%.3f".format(epsilon)}", Constants.INFO_TEXT_X_POSITION, infoY + Constants.INFO_TEXT_LINE_SPACING * 4)
-
-  val frame: MainFrame =
-    new MainFrame:
-      title = windowTitle
-      contents = panel
-      centerOnScreen()
-      visible = true
-      
+      g.drawString(
+        s"Mode: ${if explorationMode then "Exploration" else "Exploitation"}",
+        Constants.INFO_TEXT_X_POSITION,
+        infoY + Constants.INFO_TEXT_LINE_SPACING * 2
+      )
+      g.drawString(
+        s"Episode Reward: ${"%.2f".format(episodeReward)}",
+        Constants.INFO_TEXT_X_POSITION,
+        infoY + Constants.INFO_TEXT_LINE_SPACING * 3
+      )
+      g.drawString(
+        s"Epsilon: ${"%.3f".format(epsilon)}",
+        Constants.INFO_TEXT_X_POSITION,
+        infoY + Constants.INFO_TEXT_LINE_SPACING * 4
+      )
   private var singleAgentPos: Option[State] = None
   private var startPos: Option[State] = None
   private var goalPos: Option[State] = None

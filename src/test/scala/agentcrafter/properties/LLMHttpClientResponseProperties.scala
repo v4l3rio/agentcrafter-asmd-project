@@ -12,63 +12,56 @@ import scala.util.{Failure, Success}
 
 /** Verifies LLMHttpClient’s robustness when the assistant returns rich, nested JSON. */
 object LLMHttpClientResponseProperties
-  extends Properties("LLMHttpClientResponse") with Matchers:
-
-  /* ---------------- helpers ---------------- */
-
-  private def jsonEscape(s: String): String =
-    s.flatMap {
-      case '"'  => "\\\""
-      case '\\' => "\\\\"
-      case c    => c.toString
-    }
-
-  /* ---------------- generators ------------- */
-
-  // one well-formed nested JSON per successful case
+    extends Properties("LLMHttpClientResponse") with Matchers:
+  
   private val nestedJsonGen: Gen[String] =
     for
-      agent   <- Gen.identifier.map(_.take(12))
-      row     <- Gen.choose(0, 9)
-      col     <- Gen.choose(0, 9)
-      up      <- Gen.choose(-1.0, 1.0)
-      down    <- Gen.choose(-1.0, 1.0)
-      left    <- Gen.choose(-1.0, 1.0)
-      right   <- Gen.choose(-1.0, 1.0)
-      stay    <- Gen.choose(-1.0, 1.0)
+      agent <- Gen.identifier.map(_.take(12))
+      row <- Gen.choose(0, 9)
+      col <- Gen.choose(0, 9)
+      up <- Gen.choose(-1.0, 1.0)
+      down <- Gen.choose(-1.0, 1.0)
+      left <- Gen.choose(-1.0, 1.0)
+      right <- Gen.choose(-1.0, 1.0)
+      stay <- Gen.choose(-1.0, 1.0)
     yield s"""{"$agent":{"($row,$col)":{"Up":$up,"Down":$down,"Left":$left,"Right":$right,"Stay":$stay}}}"""
-
-  private val validGen: Gen[(String,String)] =
+  
+  private val validGen: Gen[(String, String)] =
     nestedJsonGen.map { inner =>
       val outer =
         s"""{"choices":[{"message":{"content":"${jsonEscape(inner)}"}}]}"""
-      (outer, inner) // (rawHTTPbody, expectedContent)
+      (outer, inner)
     }
-
   private val invalidGen: Gen[String] = Gen.oneOf(
-    "not json", "{", "{}", """{"choices":[]}""",
+    "not json",
+    "{",
+    "{}",
+    """{"choices":[]}""",
     """{"choices":[{"message":{}}]}""", // missing content
     """{"choices":[{"message":{"content":3}}]}""" // wrong type
   )
-
-  private val responseGen: Gen[(Boolean,String,String)] =
+  private val responseGen: Gen[(Boolean, String, String)] =
     Gen.frequency(
-      5 -> validGen.map { case (o,i) => (true , o, i) },
-      5 -> invalidGen.map(badBody    => (false, badBody, ""))
+      5 -> validGen.map { case (o, i) => (true, o, i) },
+      5 -> invalidGen.map(badBody => (false, badBody, ""))
     )
 
-  /* ---------------- property --------------- */
+  private def jsonEscape(s: String): String =
+    s.flatMap {
+      case '"' => "\\\""
+      case '\\' => "\\\\"
+      case c => c.toString
+    }
 
   property("parses nested-JSON content correctly") = forAll(responseGen) {
     case (shouldSucceed, body, expectedInner) =>
-
       // mock HTTP layer
-      val mockHttp  = Mockito.mock(classOf[SimpleHttpClient])
-      val uri       = Uri.parse("https://api.test.com/v1/chat/completions").getOrElse(
+      val mockHttp = Mockito.mock(classOf[SimpleHttpClient])
+      val uri = Uri.parse("https://api.test.com/v1/chat/completions").getOrElse(
         throw new IllegalArgumentException("Invalid URI")
       )
-      val metadata  = RequestMetadata(Method.POST, uri, Seq.empty)
-      val resp      = Response.ok(body, metadata)
+      val metadata = RequestMetadata(Method.POST, uri, Seq.empty)
+      val resp = Response.ok(body, metadata)
       Mockito.when(
         mockHttp.post(
           ArgumentMatchers.any(classOf[Uri]),
@@ -78,20 +71,19 @@ object LLMHttpClientResponseProperties
       ).thenReturn(resp)
 
       val client = LLMHttpClient(
-        baseUrl    = "https://api.test.com",
-        apiKey     = "test",
+        baseUrl = "https://api.test.com",
+        apiKey = "test",
         httpClient = mockHttp
       )
-
-      // correct signature: (prompt, model, simContent, stream, endpoint)
+      
       val result = client.callLLMWithContent(
-        "prompt"           , // prompt
-        "gpt-4o"           , // model
-        "simulation: {}"   , // simulation payload
-        false              , // stream
-        "/v1/chat/completions" // endpoint
+        "prompt",
+        "gpt-4o", 
+        "simulation: {}", 
+        false, 
+        "/v1/chat/completions"
       )
 
       if shouldSucceed then result == Success(expectedInner)
-      else                 result.isFailure
+      else result.isFailure
   }

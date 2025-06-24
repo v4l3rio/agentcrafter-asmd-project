@@ -4,11 +4,11 @@ import agentcrafter.common.*
 
 /**
  * Manages simulation-wide state and statistics.
- * 
+ *
  * This class follows the Single Responsibility Principle by focusing solely on:
- * - Tracking simulation progress (episodes, rewards)
- * - Managing simulation statistics
- * - Providing state snapshots for visualization
+ *   - Tracking simulation progress (episodes, rewards)
+ *   - Managing simulation statistics
+ *   - Providing state snapshots for visualization
  */
 class SimulationState:
 
@@ -22,6 +22,12 @@ class SimulationState:
   def getCurrentEpisode: Int = currentEpisode
 
   /**
+   * Sets the current episode number.
+   */
+  def setCurrentEpisode(episode: Int): Unit =
+    currentEpisode = episode
+
+  /**
    * Gets the total accumulated reward across all episodes.
    */
   def getTotalReward: Double = totalReward
@@ -30,12 +36,6 @@ class SimulationState:
    * Gets the current episode reward.
    */
   def getEpisodeReward: Double = episodeReward
-
-  /**
-   * Sets the current episode number.
-   */
-  def setCurrentEpisode(episode: Int): Unit =
-    currentEpisode = episode
 
   /**
    * Adds reward to the current episode.

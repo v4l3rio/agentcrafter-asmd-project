@@ -7,12 +7,12 @@ import scala.collection.mutable
 
 /**
  * Manages environment-related operations in a multi-agent simulation.
- * 
+ *
  * This class follows the Single Responsibility Principle by focusing solely on:
- * - Environment state management (walls, triggers)
- * - Action execution in the environment
- * - Trigger processing and effects application
- * - Grid world state management
+ *   - Environment state management (walls, triggers)
+ *   - Action execution in the environment
+ *   - Trigger processing and effects application
+ *   - Grid world state management
  */
 class EnvironmentManager(spec: WorldSpec):
 
@@ -20,12 +20,6 @@ class EnvironmentManager(spec: WorldSpec):
   private val dynamicWalls = mutable.Set.empty[State]
   private var activeTriggers: List[Trigger] = spec.triggers
   private var episodeDone = false
-
-  /**
-   * Creates a GridWorld instance reflecting the current environment state.
-   */
-  def getCurrentGrid: GridWorld =
-    GridWorld(spec.rows, spec.cols, staticWalls.toSet -- dynamicWalls, spec.stepPenalty)
 
   /**
    * Gets the current set of opened walls.
@@ -40,12 +34,21 @@ class EnvironmentManager(spec: WorldSpec):
   /**
    * Executes actions for all agents and returns new positions and step rewards.
    */
-  def executeActions(actions: Map[String, Action], currentPositions: Map[String, State]): (Map[String, State], Map[String, Double]) =
+  def executeActions(
+    actions: Map[String, Action],
+    currentPositions: Map[String, State]
+  ): (Map[String, State], Map[String, Double]) =
     actions.foldLeft(currentPositions -> Map.empty[String, Double]) {
       case ((posAcc, rewAcc), (id, action)) =>
         val stepResult = getCurrentGrid.step(posAcc(id), action)
         (posAcc + (id -> stepResult.state), rewAcc + (id -> stepResult.reward))
     }
+
+  /**
+   * Creates a GridWorld instance reflecting the current environment state.
+   */
+  def getCurrentGrid: GridWorld =
+    GridWorld(spec.rows, spec.cols, staticWalls.toSet -- dynamicWalls, spec.stepPenalty)
 
   /**
    * Processes triggers and returns trigger-based rewards.

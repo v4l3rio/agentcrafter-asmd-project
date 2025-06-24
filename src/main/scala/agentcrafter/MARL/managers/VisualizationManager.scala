@@ -6,11 +6,11 @@ import agentcrafter.marl.visualizers.{QTableVisualizer, Visualizer}
 
 /**
  * Manages visualization components for the multi-agent simulation.
- * 
+ *
  * This class follows the Single Responsibility Principle by focusing solely on:
- * - Visualization initialization and lifecycle
- * - Coordinating between main visualizer and Q-table visualizers
- * - Managing visualization state and updates
+ *   - Visualization initialization and lifecycle
+ *   - Coordinating between main visualizer and Q-table visualizers
+ *   - Managing visualization state and updates
  */
 class VisualizationManager(spec: WorldSpec, agentsQL: Map[String, Learner]):
 

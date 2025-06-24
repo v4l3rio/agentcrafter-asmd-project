@@ -3,14 +3,13 @@ package agentcrafter.marl
 import agentcrafter.common.*
 import agentcrafter.marl.managers.{EpisodeManager, VisualizationManager}
 
-
 /**
  * Runner: orchestrates marl simulation execution using decomposed components.
- * 
+ *
  * This class follows the Single Responsibility Principle by focusing solely on:
- * - Overall simulation orchestration
- * - Coordinating between specialized managers
- * - Managing simulation lifecycle and reporting
+ *   - Overall simulation orchestration
+ *   - Coordinating between specialized managers
+ *   - Managing simulation lifecycle and reporting
  */
 class Runner(spec: WorldSpec, showGui: Boolean):
 

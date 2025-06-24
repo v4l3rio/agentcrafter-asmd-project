@@ -1,16 +1,16 @@
 package agentcrafter.marl.dsl
 
-import agentcrafter.marl.builders.{AgentBuilder, TriggerBuilder, WallLineBuilder, SimulationBuilder}
-import agentcrafter.marl.dsl.*
-import agentcrafter.marl.{OpenWall, Reward, EndEpisode}
 import agentcrafter.common.State
+import agentcrafter.marl.builders.{AgentBuilder, SimulationBuilder, TriggerBuilder, WallLineBuilder}
+import agentcrafter.marl.dsl.*
+import agentcrafter.marl.{EndEpisode, OpenWall, Reward}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
 import scala.collection.mutable
 
 object TestDSL extends SimulationDSL
-import TestDSL.*
+import agentcrafter.marl.dsl.TestDSL.*
 
 class DSLPropertyTest extends AnyFunSuite with Matchers:
 

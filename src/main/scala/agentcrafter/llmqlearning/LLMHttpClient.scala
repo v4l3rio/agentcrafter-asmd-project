@@ -1,10 +1,10 @@
 package agentcrafter.llmqlearning
 
+import agentcrafter.llmqlearning.SimpleHttpClient
 import io.github.cdimascio.dotenv.Dotenv
 import play.api.libs.json.*
 import sttp.client4.Response
 import sttp.model.Uri
-import agentcrafter.llmqlearning.SimpleHttpClient
 
 import java.io.File
 import scala.io.Source
@@ -52,31 +52,6 @@ class LLMHttpClient(
       simContent <- readSimulationContent(simulationFilePath)
       response <- postRequest(prompt, model, stream, endpoint, simContent)
     yield response
-
-  /**
-   * Makes an LLM API call with simulation content provided directly as a string.
-   *
-   * @param prompt
-   *   The user prompt to send to the LLM
-   * @param model
-   *   The LLM model to use (default: "gpt-4o")
-   * @param simulationContent
-   *   The simulation configuration content as a string
-   * @param stream
-   *   Whether to enable streaming (default: false)
-   * @param endpoint
-   *   The API endpoint (default: "/v1/chat/completions")
-   * @return
-   *   Try containing the LLM response or an error
-   */
-  def callLLMWithContent(
-    prompt: String = "",
-    model: String = "gpt-4o",
-    simulationContent: String,
-    stream: Boolean = false,
-    endpoint: String = "/v1/chat/completions"
-  ): Try[String] =
-    postRequest(prompt, model, stream, endpoint, simulationContent)
 
   /**
    * Performs the actual HTTP POST request to the LLM API.
@@ -247,3 +222,28 @@ class LLMHttpClient(
     }
 
     result.mkString("\n")
+
+  /**
+   * Makes an LLM API call with simulation content provided directly as a string.
+   *
+   * @param prompt
+   *   The user prompt to send to the LLM
+   * @param model
+   *   The LLM model to use (default: "gpt-4o")
+   * @param simulationContent
+   *   The simulation configuration content as a string
+   * @param stream
+   *   Whether to enable streaming (default: false)
+   * @param endpoint
+   *   The API endpoint (default: "/v1/chat/completions")
+   * @return
+   *   Try containing the LLM response or an error
+   */
+  def callLLMWithContent(
+    prompt: String = "",
+    model: String = "gpt-4o",
+    simulationContent: String,
+    stream: Boolean = false,
+    endpoint: String = "/v1/chat/completions"
+  ): Try[String] =
+    postRequest(prompt, model, stream, endpoint, simulationContent)
