@@ -86,9 +86,6 @@ trait LLMService[T]:
     println(s"Calling LLM API ($model) to generate $contentType…")
     client.callLLMWithContent(prompt, model, simulationContent) match
       case Success(response) =>
-        println(s"Raw LLM response for $contentType:")
-        println(s"$response")
-        println("--- End of LLM response ---")
         extractContentFromResponse(response) match
           case Some(content) => Some(content)
           case None =>
