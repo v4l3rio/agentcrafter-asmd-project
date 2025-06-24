@@ -168,12 +168,6 @@ The MARL framework introduces a sophisticated architecture that extends the basi
 
 ![Sequence Diagram](./sequence_builder.svg)
 
-**Domain Model:**
-- **WorldSpec**: Complete specification for multi-agent environments
-- **AgentSpec**: Individual agent definitions with learning algorithms
-- **Trigger/Effect System**: Dynamic environment modification capabilities
-- **SimulationState**: Episode progress tracking and statistics
-
 
 ## Testing Strategy
 

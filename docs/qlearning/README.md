@@ -34,9 +34,9 @@ $$
 $$
 
 Parameters:
-- currentValue $Q_{\text{old}}(s,a)$: the agent’s current estimate of the value of taking action a in state s. 
-- r (reward): the immediate scalar reward returned by the environment after executing action a in state s.
-- maxNextValue $\displaystyle\max_{a’} Q_{\text{old}}(s’,a’)$: the highest estimated value among all actions $a′$ available in the next state $s′$, providing a one-step look-ahead toward the future.
+- **currentValue** ($Q_{\text{old}}(s,a)$): the agent’s current estimate of the value of taking action $a$ in state $s$. 
+- $r$ (reward): the immediate scalar reward returned by the environment after executing action $a$ in state $s$.
+- maxNextValue ($\displaystyle\max_{a’} Q_{\text{old}}(s’,a’)$): the highest estimated value among all actions $a′$ available in the next state $s′$, providing a one-step look-ahead toward the future.
 - $\alpha$ (alpha): learning rate, $0 < \alpha \le 1$; how strongly new information overrides the old estimate.
 - $\gamma$ (gamma): discount factor, $0 \le \gamma < 1$; weights future rewards relative to the immediate reward.
 - newValue $Q_{\text{new}}(s,a)$: the value stored back into the Q-table, moving $Q(s,a)$ toward the optimal action–value function through repeated updates.
@@ -66,8 +66,8 @@ The visual component adds comprehensive monitoring capabilities:
 **Visualization Features:**
 - **Live Agent Movement**: Real-time display of agent position and trajectory
 - **Q-Value Display**: Current Q-values for debugging and analysis
-- **Exploration Mode**: Visual indication of exploration vs exploitation
-- **Episode Statistics**: Step count, rewards, and success metrics
+- **Mode**: Visual indication of exploration vs exploitation
+- **Episode Statistics**: Step count, rewards, episode count, epsilon decay
 
 ### Interactive Debugging
 

@@ -77,7 +77,7 @@ Comprehensive syntax reference and language specification (unchanged from origin
 **⚠️ LLM Integration Has Limitations**
 - Technical integration succeeds but practical benefits are limited
 - LLMs struggle with optimal policy understanding and spatial reasoning
-- - Traditional algorithmic approaches often provide better reliability
+- Traditional algorithmic approaches often provide better reliability
 
 ## Getting Started
 
@@ -90,7 +90,3 @@ To understand the complete development journey:
 5. **[Conclusions](conclusions.md)** - Learn from project outcomes and insights
 
 Each section focuses on explaining concepts and integration points rather than detailed implementation, with clear directions where patterns will be introduced.
-
----
-
-*This documentation captures the complete development journey from basic reinforcement learning to advanced multi-agent systems, providing honest insights into both the successes of MARL and the practical limitations of current LLM integration approaches.*
