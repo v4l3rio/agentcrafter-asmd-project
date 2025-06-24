@@ -1,4 +1,4 @@
-package agentcrafter.llmqlearning
+package agentcrafter.llmqlearning.loader
 
 import agentcrafter.common.{Action, Learner, QLearner, State}
 import play.api.libs.json.*
@@ -8,13 +8,13 @@ import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
 /**
- * Utility for loading Q-tables from JSON into learner instances.
+ * Loader for Q-tables from LLM responses.
  * 
  * Handles JSON parsing, cleaning LLM-generated decorations, and injecting
- * Q-values into QLearner instances via reflection.
+ * Q-values into QLearner instances via reflection. Uses the common
+ * LLMResponseParser for consistent error handling.
  */
 object QTableLoader:
-
 
   /**
    * Loads agent-specific Q-tables from multi-agent JSON into learner instances.
@@ -29,61 +29,53 @@ object QTableLoader:
     rawJson: String, 
     agentLearners: Map[String, Learner]
   ): Map[String, Try[Unit]] =
-    val cleanedJson = cleanLLMDecorations(rawJson)
     
-    // Parse the multi-agent JSON structure
-    val multiAgentQTables = parseMultiAgentQTables(cleanedJson)
+    // Use common parser for JSON extraction and cleaning
+    val cleanedJsonResult = LLMResponseParser.extractJsonContent(rawJson)
     
-    multiAgentQTables match
-      case Success(agentQTables) =>
-        // Try to load each agent's Q-table
-        val loadResults = agentLearners.map { case (agentId, learner) =>
-          agentQTables.get(agentId) match
-            case Some(qTable) =>
-              agentId -> injectQTable(learner.asInstanceOf[QLearner], qTable)
-            case None =>
-              agentId -> Failure(new RuntimeException(s"No Q-table found for agent: $agentId"))
-        }
+    cleanedJsonResult match
+      case Success(cleanedJson) =>
+        // Parse the multi-agent JSON structure
+        val multiAgentQTables = parseMultiAgentQTables(cleanedJson)
         
-        // Check if any agent succeeded
-        val successfulLoads = loadResults.values.count(_.isSuccess)
-        
-        if successfulLoads == 0 then
-          // All failed - return failures for all agents (they'll use default values)
-          loadResults
-        else
-          // Some succeeded - for failed agents, give them default (empty) Q-tables
-          loadResults.map { case (agentId, result) =>
-            result match
-              case Success(_) => agentId -> result
-              case Failure(_) => 
-                // Agent gets default optimistic initialization
-                agentId -> Success(())
-          }
+        multiAgentQTables match
+          case Success(agentQTables) =>
+            // Try to load each agent's Q-table
+            val loadResults = agentLearners.map { case (agentId, learner) =>
+              agentQTables.get(agentId) match
+                case Some(qTable) =>
+                  agentId -> injectQTable(learner.asInstanceOf[QLearner], qTable)
+                case None =>
+                  agentId -> Failure(new RuntimeException(s"No Q-table found for agent: $agentId"))
+            }
+            
+            // Check if any agent succeeded
+            val successfulLoads = loadResults.values.count(_.isSuccess)
+            
+            if successfulLoads == 0 then
+              // All failed - return failures for all agents (they'll use default values)
+              loadResults
+            else
+              // Some succeeded - for failed agents, give them default (empty) Q-tables
+              loadResults.map { case (agentId, result) =>
+                result match
+                  case Success(_) => agentId -> result
+                  case Failure(_) => 
+                    // Agent gets default optimistic initialization
+                    agentId -> Success(())
+              }
+          
+          case Failure(parseError) =>
+            // JSON parsing failed completely - all agents get failures (default values)
+            agentLearners.map { case (agentId, _) =>
+              agentId -> Failure(new RuntimeException(s"Failed to parse multi-agent Q-tables: ${parseError.getMessage}"))
+            }
       
-      case Failure(parseError) =>
-        // JSON parsing failed completely - all agents get failures (default values)
+      case Failure(extractionError) =>
+        // Content extraction failed - all agents get failures (default values)
         agentLearners.map { case (agentId, _) =>
-          agentId -> Failure(new RuntimeException(s"Failed to parse multi-agent Q-tables: ${parseError.getMessage}"))
+          agentId -> Failure(new RuntimeException(s"Failed to extract JSON content: ${extractionError.getMessage}"))
         }
-
-  /**
-   * Removes common LLM decorations from JSON strings.
-   */
-  private def cleanLLMDecorations(json: String): String =
-    val trimmed = json.trim
-    
-    // Handle markdown code blocks - remove ```json and ``` markers
-    val withoutCodeBlocks = trimmed
-      .replaceAll("```json\\s*", "")
-      .replaceAll("```\\s*", "")
-      .replaceAll("(?i)^json\\s*", "")
-      .replaceAll("(?i)^here.*?:\\s*", "")
-      .trim
-    
-    withoutCodeBlocks
-
-
 
   /**
    * Parses multi-agent Q-tables JSON into a map of agent IDs to Q-table maps.

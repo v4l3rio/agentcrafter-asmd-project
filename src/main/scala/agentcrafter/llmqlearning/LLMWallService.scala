@@ -1,5 +1,6 @@
 package agentcrafter.llmqlearning
 
+import agentcrafter.llmqlearning.loader.WallLoader
 import agentcrafter.marl.builders.SimulationBuilder
 import scala.util.matching.Regex
 import scala.util.{Failure, Success}
@@ -59,27 +60,10 @@ object LLMWallService extends LLMService[String]:
     """.stripMargin
 
   /**
-   * Extracts ASCII map from LLM response.
+   * Extracts ASCII map from LLM response using the common loader.
    */
   protected def extractContentFromResponse(response: String): Option[String] =
-    // Look for ASCII content between ```ascii and ``` tags
-    val asciiPattern = "```ascii\\s*\\n([\\s\\S]*?)\\n```".r
-    asciiPattern.findFirstMatchIn(response) match
-      case Some(m) => Some(m.group(1).trim)
-      case None =>
-        // Fallback: look for any content between ``` tags
-        val genericPattern = "```\\s*\\n([\\s\\S]*?)\\n```".r
-        genericPattern.findFirstMatchIn(response) match
-          case Some(m) => Some(m.group(1).trim)
-          case None =>
-            // Last resort: try to find lines that look like ASCII art
-            val lines = response.split("\\n")
-            val asciiLines = lines.filter(line =>
-              line.trim.nonEmpty &&
-              line.forall(c => c == '#' || c == '.' || c == ' ')
-            )
-            if asciiLines.nonEmpty then Some(asciiLines.mkString("\\n"))
-            else None
+    WallLoader.extractWallsFromResponse(response).toOption
 
   /**
    * Loads the ASCII walls into the simulation builder.
@@ -90,11 +74,10 @@ object LLMWallService extends LLMService[String]:
    *   The ASCII representation of walls
    */
   def loadIntoBuilder(builder: SimulationBuilder, asciiWalls: String): Unit =
-    try
-      builder.wallsFromAscii(asciiWalls)
-      println("Successfully loaded LLM-generated walls into simulation")
-    catch
-      case ex: Exception =>
+    WallLoader.loadIntoBuilder(builder, asciiWalls) match
+      case Success(_) =>
+        println("Successfully loaded LLM-generated walls into simulation")
+      case Failure(ex) =>
         println(s"Error loading walls into simulation: ${ex.getMessage}")
 
   /**

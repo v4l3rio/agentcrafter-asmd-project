@@ -11,6 +11,20 @@ This section covers two main LLM integration features:
 
 Both features integrate seamlessly with the MARL framework while providing optional AI enhancement capabilities.
 
+### Implementation Architecture
+
+**Core Components:**
+- `LLMQLearning` trait: Provides LLM integration capabilities
+- `LLMQTableService`: Service layer for Q-table generation and loading
+- `LLMWallService`: Service layer for wall generation and loading
+- `LLMProperties`: DSL extensions for LLM configuration
+
+**Loader Package (`agentcrafter.llmqlearning.loader`):**
+- `LLMResponseParser`: Common utilities for parsing and cleaning LLM responses
+- `QTableLoader`: Specialized loader for Q-table JSON parsing and injection
+- `WallLoader`: Specialized loader for ASCII wall content extraction and loading
+- Unified error handling and fallback strategies across all loaders
+
 ## LLM Q-Learning: AI-Powered Initialization
 
 ### Concept and Motivation
@@ -19,12 +33,6 @@ Traditional Q-Learning starts with zero or optimistically initialized Q-values, 
 
 ![LLM Q-Learning Workflow](./qtable_generation.svg)
 
-### Implementation Architecture
-
-**Core Components:**
-- `LLMQLearning` trait: Provides LLM integration capabilities
-- `QTableLoader`: Handles parsing and loading of LLM-generated Q-tables
-- `LLMProperties`: DSL extensions for LLM configuration
 
 ### How It Works
 
@@ -65,13 +73,26 @@ The generated Q-table is:
 
 ### Data Processing
 
-The system handles various LLM output formats:
+The system uses a unified loader architecture for robust LLM response handling:
 
-**Supported Formats:**
+**LLMResponseParser Features:**
+- Automatic cleaning of LLM decorations (```json, ```ascii markers)
+- Fallback strategies for various response formats
+- Content validation and error reporting
+- Support for both JSON and ASCII content extraction
+
+**QTableLoader Capabilities:**
+- Multi-agent Q-table parsing with individual fallback handling
+- Reflection-based injection into QLearner instances
+- Graceful degradation: corrupted agents use default initialization
+- Comprehensive error reporting and recovery strategies
+
+**Supported Q-Table Formats:**
 - Pure JSON Q-table data
 - Markdown-wrapped JSON (common LLM output)
+- Multi-agent JSON with per-agent Q-tables
 - Partial Q-tables (sparse initialization)
-- Error handling for malformed responses
+- Robust error handling for malformed responses
 
 ## Wall LLM: AI-Powered Environment Design
 
@@ -79,12 +100,6 @@ The system handles various LLM output formats:
 
 Creating interesting and challenging environments manually is time-consuming. Wall LLM enables natural language description of desired environments, with AI generating the corresponding wall configurations.
 
-### Implementation Architecture
-
-**Core Components:**
-- `WallLLMProperty` enum: DSL properties for wall generation
-- Natural language prompt processing
-- Wall coordinate generation and validation
 
 ### How It Works
 
@@ -116,16 +131,13 @@ The LLM processes the request and:
 - Creates interesting challenge patterns
 
 **Step 4: Validation and Integration**
-Generated walls are:
-- Validated for grid boundaries
-- Checked for accessibility
-- Integrated into the environment
-- Visualized for verification
+Generated walls are processed through the WallLoader:
+- ASCII content extraction with multiple fallback strategies
+- Structural validation (consistent line lengths, valid characters)
+- Grid boundary validation
+- Integration into the SimulationBuilder
+- Comprehensive error handling and recovery
 
-
-## Testing Strategy
-
-... TODO
 
 ### DSL Integration
 
@@ -154,19 +166,3 @@ simulation:
     Prompt >> "Create a challenging maze..."
 
 ```
-
-## Key Insights
-
-### Technical Achievements
-
-1. **Seamless Integration**: LLM features integrate naturally with existing architecture
-2. **Robust Error Handling**: System remains stable despite LLM unpredictability
-3. **Flexible Configuration**: DSL extensions maintain usability
-4. **Comprehensive Testing**: Thorough validation ensures reliability
-
-### Fundamental Limitations
-
-1. **Policy Understanding**: LLMs lack deep understanding of optimal RL policies
-2. **Spatial Reasoning**: Inconsistent performance on spatial optimization tasks
-3. **Domain Knowledge**: Limited understanding of RL-specific design principles
-4. **Consistency**: High variability in output quality

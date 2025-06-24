@@ -1,5 +1,6 @@
 package agentcrafter.llmqlearning
 
+import agentcrafter.llmqlearning.loader.QTableLoader
 import agentcrafter.marl.builders.SimulationBuilder
 import scala.util.{Failure, Success}
 
