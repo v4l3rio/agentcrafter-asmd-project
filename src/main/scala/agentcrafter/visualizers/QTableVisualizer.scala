@@ -23,6 +23,21 @@ import scala.swing.*
  */
 class QTableVisualizer(agentId: String, learner: Learner, spec: WorldSpec):
 
+  private val cellSize = Constants.DEFAULT_VISUALIZATION_CELL_SIZE
+  private val fontSize = Constants.QTABLE_FONT_SIZE
+  private val tableModel = new DefaultTableModel(
+    Array[Object]("State", "Up", "Down", "Left", "Right", "Stay"),
+    0
+  ) {
+    override def isCellEditable(row: Int, column: Int): Boolean = false
+  }
+  private val table = new JTable(tableModel)
+  table.setFont(new Font("Monospaced", Font.PLAIN, Constants.QTABLE_FONT_SIZE))
+  table.getTableHeader.setFont(new Font("Monospaced", Font.BOLD, Constants.QTABLE_FONT_SIZE))
+  private val scrollPane = new ScrollPane {
+    contents = scala.swing.Component.wrap(table)
+    preferredSize = new java.awt.Dimension(Constants.QTABLE_SCROLL_PANE_WIDTH, Constants.QTABLE_SCROLL_PANE_HEIGHT)
+  }
   val frame: MainFrame = new MainFrame {
     title = s"Q-Table: $agentId"
     contents = scrollPane
@@ -32,21 +47,6 @@ class QTableVisualizer(agentId: String, learner: Learner, spec: WorldSpec):
       Constants.WINDOW_POSITION_OFFSET + agentId.hashCode.abs % Constants.WINDOW_POSITION_Y_RANGE
     )
     visible = true
-  }
-  private val cellSize = Constants.DEFAULT_VISUALIZATION_CELL_SIZE
-  private val fontSize = Constants.QTABLE_FONT_SIZE
-  private val tableModel = new DefaultTableModel(
-    Array[Object]("State", "Up", "Down", "Left", "Right", "Stay"),
-    0
-  ) {
-    override def isCellEditable(row: Int, column: Int): Boolean = false
-  }
-  table.setFont(new Font("Monospaced", Font.PLAIN, Constants.QTABLE_FONT_SIZE))
-  table.getTableHeader.setFont(new Font("Monospaced", Font.BOLD, Constants.QTABLE_FONT_SIZE))
-  private val table = new JTable(tableModel)
-  private val scrollPane = new ScrollPane {
-    contents = scala.swing.Component.wrap(table)
-    preferredSize = new java.awt.Dimension(Constants.QTABLE_SCROLL_PANE_WIDTH, Constants.QTABLE_SCROLL_PANE_HEIGHT)
   }
 
   /**

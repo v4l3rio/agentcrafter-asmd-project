@@ -42,12 +42,6 @@ class Visualizer(
   delayMs: Int = Constants.DEFAULT_STEP_DELAY_MS
 ):
 
-  val frame: MainFrame =
-    new MainFrame:
-      title = windowTitle
-      contents = panel
-      centerOnScreen()
-      visible = true
   private val colors = Array(
     Color.blue,
     Color.magenta,
@@ -135,6 +129,13 @@ class Visualizer(
         Constants.INFO_TEXT_X_POSITION,
         infoY + Constants.INFO_TEXT_LINE_SPACING * 4
       )
+
+  val frame: MainFrame =
+    new MainFrame:
+      title = windowTitle
+      contents = panel
+      centerOnScreen()
+      visible = true
   private var singleAgentPos: Option[State] = None
   private var startPos: Option[State] = None
   private var goalPos: Option[State] = None

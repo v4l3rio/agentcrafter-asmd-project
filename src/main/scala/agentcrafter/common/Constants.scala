@@ -54,8 +54,7 @@ object Constants:
   val QTABLE_FONT_SIZE: Int = 12
   val QTABLE_SCROLL_PANE_WIDTH: Int = 600
   val QTABLE_SCROLL_PANE_HEIGHT: Int = 400
-
-  // Q-table has 6 columns: state + 5 actions
+  
   val QTABLE_TOTAL_COLUMNS: Int = 6
   val QTABLE_STATE_COLUMN_INDEX: Int = 0
   val QTABLE_ACTION_UP_INDEX: Int = 1
