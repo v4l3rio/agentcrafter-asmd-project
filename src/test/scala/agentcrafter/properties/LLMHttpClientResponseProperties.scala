@@ -12,8 +12,8 @@ import scala.util.{Failure, Success}
 
 /** Verifies LLMHttpClient’s robustness when the assistant returns rich, nested JSON. */
 object LLMHttpClientResponseProperties
-    extends Properties("LLMHttpClientResponse") with Matchers:
-  
+  extends Properties("LLMHttpClientResponse") with Matchers:
+
   private val nestedJsonGen: Gen[String] =
     for
       agent <- Gen.identifier.map(_.take(12))
@@ -25,7 +25,7 @@ object LLMHttpClientResponseProperties
       right <- Gen.choose(-1.0, 1.0)
       stay <- Gen.choose(-1.0, 1.0)
     yield s"""{"$agent":{"($row,$col)":{"Up":$up,"Down":$down,"Left":$left,"Right":$right,"Stay":$stay}}}"""
-  
+
   private val validGen: Gen[(String, String)] =
     nestedJsonGen.map { inner =>
       val outer =
@@ -75,12 +75,12 @@ object LLMHttpClientResponseProperties
         apiKey = "test",
         httpClient = mockHttp
       )
-      
+
       val result = client.callLLMWithContent(
         "prompt",
-        "gpt-4o", 
-        "simulation: {}", 
-        false, 
+        "gpt-4o",
+        "simulation: {}",
+        false,
         "/v1/chat/completions"
       )
 
