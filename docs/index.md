@@ -27,7 +27,7 @@ This roadmap explicitly shows how each component builds upon previous work, crea
 
 ## Documentation Structure
 
-The documentation follows the development journey, explaining how each component works with minimal code snippets and clear integration points for future patterns:
+The documentation follows the development journey, explaining how each component works:
 
 ### [Q-Learning](qlearning/)
 **Foundation Analysis and Implementation**
@@ -41,7 +41,7 @@ The documentation follows the development journey, explaining how each component
 ### [MARL](marl/)
 **Multi-Agent Extensions and Coordination**
 - What extends beyond basic Q-Learning: coordination mechanisms and shared environments
-- Multi-agent implementation: agent coordination, dynamic spawning, and state management
+- Multi-agent implementation: Many QTable, agent coordination and state management
 - DSL additions: enhanced syntax for multi-agent scenarios, triggers, and complex configurations
 
 *This section demonstrates how the foundation scales to support multiple coordinated agents in complex environments.*
@@ -56,13 +56,12 @@ The documentation follows the development journey, explaining how each component
 
 ### [Grammar](grammar/)
 **Complete DSL Specification**
-Comprehensive syntax reference and language specification (unchanged from original)
+Comprehensive syntax reference and language specification.
 
 ### [Conclusions](conclusions/)
 **Project Outcomes and Insights**
 - **MARL Success**: Why multi-agent coordination works effectively
 - **LLM Limitations**: Why AI integration faces significant challenges and what this teaches us
-- **Future Directions**: Recommendations based on project outcomes
 
 ## Key Results Summary
 
@@ -72,7 +71,7 @@ Comprehensive syntax reference and language specification (unchanged from origin
 
 **⚠️ LLM Integration Has Limitations**
 - Technical integration succeeds but practical benefits are limited
-- LLMs struggle with optimal policy understanding and spatial reasoning
+- LLMs struggle to understand information in a spatial environment with multiple entities interacting within it
 - Traditional algorithmic approaches often provide better reliability
 
 ## Getting Started
@@ -82,7 +81,5 @@ To understand the complete development journey:
 1. **[Q-Learning](qlearning/)** - Understand the foundational architecture and core concepts
 2. **[MARL](marl/)** - See how multi-agent features build naturally on the foundation
 3. **[LLM](llm/)** - Explore experimental AI features and their real-world limitations
-4. **[Grammar](grammar.md)** - Reference the complete DSL specification
-5. **[Conclusions](conclusions.md)** - Learn from project outcomes and insights
-
-Each section focuses on explaining concepts and integration points rather than detailed implementation, with clear directions where patterns will be introduced.
+4. **[Grammar](grammar/)** - Reference the complete DSL specification
+5. **[Conclusions](conclusions/)** - Learn from project outcomes and insights

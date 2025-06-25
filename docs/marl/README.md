@@ -1,6 +1,6 @@
 # Multi-Agent Reinforcement Learning (MARL)
 
-The MARL framework extends the foundational Q-Learning implementation to support multiple coordinated agents working together in complex environments with triggers, switches, and dynamic interactions.
+The MARL framework extends the foundational Q-Learning implementation to support multiple coordinated agents working together in complex environments with triggers/switches and dynamic interactions.
 
 ## What's Beyond Basic Q-Learning?
 
@@ -9,7 +9,7 @@ While basic Q-Learning handles single agents in static environments, MARL adds:
 ### Multi-Agent Coordination
 - **Simultaneous Learning**: Multiple agents learning and acting concurrently
 - **Shared Environment**: Agents affect each other's state transitions and rewards
-- **Coordination Mechanisms**: Triggers and switches requiring collaborative activation
+- **Coordination Mechanisms**: Switches requiring collaborative activation
 
 ### Dynamic Environment Features
 - **Trigger Systems**: Environmental elements that respond to agent actions
@@ -31,10 +31,10 @@ simulation:
       Direction >> "vertical"
       From >> (1, 6)
       To >> (6, 6)
-    block >> (2, 2)
-    block >> (3, 2)
-    block >> (5, 9)
-    block >> (6, 9)
+    Block >> (2, 2)
+    Block >> (3, 2)
+    Block >> (5, 9)
+    Block >> (6, 9)
 
   agent:
     Name >> "Opener"
@@ -131,8 +131,8 @@ simulation:
 ```
 
 These examples demonstrate two different approaches for defining walls in multi-agent scenarios:
-- **Structured walls**: Use `walls:` with `line:` and `block` elements for precise programmatic control
-- **ASCII walls**: Use `asciiWalls:` with visual string representation for intuitive maze design
+- **Structured walls**: Use `walls:` with `line:` and `Block` elements for environment design
+- **ASCII walls**: Use `asciiWalls:` with visual string representation for intuitive environment design
 
 Both showcase cooperative multi-agent scenarios with hierarchical DSL syntax, `withLearner` blocks, and coordination triggers as used in the actual codebase.
 
@@ -171,12 +171,8 @@ The MARL framework introduces a sophisticated architecture that extends the basi
 
 ## Testing Strategy
 
-### Gherkin Specifications
+### Unit Tests
 
-Behavior-driven development with Cucumber tests:
-
-**BDD Test Coverage:**
-- Multi-agent coordination scenarios
+- Multi-agent coordination
 - Trigger activation and effects
-- Complex reward distribution
 - Episode termination conditions

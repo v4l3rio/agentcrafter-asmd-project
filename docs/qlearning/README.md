@@ -7,7 +7,7 @@ This section covers the foundational Q-Learning implementation that forms the co
 The Q-Learning implementation evolved through several key phases:
 
 1. **Grid Q-Learning** - Core reinforcement learning algorithms and grid-based environments
-2. **Visual Q-Learning** - Real-time visualization and monitoring capabilities  
+2. **Visual Q-Learning** - Real-time visualization capabilities  
 3. **First DSL Version** - Initial domain-specific language for simulation configuration
 4. **Unit Tests** - Comprehensive testing to validate implementation correctness
 
@@ -66,7 +66,7 @@ The visual component adds comprehensive monitoring capabilities:
 **Visualization Features:**
 - **Live Agent Movement**: Real-time display of agent position and trajectory
 - **Q-Value Display**: Current Q-values for debugging and analysis
-- **Mode**: Visual indication of exploration vs exploitation
+- **Mode**: Visual indication of exploration/exploitation
 - **Episode Statistics**: Step count, rewards, episode count, epsilon decay
 
 ### Interactive Debugging
@@ -86,7 +86,7 @@ simulation:
   grid:
     5 x 5
   wall:
-    block >> (2, 2)
+    Block >> (2, 2)
   agent:
     Start >> (0, 0)
     Goal >> (4, 4)
@@ -95,21 +95,16 @@ simulation:
   GoalReward >> 10
   WithGUI >> true
 ```
-This example uses the same DSL syntax style as the Scala example, with indentation and property assignment, but remains minimal and single-agent.
 
 **Early DSL Features:**
 - Simple agent configuration
 - Basic environment setup
-- Learning parameter specification
 - Episode and step limits
 
 ## Testing Strategy
 
-### Unit Tests
+### Unit Tests, Behavior-drive Tests, and Property-based Tests
 
-Comprehensive testing validates:
-
-**Test Coverage:**
 - Q-Learning algorithm correctness
 - Environment state transitions
 - Parameter handling and validation

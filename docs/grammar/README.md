@@ -18,6 +18,34 @@ grid_block ::= "grid:" grid_size ;
 
 grid_size ::= number "x" number ;
 
+wall_block ::= "walls:" wall_config ;
+
+wall_config ::= wall_element+ ;
+
+wall_element ::= line_block
+               | block_property ;
+
+line_block ::= "line:" line_config ;
+
+line_config ::= line_property+ ;
+
+line_property ::= "Direction" ">>" direction
+                | "From" ">>" coordinate
+                | "To" ">>" coordinate ;
+
+direction ::= "\"horizontal\"" | "\"vertical\"" ;
+
+block_property ::= "block" ">>" coordinate ;
+
+ascii_wall_block ::= "asciiWalls:" string ;
+
+llm_wall_block ::= "wallsFromLLM:" llm_wall_config ;
+
+llm_wall_config ::= wall_llm_property+ ;
+
+wall_llm_property ::= "Model" ">>" string
+                    | "Prompt" ">>" string ;
+
 agent_block ::= "agent:" agent_config ;
 
 agent_config ::= agent_property+ ;
@@ -46,34 +74,6 @@ trigger_config ::= trigger_property+ ;
 trigger_property ::= "Give" ">>" number
                    | "OpenWall" ">>" coordinate
                    | "EndEpisode" ">>" boolean ;
-
-wall_block ::= "walls:" wall_config ;
-
-wall_config ::= wall_element+ ;
-
-wall_element ::= line_block
-               | block_property ;
-
-line_block ::= "line:" line_config ;
-
-line_config ::= line_property+ ;
-
-line_property ::= "Direction" ">>" direction
-                | "From" ">>" coordinate
-                | "To" ">>" coordinate ;
-
-direction ::= "\"horizontal\"" | "\"vertical\"" ;
-
-block_property ::= "block" ">>" coordinate ;
-
-ascii_wall_block ::= "asciiWalls:" string ;
-
-llm_wall_block ::= "wallsFromLLM:" llm_wall_config ;
-
-llm_wall_config ::= wall_llm_property+ ;
-
-wall_llm_property ::= "Model" ">>" string
-                    | "Prompt" ">>" string ;
 
 simulation_property ::= "Penalty" ">>" number
                       | "Episodes" ">>" number
@@ -111,13 +111,18 @@ string ::= "\"" [^\"]* "\"" ;
 - **grid_block**: Defines the simulation grid dimensions
 - **grid_size**: Specifies width and height using "NxM" format
 
+#### Wall Configuration
+- **wall_block**: Defines walls in the simulation
+- **ascii_wall_block**: ASCII representation of walls
+- **llm_wall_block**: LLM-generated walls
+
 #### Agent Configuration
 - **agent_block**: Defines agent properties and behavior
 - **agent_config**: Contains all agent-specific configurations
 - **agent_property**: Individual agent properties including:
-  - **name_property**: Agent identifier
-  - **start_property**: Initial position coordinates
-  - **goal_property**: Target position coordinates
+  - **Name**: Agent identifier
+  - **Start**: Initial position coordinates
+  - **Goal**: Target position coordinates
   - **learner_block**: Learning algorithm configuration
 
 #### Learner Configuration
@@ -139,11 +144,6 @@ string ::= "\"" [^\"]* "\"" ;
   - **OpenWall**: Wall position to remove
   - **EndEpisode**: Whether to end the episode
 
-#### Wall Configuration
-- **wall_block**: Defines walls in the simulation
-- **ascii_wall_block**: ASCII representation of walls
-- **llm_wall_block**: LLM-generated walls
-
 #### Simulation Control
 - **simulation_property**: Global simulation parameters:
   - **Penalty**: Movement penalty
@@ -161,90 +161,8 @@ string ::= "\"" [^\"]* "\"" ;
 - **number**: Integer or decimal numbers
 - **string**: Quoted string literals
 
-## Usage Examples
-
-### Basic Simulation
-```
-simulation:
-  grid: 10x10
-  agent:
-    Name >> "Agent1"
-    Start >> (0, 0)
-    Goal >> (9, 9)
-    withLearner:
-      Alpha >> 0.1
-      Gamma >> 0.9
-      Eps0 >> 0.3
-  Episodes >> 1000
-  WithGUI >> true
-```
-
-### LLM-Enhanced Simulation
-```
-simulation:
-  useLLM:
-    Enabled >> true
-    Model >> "gpt-4o"
-  grid: 15x15
-  agent:
-    Name >> "LLMAgent"
-    Start >> (1, 1)
-    Goal >> (14, 14)
-    withLearner:
-      Alpha >> 0.15
-      Gamma >> 0.95
-  Episodes >> 500
-  Steps >> 200
-  Delay >> 50
-  ShowAfter >> 100
-  WithGUI >> true
-```
-
-### Multi-Agent Simulation
-```
-simulation:
-  grid: 12x12
-  agent:
-    Name >> "Agent1"
-    Start >> (0, 0)
-    Goal >> (11, 11)
-    withLearner:
-      Alpha >> 0.1
-      Gamma >> 0.9
-  agent:
-    Name >> "Agent2"
-    Start >> (11, 0)
-    Goal >> (0, 11)
-    withLearner:
-      Alpha >> 0.15
-      Gamma >> 0.85
-  Episodes >> 2000
-  WithGUI >> true
-```
-
-## Grammar Notes
-
-### Syntax Rules
-1. **Case Sensitivity**: All keywords and property names are case-sensitive
-2. **Whitespace**: Whitespace is generally ignored except within string literals
-3. **Comments**: The grammar does not currently support comments
-4. **Termination**: Statements are terminated by the end of the property assignment
 
 ### Property Assignment
 - Uses the `>>` operator for all property assignments
 - Format: `PropertyName >> Value`
 - Values must match the expected type for each property
-
-### Block Structure
-- Blocks are defined using `:` after the block name
-- Block content is indented (though indentation is not grammatically required)
-- Nested blocks are supported (e.g., `withLearner:` within `agent:`)
-
-### Optional Elements
-- Elements marked with `?` are optional
-- Elements marked with `+` require at least one occurrence
-- Elements without modifiers are required exactly once
-
----
-
-*This grammar specification defines the complete syntax for AgentCrafter DSL configurations, enabling precise and flexible definition of reinforcement learning simulations with optional LLM integration.*

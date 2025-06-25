@@ -45,7 +45,7 @@ The system analyzes the grid environment, including:
 **Step 2: Prompt Generation**
 A structured prompt is created describing:
 - The reinforcement learning scenario
-- Grid layout with ASCII representation
+- Environment characteristics
 - Optimal policy requirements
 - Expected Q-table format
 - Uses templates stored in `src/main/resources/prompts/`:
@@ -83,7 +83,7 @@ The system uses a unified loader architecture for robust LLM response handling:
 
 **QTableLoader Capabilities:**
 - Multi-agent Q-table parsing with individual fallback handling
-- Reflection-based injection into QLearner instances
+- Injection into QLearner instances
 - Graceful degradation: corrupted agents use default initialization
 - Comprehensive error reporting and recovery strategies
 
@@ -166,3 +166,10 @@ simulation:
     Prompt >> "Create a challenging maze..."
 
 ```
+
+## Testing Strategy
+
+### Unit Tests, Behavior-driven Tests, Property-based Tests and Mocking
+
+- Mock LLM responses for predictable Q-table generation
+- Validate Q-table structure and content
