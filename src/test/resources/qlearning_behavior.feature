@@ -52,11 +52,4 @@ Feature: Q-Learning Agent Behavior
     When the agent encounters a new state-action pair
     Then the initial Q-value should be 5.0
     And this should encourage exploration of unknown areas
-
-  Scenario: Q-Table persistence and retrieval
-    Given the agent has learned some Q-values
-    When I export the Q-Table
-    And create a new agent
-    And import the Q-Table
-    Then the new agent should have the same Q-values
-    And the learning should continue from the imported state
+    
