@@ -60,12 +60,7 @@ object LLMWallService extends LLMService[String]:
        |Please generate the ASCII map now based on the above requirements and context:
     """.stripMargin
 
-  /**
-   * Alias for backward compatibility.
-   */
-  def loadWallsIntoBuilder(builder: SimulationBuilder, asciiWalls: String): Unit =
-    loadIntoBuilder(builder, asciiWalls)
-
+  
   /**
    * Loads the ASCII walls into the simulation builder.
    *

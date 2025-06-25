@@ -51,7 +51,7 @@ trait LLMQLearning extends SimulationDSL:
         ) match
           case Some(asciiWalls) =>
             println(s"LLM wall generation successful, loading walls...")
-            LLMWallService.loadWallsIntoBuilder(wrapper.builder, asciiWalls)
+            LLMWallService.loadIntoBuilder(wrapper.builder, asciiWalls)
           case None =>
             println("LLM wall generation failed, proceeding without generated walls")
     }
